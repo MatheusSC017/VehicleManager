@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Veículos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+        .sidebar.collapsed {
+            width: 70px;
+        }
+        .sidebar.collapsed .menu-text {
+            display: none;
+        }
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+        .sidebar.collapsed .menu-item {
+            justify-content: center;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .status-available {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .status-reserved {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        .status-sold {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <div class="sidebar bg-blue-800 text-white w-64 flex flex-col">
+            <div class="p-4 flex items-center space-x-3 border-b border-blue-700">
+                <i class="fas fa-car text-2xl"></i>
+                <span class="logo-text font-bold text-xl">AutoGest</span>
+            </div>
+
+            <div class="p-4 flex justify-between items-center border-b border-blue-700">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <div class="font-medium">Admin</div>
+                        <div class="text-xs text-blue-200">Administrador</div>
+                    </div>
+                </div>
+                <button id="toggleSidebar" class="text-blue-200 hover:text-white">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <nav class="flex-1 overflow-y-auto p-4 space-y-2">
+                <a href="#" class="menu-item flex items-center space-x-3 p-2 rounded hover:bg-blue-700 bg-blue-700">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span class="menu-text">Dashboard</span>
+                </a>
+
+                <div class="mt-6 text-xs uppercase text-blue-300 px-2 menu-text">Gerenciamento</div>
+
+                <a href="#" class="menu-item flex items-center space-x-3 p-2 rounded hover:bg-blue-700">
+                    <i class="fas fa-car"></i>
+                    <span class="menu-text">Veículos</span>
+                </a>
+
+                <a href="#" class="menu-item flex items-center space-x-3 p-2 rounded hover:bg-blue-700">
+                    <i class="fas fa-users"></i>
+                    <span class="menu-text">Clientes</span>
+                </a>
+
+                <a href="#" class="menu-item flex items-center space-x-3 p-2 rounded hover:bg-blue-700">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <span class="menu-text">Financiamentos</span>
+                </a>
+
+                <div class="mt-6 text-xs uppercase text-blue-300 px-2 menu-text">Outros</div>
+
+                <a href="#" class="menu-item flex items-center space-x-3 p-2 rounded hover:bg-blue-700">
+                    <i class="fas fa-cog"></i>
+                    <span class="menu-text">Configurações</span>
+                </a>
+
+                <a href="#" class="menu-item flex items-center space-x-3 p-2 rounded hover:bg-blue-700">
+                    <i class="fas fa-question-circle"></i>
+                    <span class="menu-text">Ajuda</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-blue-700">
+                <a href="#" class="menu-item flex items-center space-x-3 p-2 rounded hover:bg-blue-700">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="menu-text">Sair</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-800">Veículos Disponíveis</h1>
+
+                <div class="flex space-x-4">
+                    <div class="relative">
+                        <input type="text" placeholder="Buscar veículo..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+
+                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
+                        <i class="fas fa-plus"></i>
+                        <span>Adicionar Veículo</span>
+                    </button>
+                </div>
+            </header>
+
+            <main class="p-6">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl shadow">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-500">Total de Veículos</p>
+                                <h3 class="text-2xl font-bold">48</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <i class="fas fa-car text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-500">Disponíveis</p>
+                                <h3 class="text-2xl font-bold">32</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                <i class="fas fa-check-circle text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="text-gray-500">Vendidos (Mês)</p>
+                                <h3 class="text-2xl font-bold">5</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-purple-100 text-purple-600">
+                                <i class="fas fa-chart-line text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="bg-white p-4 rounded-xl shadow mb-6">
+                    <div class="flex flex-wrap items-center gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                            <select class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option>Todos</option>
+                                <option>Disponível</option>
+                                <option>Reservado</option>
+                                <option>Vendido</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
+                            <select class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option>Todas</option>
+                                <option>Volkswagen</option>
+                                <option>Fiat</option>
+                                <option>Chevrolet</option>
+                                <option>Ford</option>
+                                <option>Hyundai</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Ano</label>
+                            <select class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option>Todos</option>
+                                <option>2023</option>
+                                <option>2022</option>
+                                <option>2021</option>
+                                <option>2020</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Preço</label>
+                            <select class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option>Todos</option>
+                                <option>Até R$ 50.000</option>
+                                <option>R$ 50.000 - R$ 100.000</option>
+                                <option>Acima de R$ 100.000</option>
+                            </select>
+                        </div>
+
+                        <button class="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                            Aplicar Filtros
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Vehicles Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <!-- Vehicle Card 1 -->
+                    <div class="bg-white rounded-xl shadow overflow-hidden transition-all duration-300 card-hover">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Vehicle" class="w-full h-48 object-cover">
+                            <div class="absolute top-2 right-2 status-available px-2 py-1 rounded-full text-xs font-medium">
+                                Disponível
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-lg">Volkswagen Golf</h3>
+                                    <p class="text-gray-500">2022 • 15.000 km</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500">Código</p>
+                                    <p class="font-mono font-bold">VG-2022-001</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm text-gray-500">Preço</p>
+                                    <p class="font-bold text-blue-600">R$ 125.900</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Card 2 -->
+                    <div class="bg-white rounded-xl shadow overflow-hidden transition-all duration-300 card-hover">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Vehicle" class="w-full h-48 object-cover">
+                            <div class="absolute top-2 right-2 status-reserved px-2 py-1 rounded-full text-xs font-medium">
+                                Reservado
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-lg">Fiat Toro</h3>
+                                    <p class="text-gray-500">2021 • 25.000 km</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500">Código</p>
+                                    <p class="font-mono font-bold">FT-2021-015</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm text-gray-500">Preço</p>
+                                    <p class="font-bold text-blue-600">R$ 98.500</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Card 3 -->
+                    <div class="bg-white rounded-xl shadow overflow-hidden transition-all duration-300 card-hover">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Vehicle" class="w-full h-48 object-cover">
+                            <div class="absolute top-2 right-2 status-available px-2 py-1 rounded-full text-xs font-medium">
+                                Disponível
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-lg">Chevrolet Onix</h3>
+                                    <p class="text-gray-500">2023 • 5.000 km</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500">Código</p>
+                                    <p class="font-mono font-bold">CO-2023-007</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm text-gray-500">Preço</p>
+                                    <p class="font-bold text-blue-600">R$ 72.300</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Card 4 -->
+                    <div class="bg-white rounded-xl shadow overflow-hidden transition-all duration-300 card-hover">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Vehicle" class="w-full h-48 object-cover">
+                            <div class="absolute top-2 right-2 status-sold px-2 py-1 rounded-full text-xs font-medium">
+                                Vendido
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-lg">Ford Ranger</h3>
+                                    <p class="text-gray-500">2020 • 40.000 km</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500">Código</p>
+                                    <p class="font-mono font-bold">FR-2020-022</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm text-gray-500">Preço</p>
+                                    <p class="font-bold text-blue-600">R$ 145.000</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Card 5 -->
+                    <div class="bg-white rounded-xl shadow overflow-hidden transition-all duration-300 card-hover">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Vehicle" class="w-full h-48 object-cover">
+                            <div class="absolute top-2 right-2 status-available px-2 py-1 rounded-full text-xs font-medium">
+                                Disponível
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-lg">Hyundai HB20</h3>
+                                    <p class="text-gray-500">2022 • 18.000 km</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500">Código</p>
+                                    <p class="font-mono font-bold">HH-2022-009</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm text-gray-500">Preço</p>
+                                    <p class="font-bold text-blue-600">R$ 67.800</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Card 6 -->
+                    <div class="bg-white rounded-xl shadow overflow-hidden transition-all duration-300 card-hover">
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Vehicle" class="w-full h-48 object-cover">
+                            <div class="absolute top-2 right-2 status-available px-2 py-1 rounded-full text-xs font-medium">
+                                Disponível
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h3 class="font-bold text-lg">Jeep Renegade</h3>
+                                    <p class="text-gray-500">2021 • 22.000 km</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500">Código</p>
+                                    <p class="font-mono font-bold">JR-2021-012</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-4 flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm text-gray-500">Preço</p>
+                                    <p class="font-bold text-blue-600">R$ 112.500</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="mt-8 flex justify-center">
+                    <nav class="inline-flex rounded-md shadow">
+                        <a href="#" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                        <a href="#" class="px-4 py-2 border-t border-b border-gray-300 bg-white text-blue-600 font-medium">1</a>
+                        <a href="#" class="px-4 py-2 border-t border-b border-gray-300 bg-white text-gray-500 hover:bg-gray-50">2</a>
+                        <a href="#" class="px-4 py-2 border-t border-b border-gray-300 bg-white text-gray-500 hover:bg-gray-50">3</a>
+                        <a href="#" class="px-4 py-2 border-t border-b border-gray-300 bg-white text-gray-500 hover:bg-gray-50">4</a>
+                        <a href="#" class="px-4 py-2 border-t border-b border-gray-300 bg-white text-gray-500 hover:bg-gray-50">5</a>
+                        <a href="#" class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </nav>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Toggle sidebar
+        document.getElementById('toggleSidebar').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+        });
+
+        // Sample vehicle data (in a real app, this would come from an API)
+        const vehicles = [
+            {
+                id: 1,
+                code: "VG-2022-001",
+                brand: "Volkswagen",
+                model: "Golf",
+                year: 2022,
+                mileage: 15000,
+                price: 125900,
+                status: "available",
+                image: "https://source.unsplash.com/random/600x400/?car,1"
+            },
+            {
+                id: 2,
+                code: "FT-2021-015",
+                brand: "Fiat",
+                model: "Toro",
+                year: 2021,
+                mileage: 25000,
+                price: 98500,
+                status: "reserved",
+                image: "https://source.unsplash.com/random/600x400/?car,2"
+            },
+            // More vehicles would be here...
+        ];
+
+        // In a real application, you would use this data to dynamically generate the vehicle cards
+        // For example:
+        /*
+        function renderVehicles() {
+            const container = document.querySelector('.grid');
+            container.innerHTML = '';
+
+            vehicles.forEach(vehicle => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow overflow-hidden transition-all duration-300 card-hover';
+                card.innerHTML = `
+                    <div class="relative">
+                        <img src="${vehicle.image}" alt="${vehicle.brand} ${vehicle.model}" class="w-full h-48 object-cover">
+                        <div class="absolute top-2 right-2 status-${vehicle.status} px-2 py-1 rounded-full text-xs font-medium">
+                            ${vehicle.status === 'available' ? 'Disponível' : vehicle.status === 'reserved' ? 'Reservado' : 'Vendido'}
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-bold text-lg">${vehicle.brand} ${vehicle.model}</h3>
+                                <p class="text-gray-500">${vehicle.year} • ${vehicle.mileage.toLocaleString()} km</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">Código</p>
+                                <p class="font-mono font-bold">${vehicle.code}</p>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 flex justify-between items-center">
+                            <div>
+                                <p class="text-sm text-gray-500">Preço</p>
+                                <p class="font-bold text-blue-600">R$ ${vehicle.price.toLocaleString()}</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        renderVehicles();
+        */
+    </script>
+
+</body>
+
+</html>
