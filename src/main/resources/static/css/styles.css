@@ -1,0 +1,40 @@
+.sidebar {
+            transition: all 0.3s ease;
+        }
+        .sidebar.collapsed {
+            width: 70px;
+        }
+        .sidebar.collapsed .menu-text {
+            display: none;
+        }
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+        .sidebar.collapsed .menu-item {
+            justify-content: center;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .status-available {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        .status-reserved {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        .status-sold {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .form-section {
+            transition: all 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+        }
+        .form-section.active {
+            max-height: 1000px;
+            padding: 1.5rem;
+        }
