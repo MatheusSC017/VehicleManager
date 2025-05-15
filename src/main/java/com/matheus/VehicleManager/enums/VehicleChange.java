@@ -3,12 +3,18 @@ package com.matheus.VehicleManager.enums;
 public enum VehicleChange {
 
     MANUAL("Manual"),
-    AUTOMATIC("Automatic"),
-    AUTOMATED("Automated"),
+    AUTOMATIC("Automático"),
+    AUTOMATED("Automatizado"),
     CVT("CVT");
 
     private String vehicleChange;
 
-    private VehicleChange(String vehicleChange) { this.vehicleChange = vehicleChange; }
+    private VehicleChange(String vehicleChange) {
+        this.vehicleChange = vehicleChange;
+    }
+
+    public String getVehicleChange() {
+        return this.vehicleChange;
+    }
 
 }
