@@ -24,6 +24,8 @@ public class VehicleController {
     public ModelAndView index() {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicles");
+        System.out.println(vehicleRepository.findAll());
+        modelAndView.addObject("vehiclesList", vehicleRepository.findAll());
         return modelAndView;
     }
 
