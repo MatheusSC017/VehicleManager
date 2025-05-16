@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Gestão de Veículos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body class="bg-gray-50">
+<div class="flex h-screen overflow-hidden">
+    <div th:replace="fragments/fragments :: sidebar"></div>
+
+    <div class="flex-1 overflow-auto">
+        <header class="bg-white shadow-sm p-4 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Detalhes do Veículo</h1>
+                <nav aria-label="Breadcrumb" class="flex mt-1">
+                    <ol class="inline-flex items-center space-x-1 md:space-x-2">
+                        <li class="inline-flex items-center">
+                            <a class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600"
+                               href="dashboard.html">
+                                <i class="fas fa-home mr-2"></i>
+                                Home
+                            </a>
+                        </li>
+                        <li>
+                            <div class="flex items-center">
+                                <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                                <a class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2"
+                                   href="vehicles.html">Veículos</a>
+                            </div>
+                        </li>
+                        <li aria-current="page">
+                            <div class="flex items-center">
+                                <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                                <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Detalhes</span>
+                            </div>
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="flex space-x-4">
+                <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg flex items-center space-x-2"
+                        onclick="window.location.href='vehicles.html'">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Voltar</span>
+                </button>
+            </div>
+        </header>
+
+        <main class="p-6">
+            <!-- Vehicle Details Card -->
+            <div class="bg-white rounded-xl shadow overflow-hidden">
+                <!-- Vehicle Header -->
+                <div class="bg-blue-600 text-white px-6 py-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-xl font-bold">Volkswagen Golf 1.4 TSI</h2>
+                            <p class="text-blue-100">Ano 2022 • 15.000 km</p>
+                        </div>
+                        <span class="bg-white text-blue-600 px-3 py-1 rounded-full text-sm font-semibold">Disponível</span>
+                    </div>
+                </div>
+
+                <!-- Vehicle Content -->
+                <div class="p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6"
+                        th:object="${vehicle}">
+                        <!-- Vehicle Image -->
+                        <div class="lg:col-span-1">
+                            <div class="relative">
+                                <img alt="Volkswagen Golf"
+                                     class="vehicle-image w-full"
+                                     src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80">
+                                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
+                                    <div class="text-2xl font-bold">R$ <span th:text="*{price}"></span></div>
+                                    <div class="text-sm">Placa: <span th:text="*{plate}"></span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vehicle Details -->
+                        <div class="lg:col-span-2">
+                            <div class="mb-6">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                    <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                                    Informações Básicas
+                                </h3>
+                                <div class="specs-grid">
+                                    <div class="spec-card">
+                                        <div class="text-sm text-gray-500">Marca</div>
+                                        <div class="font-medium" th:text="*{brand}"></div>
+                                    </div>
+                                    <div class="spec-card">
+                                        <div class="text-sm text-gray-500">Modelo</div>
+                                        <div class="font-medium" th:text="*{model}"></div>
+                                    </div>
+                                    <div class="spec-card">
+                                        <div class="text-sm text-gray-500">Ano</div>
+                                        <div class="font-medium" th:text="*{year}"></div>
+                                    </div>
+                                    <div class="spec-card">
+                                        <div class="text-sm text-gray-500">Cor</div>
+                                        <div class="font-medium" th:text="*{color}"></div>
+                                    </div>
+                                    <div class="spec-card">
+                                        <div class="text-sm text-gray-500">Chassi</div>
+                                        <div class="font-medium" th:text="*{chassi}"></div>
+                                    </div>
+                                    <div class="spec-card">
+                                        <div class="text-sm text-gray-500">Quilometragem</div>
+                                        <div class="font-medium"><span th:text="*{mileage}"></span> km</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                                    <i class="fas fa-cogs mr-2 text-blue-500"></i>
+                                    Especificações Técnicas
+                                </h3>
+                                <div class="specs-grid">
+                                    <div class="spec-card">
+                                        <div class="text-sm text-gray-500">Tipo</div>
+                                        <div class="font-medium" th:text="*{vehicleType}"></div>
+                                    </div>
+                                    <div class="spec-card">
+                                        <div class="text-sm text-gray-500">Combustível</div>
+                                        <div class="font-medium" th:text="*{vehicleFuel}"></div>
+                                    </div>
+                                    <div class="spec-card">
+                                        <div class="text-sm text-gray-500">Câmbio</div>
+                                        <div class="font-medium" th:text="*{vehicleChange}"></div>
+                                    </div>
+                                    <div class="spec-card">
+                                        <div class="text-sm text-gray-500">Portas</div>
+                                        <div class="font-medium" th:text="*{doors}"></div>
+                                    </div>
+                                    <div class="spec-card">
+                                        <div class="text-sm text-gray-500">Motor</div>
+                                        <div class="font-medium" th:text="*{motor}"></div>
+                                    </div>
+                                    <div class="spec-card">
+                                        <div class="text-sm text-gray-500">Potência</div>
+                                        <div class="font-medium" th:text="*{power}"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end pt-6 border-t border-gray-200">
+                                <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center space-x-2"
+                                        onclick="window.location.href='edit-vehicle.html'">
+                                    <i class="fas fa-edit"></i>
+                                    <span>Editar Veículo</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // Toggle sidebar
+    document.getElementById('toggleSidebar').addEventListener('click', function() {
+        document.querySelector('.sidebar').classList.toggle('collapsed');
+    });
+
+    // Toggle form sections
+    function toggleSection(sectionId) {
+        const section = document.getElementById(sectionId);
+        const icon = document.getElementById(sectionId + 'Icon');
+
+        section.classList.toggle('active');
+
+        if (section.classList.contains('active')) {
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+        } else {
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+        }
+    }
+
+    // File input display
+    document.getElementById('crvFile').addEventListener('change', function(e) {
+        const fileName = e.target.files[0] ? e.target.files[0].name : 'Nenhum arquivo selecionado';
+        document.getElementById('crvText').value = fileName;
+    });
+
+    document.getElementById('invoiceFile').addEventListener('change', function(e) {
+        const fileName = e.target.files[0] ? e.target.files[0].name : 'Nenhum arquivo selecionado';
+        document.getElementById('invoiceText').value = fileName;
+    });
+
+    document.getElementById('ipvaFile').addEventListener('change', function(e) {
+        const fileName = e.target.files[0] ? e.target.files[0].name : 'Nenhum arquivo selecionado';
+        document.getElementById('ipvaText').value = fileName;
+    });
+
+    document.getElementById('insuranceFile').addEventListener('change', function(e) {
+        const fileName = e.target.files[0] ? e.target.files[0].name : 'Nenhum arquivo selecionado';
+        document.getElementById('insuranceText').value = fileName;
+    });
+
+    // Image preview functionality
+    document.getElementById('dropzone-file').addEventListener('change', function(e) {
+        const previewContainer = document.getElementById('preview-container');
+        previewContainer.innerHTML = '';
+
+        if (e.target.files) {
+            Array.from(e.target.files).forEach(file => {
+                const reader = new FileReader();
+
+                reader.onload = function(event) {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'relative group';
+
+                    previewDiv.innerHTML = `
+                        <img src="${event.target.result}" class="h-32 w-full object-cover rounded-lg">
+                        <button type="button" class="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                            <i class="fas fa-times text-xs"></i>
+                        </button>
+                    `;
+
+                    previewContainer.appendChild(previewDiv);
+                }
+
+                reader.readAsDataURL(file);
+            });
+        }
+    });
+
+    // Form submission
+    document.getElementById('vehicleForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Here you would normally send the form data to the server
+        // For this example, we'll just show an alert
+        alert('Veículo cadastrado com sucesso!');
+        window.location.href = 'vehicles.html';
+    });
+</script>
+</body>
+</html>

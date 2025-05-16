@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -21,18 +22,19 @@ public class VehicleController {
     private VehicleRepository vehicleRepository;
 
     @GetMapping("/veiculos")
-    public ModelAndView index() {
+    public ModelAndView vehicles() {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicles");
-        System.out.println(vehicleRepository.findAll());
         modelAndView.addObject("vehiclesList", vehicleRepository.findAll());
         return modelAndView;
     }
 
     @GetMapping("/veiculos/{id}")
-    public ModelAndView select() {
+    public ModelAndView vehicle(@PathVariable("id") Long id) {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("vehicles/vehicles");
+        modelAndView.setViewName("vehicles/vehicle");
+        Vehicle vehicle = vehicleRepository.getReferenceById(id);
+        modelAndView.addObject("vehicle", vehicle);
         return modelAndView;
     }
 
@@ -48,11 +50,9 @@ public class VehicleController {
     public ModelAndView insertVehicle(@Valid Vehicle vehicle, BindingResult bindingResult) {
         ModelAndView modelAndView = new ModelAndView();
         if (bindingResult.hasErrors()) {
-            System.out.println(bindingResult.getAllErrors());
             modelAndView.setViewName("vehicles/vehicle_register");
             modelAndView.addObject("vehicle");
         } else {
-            System.out.println("HEREEEEEEEEEEEEEEEEEEEEEEE22");
             modelAndView.setViewName("redirect:/veiculos");
             vehicleRepository.save(vehicle);
         }
@@ -62,7 +62,14 @@ public class VehicleController {
     @GetMapping("/veiculos/editar/{id}")
     public ModelAndView update() {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("vehicles/vehicle_register");
+        modelAndView.setViewName("vehicles/vehicles");
+        return modelAndView;
+    }
+
+    @GetMapping("/veiculos/editar/{id}/delete")
+    public ModelAndView delete() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("vehicles/vehicles");
         return modelAndView;
     }
 

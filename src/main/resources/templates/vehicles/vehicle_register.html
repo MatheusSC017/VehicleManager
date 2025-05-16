@@ -60,7 +60,7 @@
                 </div>
 
                 <!-- Form Content -->
-                <form class="p-6" id="vehicleForm" action="/veiculos/cadastrar" th:object="${vehicle}" method="post">
+                <form action="/veiculos/cadastrar" class="p-6" id="vehicleForm" method="post" th:object="${vehicle}">
                     <!-- Basic Information Section -->
                     <div class="mb-8">
                         <div class="flex items-center justify-between cursor-pointer"
@@ -82,8 +82,8 @@
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                            placeholder="Ex: Volkswagen, Fiat, Ford"
                                            required
-                                           type="text"
-                                           th:field="*{brand}">
+                                           th:field="*{brand}"
+                                           type="text">
                                 </div>
 
                                 <div>
@@ -94,8 +94,8 @@
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                            placeholder="Ex: Golf, Onix, HB20"
                                            required
-                                           type="text"
-                                           th:field="*{model}">
+                                           th:field="*{model}"
+                                           type="text">
                                 </div>
 
                                 <div>
@@ -106,8 +106,8 @@
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                            placeholder="Ex: 2023, 2022, 2021"
                                            required
-                                           type="text"
-                                           th:field="*{year}">
+                                           th:field="*{year}"
+                                           type="text">
                                 </div>
 
                                 <div>
@@ -117,8 +117,8 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Placa</label>
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                            placeholder="Ex: ABC1D23"
-                                           type="text"
-                                           th:field="*{plate}">
+                                           th:field="*{plate}"
+                                           type="text">
                                 </div>
 
                                 <div>
@@ -128,8 +128,8 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Chassi</label>
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                            placeholder="Número do chassi"
-                                           type="text"
-                                           th:field="*{chassi}">
+                                           th:field="*{chassi}"
+                                           type="text">
                                 </div>
 
                                 <div>
@@ -140,24 +140,26 @@
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                            placeholder="Ex: Branco, Preto, Vermelho"
                                            required
-                                           type="text"
-                                           th:field="*{color}">
+                                           th:field="*{color}"
+                                           type="text">
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('mileage')}">
+                                    <div class="alert alert-danger" role="alert"
+                                         th:if="${#fields.hasErrors('mileage')}">
                                         <label class="validation-message" th:erros="*{mileage}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Quilometragem*</label>
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                            placeholder="Ex: 15000"
                                            required
-                                           type="number"
-                                           th:field="*{mileage}">
+                                           th:field="*{mileage}"
+                                           type="number">
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('vehicleStatus')}">
+                                    <div class="alert alert-danger" role="alert"
+                                         th:if="${#fields.hasErrors('vehicleStatus')}">
                                         <label class="validation-message" th:erros="*{vehicleStatus}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Status*</label>
@@ -166,7 +168,7 @@
                                             th:field="*{vehicleStatus}">
                                         <option value="">Selecione</option>
                                         <option th:each="status : ${T(com.matheus.VehicleManager.enums.VehicleStatus).values()}"
-                                                th:value="${status}" th:text="${status.getVehicleStatus()}"></option>
+                                                th:text="${status.getVehicleStatus()}" th:value="${status}"></option>
                                     </select>
                                 </div>
 
@@ -180,8 +182,8 @@
                                         <input class="w-full border rounded-lg pl-8 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                placeholder="0,00"
                                                required
-                                               type="text"
-                                               th:field="*{price}">
+                                               th:field="*{price}"
+                                               type="text">
                                     </div>
                                 </div>
                             </div>
@@ -202,41 +204,44 @@
                         <div class="form-section" id="techSpecs">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
                                 <div>
-                                    <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('vehicleType')}">
+                                    <div class="alert alert-danger" role="alert"
+                                         th:if="${#fields.hasErrors('vehicleType')}">
                                         <label class="validation-message" th:erros="*{vehicleType}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Veículo</label>
                                     <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        th:field="*{vehicleType}">
+                                            th:field="*{vehicleType}">
                                         <option value="">Selecione</option>
                                         <option th:each="type : ${T(com.matheus.VehicleManager.enums.VehicleType).values()}"
-                                                th:value="${type}" th:text="${type.getVehicleType()}"></option>
+                                                th:text="${type.getVehicleType()}" th:value="${type}"></option>
                                     </select>
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('vehicleFuel')}">
+                                    <div class="alert alert-danger" role="alert"
+                                         th:if="${#fields.hasErrors('vehicleFuel')}">
                                         <label class="validation-message" th:erros="*{vehicleFuel}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Combustível</label>
                                     <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        th:field="*{vehicleFuel}">
+                                            th:field="*{vehicleFuel}">
                                         <option value="">Selecione</option>
                                         <option th:each="fuel : ${T(com.matheus.VehicleManager.enums.VehicleFuel).values()}"
-                                                th:value="${fuel}" th:text="${fuel.getVehicleFuel()}"></option>
+                                                th:text="${fuel.getVehicleFuel()}" th:value="${fuel}"></option>
                                     </select>
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('vehicleChange')}">
+                                    <div class="alert alert-danger" role="alert"
+                                         th:if="${#fields.hasErrors('vehicleChange')}">
                                         <label class="validation-message" th:erros="*{vehicleChange}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Câmbio</label>
                                     <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        th:field="*{vehicleChange}">
+                                            th:field="*{vehicleChange}">
                                         <option value="">Selecione</option>
                                         <option th:each="change : ${T(com.matheus.VehicleManager.enums.VehicleChange).values()}"
-                                                th:value="${change}" th:text="${change.getVehicleChange()}"></option>
+                                                th:text="${change.getVehicleChange()}" th:value="${change}"></option>
                                     </select>
                                 </div>
 
@@ -246,11 +251,11 @@
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Portas</label>
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                           placeholder="Ex: 2, 3, 4"
-                                           min="1"
                                            max="4"
-                                           type="number"
-                                           th:field="*{doors}">
+                                           min="1"
+                                           placeholder="Ex: 2, 3, 4"
+                                           th:field="*{doors}"
+                                           type="number">
                                 </div>
 
                                 <div>
@@ -260,8 +265,8 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Motor</label>
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                            placeholder="Ex: 1.0, 1.4, 2.0"
-                                           type="text"
-                                           th:field="*{motor}">
+                                           th:field="*{motor}"
+                                           type="text">
                                 </div>
 
                                 <div>
@@ -271,8 +276,8 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Potência (cv)</label>
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                            placeholder="Ex: 120"
-                                           type="number"
-                                           th:field="*{power}">
+                                           th:field="*{power}"
+                                           type="number">
                                 </div>
                             </div>
                         </div>

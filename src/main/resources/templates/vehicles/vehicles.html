@@ -14,11 +14,12 @@
 
     <div class="flex-1 overflow-auto">
         <header class="bg-white shadow-sm p-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold text-gray-800">Veículos Disponíveis</h1>
+            <h1 class="text-2xl font-bold text-gray-800">Veículos</h1>
 
             <div class="flex space-x-4">
                 <div class="relative">
-                    <input class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Buscar veículo..."
+                    <input class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="Buscar veículo..."
                            type="text">
                     <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                 </div>
@@ -39,25 +40,28 @@
 
             <!-- Vehicles Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                th:each="vehicle : ${vehiclesList}">
+                 th:each="vehicle : ${vehiclesList}">
 
                 <div class="bg-white rounded-xl shadow overflow-hidden transition-all duration-300 card-hover">
                     <div class="relative">
                         <img alt="Vehicle"
-                             class="w-full h-48 object-cover" src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
+                             class="w-full h-48 object-cover"
+                             src="https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80">
                         <div class="absolute top-2 right-2 status-available px-2 py-1 rounded-full text-xs font-medium"
-                            th:text="${vehicle.vehicleStatus}">
+                             th:text="${vehicle.vehicleStatus.getVehicleStatus()}">
                         </div>
                     </div>
                     <div class="p-4">
                         <div class="flex justify-between items-start">
                             <div>
-                                <h3 class="font-bold text-lg"><span th:text="${vehicle.brand}"></span> <span th:text="${vehicle.model}"></span></h3>
-                                <p class="text-gray-500"><span th:text="${vehicle.year}"></span> • <span th:text="${vehicle.mileage}"></span> km</p>
+                                <h3 class="font-bold text-lg"><span th:text="${vehicle.brand}"></span> <span
+                                        th:text="${vehicle.model}"></span></h3>
+                                <p class="text-gray-500"><span th:text="${vehicle.year}"></span> • <span
+                                        th:text="${vehicle.mileage}"></span> km</p>
                             </div>
                             <div class="text-right">
                                 <p class="text-sm text-gray-500"><span th:text="${vehicle.doors}"></span> portas</p>
-                                <p class="font-mono font-bold" ><span th:text="${vehicle.color}"></span></p>
+                                <p class="font-mono font-bold"><span th:text="${vehicle.color}"></span></p>
                             </div>
                         </div>
 
@@ -67,9 +71,11 @@
                                 <p class="font-bold text-blue-600">R$ <span th:text="${vehicle.price}"></span></p>
                             </div>
                             <div class="flex space-x-2">
-                                <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
-                                    <i class="fas fa-edit"></i>
-                                </button>
+                                <a th:href="@{/veiculos/{id}(id=${vehicle.id})}">
+                                    <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </a>
                                 <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
                                     <i class="fas fa-trash"></i>
                                 </button>
