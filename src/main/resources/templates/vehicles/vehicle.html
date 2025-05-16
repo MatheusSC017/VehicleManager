@@ -43,11 +43,13 @@
             </div>
 
             <div class="flex space-x-4">
-                <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg flex items-center space-x-2"
-                        onclick="window.location.href='vehicles.html'">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Voltar</span>
-                </button>
+                <a href="/veiculos">
+                    <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg flex items-center space-x-2"
+                            onclick="window.location.href='vehicles.html'">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Voltar</span>
+                    </button>
+                </a>
             </div>
         </header>
 
@@ -68,7 +70,7 @@
                 <!-- Vehicle Content -->
                 <div class="p-6">
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6"
-                        th:object="${vehicle}">
+                         th:object="${vehicle}">
                         <!-- Vehicle Image -->
                         <div class="lg:col-span-1">
                             <div class="relative">
@@ -151,11 +153,13 @@
                             </div>
 
                             <div class="flex justify-end pt-6 border-t border-gray-200">
-                                <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center space-x-2"
-                                        onclick="window.location.href='edit-vehicle.html'">
-                                    <i class="fas fa-edit"></i>
-                                    <span>Editar Veículo</span>
-                                </button>
+                                <a th:href="@{/veiculos/{id}/editar(id=${id})}">
+                                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center space-x-2"
+                                            onclick="window.location.href='edit-vehicle.html'">
+                                        <i class="fas fa-edit"></i>
+                                        <span>Editar Veículo</span>
+                                    </button>
+                                </a>
                             </div>
                         </div>
                     </div>

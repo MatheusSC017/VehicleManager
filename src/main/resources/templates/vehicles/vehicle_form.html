@@ -42,11 +42,13 @@
             </div>
 
             <div class="flex space-x-4">
-                <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg flex items-center space-x-2"
-                        onclick="window.location.href='vehicles.html'">
-                    <i class="fas fa-arrow-left"></i>
-                    <span>Voltar</span>
-                </button>
+                <a href="/veiculos">
+                    <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg flex items-center space-x-2"
+                            onclick="window.location.href='vehicles.html'">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Voltar</span>
+                    </button>
+                </a>
             </div>
         </header>
 
@@ -60,7 +62,7 @@
                 </div>
 
                 <!-- Form Content -->
-                <form action="/veiculos/cadastrar" class="p-6" id="vehicleForm" method="post" th:object="${vehicle}">
+                <form action="" class="p-6" id="vehicleForm" method="post" th:object="${vehicle}">
                     <!-- Basic Information Section -->
                     <div class="mb-8">
                         <div class="flex items-center justify-between cursor-pointer"
@@ -285,11 +287,13 @@
 
                     <!-- Form Actions -->
                     <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
-                        <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg"
-                                onclick="window.location.href='vehicles.html'"
-                                type="button">
-                            Cancelar
-                        </button>
+                        <a href="/veiculos">
+                            <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-6 py-2 rounded-lg"
+                                    onclick="window.location.href='vehicles.html'"
+                                    type="button">
+                                Cancelar
+                            </button>
+                        </a>
                         <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center space-x-2"
                                 type="submit">
                             <i class="fas fa-save"></i>
