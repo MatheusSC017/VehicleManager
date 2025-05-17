@@ -4,7 +4,7 @@ package com.matheus.VehicleManager.enums;
 public enum VehicleType {
 
     CAR("Carro"),
-    MOTORCYLCLE("Moto");
+    MOTORCYCLE("Moto");
 
     private String vehicleType;
     private VehicleType(String vehicleType) {

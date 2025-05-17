@@ -81,10 +81,16 @@ public class VehicleController {
         return modelAndView;
     }
 
-    @GetMapping("/veiculos/{id}/delete")
-    public ModelAndView delete() {
+    @GetMapping("/veiculos/{id}/deletar")
+    public ModelAndView delete(@PathVariable("id") Long id) {
+        Vehicle vehicle = vehicleRepository.getReferenceById(id);
+        if (vehicle != null) {
+            vehicleRepository.delete(vehicle);
+        }
+
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicles");
+        modelAndView.addObject("vehiclesList", vehicleRepository.findAll());
         return modelAndView;
     }
 

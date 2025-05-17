@@ -69,7 +69,7 @@ public class Vehicle {
     private VehicleChange vehicleChange;
 
     @Column(name = "doors")
-    @Min(value = 1, message = "Número de portas inválido")
+    @Min(value = 0, message = "Número de portas inválido")
     @Max(value = 4, message = "Número de portas inválido")
     private int doors;
 
@@ -134,7 +134,7 @@ public class Vehicle {
         return vehicleChange;
     }
 
-    @Min(value = 1, message = "Número de portas inválido")
+    @Min(value = 0, message = "Número de portas inválido")
     @Max(value = 4, message = "Número de portas inválido")
     public int getDoors() {
         return doors;
@@ -200,7 +200,7 @@ public class Vehicle {
         this.vehicleChange = vehicleChange;
     }
 
-    public void setDoors(@Min(value = 1, message = "Número de portas inválido") @Max(value = 4, message = "Número de portas inválido") int doors) {
+    public void setDoors(@Min(value = 0, message = "Número de portas inválido") @Max(value = 4, message = "Número de portas inválido") int doors) {
         this.doors = doors;
     }
 

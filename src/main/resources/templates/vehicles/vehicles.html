@@ -39,10 +39,10 @@
             <!-- Filters -->
 
             <!-- Vehicles Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-                 th:each="vehicle : ${vehiclesList}">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
-                <div class="bg-white rounded-xl shadow overflow-hidden transition-all duration-300 card-hover">
+                <div class="bg-white rounded-xl shadow overflow-hidden transition-all duration-300 card-hover"
+                     th:each="vehicle : ${vehiclesList}">
                     <div class="relative">
                         <img alt="Vehicle"
                              class="w-full h-48 object-cover"
@@ -76,7 +76,7 @@
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </a>
-                                <a th:href="@{/veiculos/{id}/deletar(id=${id})}">
+                                <a th:href="@{/veiculos/{id}/deletar(id=${vehicle.id})}">
                                     <button class="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600">
                                         <i class="fas fa-trash"></i>
                                     </button>
