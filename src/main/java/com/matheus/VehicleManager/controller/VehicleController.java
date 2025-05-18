@@ -10,7 +10,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Controller
 public class VehicleController {
@@ -26,6 +30,38 @@ public class VehicleController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicles");
         modelAndView.addObject("vehiclesList", vehicleRepository.findAll());
+        return modelAndView;
+    }
+
+    @PostMapping("/veiculos/pesquisa")
+    public ModelAndView searcVehicles(@RequestParam("searchInput") String search) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("vehicles/vehicles");
+        List<Vehicle> filteredVehicles = vehicleRepository.findByBrandAndModelIgnoreCase(search);
+        modelAndView.addObject("vehiclesList", filteredVehicles);
+        return modelAndView;
+    }
+
+    @GetMapping("/veiculos/filtro")
+    public ModelAndView filterVehicles(@RequestParam("status") String status, @RequestParam("type") String type,
+                                       @RequestParam("fuel") String fuel, @RequestParam("priceMin") int priceMin,
+                                       @RequestParam("priceMax") int priceMax) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("vehicles/vehicles");
+        List<Vehicle> vehicles = vehicleRepository.findAll();
+        vehicles = vehicles.stream()
+                .filter(v -> status.isEmpty() || v.getVehicleStatus().name().equalsIgnoreCase(status))
+                .filter(v -> type.isEmpty() || v.getVehicleType().name().equalsIgnoreCase(type))
+                .filter(v -> fuel.isEmpty() || v.getVehicleFuel().name().equalsIgnoreCase(fuel))
+                .filter(v -> priceMin == 0 || v.getPrice().compareTo(BigDecimal.valueOf(priceMin)) >= 0)
+                .filter(v -> priceMax == 0 || v.getPrice().compareTo(BigDecimal.valueOf(priceMax)) <= 0)
+                .toList();
+        modelAndView.addObject("statusFilter", status);
+        modelAndView.addObject("typeFilter", type);
+        modelAndView.addObject("fuelFilter", fuel);
+        modelAndView.addObject("priceMinFilter", priceMin);
+        modelAndView.addObject("priceMaxFilter", priceMax);
+        modelAndView.addObject("vehiclesList", vehicles);
         return modelAndView;
     }
 
