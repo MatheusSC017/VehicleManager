@@ -8,6 +8,7 @@ import com.matheus.VehicleManager.enums.VehicleType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 public class Vehicle {
@@ -81,6 +82,9 @@ public class Vehicle {
     @Size(max = 50, message = "O limite máximo de caracteres é 50")
     private String power;
 
+    @OneToMany(mappedBy = "vehicle")
+    private List<FileStore> images;
+
     public Long getId() {
         return id;
     }
@@ -148,6 +152,10 @@ public class Vehicle {
         return power;
     }
 
+    public List<FileStore> getImages() {
+        return images;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -212,4 +220,7 @@ public class Vehicle {
         this.power = power;
     }
 
+    public void setImages(List<FileStore> images) {
+        this.images = images;
+    }
 }

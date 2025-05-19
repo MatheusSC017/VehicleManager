@@ -62,7 +62,7 @@
                 </div>
 
                 <!-- Form Content -->
-                <form action="" class="p-6" id="vehicleForm" method="post" th:object="${vehicle}">
+                <form action="" class="p-6" id="vehicleForm" method="post" th:object="${vehicle}" enctype='multipart/form-data'>
                     <!-- Basic Information Section -->
                     <div class="mb-8">
                         <div class="flex items-center justify-between cursor-pointer"
@@ -286,6 +286,38 @@
                         </div>
                     </div>
 
+                    <!-- Images Section -->
+                    <div class="mb-8">
+                        <div class="flex items-center justify-between cursor-pointer" onclick="toggleSection('images')">
+                            <h3 class="text-lg font-semibold text-gray-800">
+                                <i class="fas fa-images mr-2 text-blue-500"></i>
+                                Fotos do Veículo
+                            </h3>
+                            <i class="fas fa-chevron-down text-gray-500" id="imagesIcon"></i>
+                        </div>
+
+                        <div class="form-section" id="images">
+                            <div class="mt-4">
+                                <div class="flex items-center justify-center w-full">
+                                    <label class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+                                           for="dropzone-file">
+                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <i class="fas fa-cloud-upload-alt text-3xl text-gray-400 mb-3"></i>
+                                            <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">Clique para enviar</span>
+                                                ou arraste e solte</p>
+                                            <p class="text-xs text-gray-500">PNG, JPG ou JPEG (MAX. 5MB cada)</p>
+                                        </div>
+                                        <input class="hidden" id="dropzone-file" multiple type="file" name="imagesInput"/>
+                                    </label>
+                                </div>
+
+                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6"
+                                     id="preview-container">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Form Actions -->
                     <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
                         <a href="/veiculos">
@@ -308,11 +340,6 @@
 </div>
 
 <script>
-    // Toggle sidebar
-    document.getElementById('toggleSidebar').addEventListener('click', function() {
-        document.querySelector('.sidebar').classList.toggle('collapsed');
-    });
-
     // Toggle form sections
     function toggleSection(sectionId) {
         const section = document.getElementById(sectionId);
@@ -329,27 +356,6 @@
         }
     }
 
-    // File input display
-    document.getElementById('crvFile').addEventListener('change', function(e) {
-        const fileName = e.target.files[0] ? e.target.files[0].name : 'Nenhum arquivo selecionado';
-        document.getElementById('crvText').value = fileName;
-    });
-
-    document.getElementById('invoiceFile').addEventListener('change', function(e) {
-        const fileName = e.target.files[0] ? e.target.files[0].name : 'Nenhum arquivo selecionado';
-        document.getElementById('invoiceText').value = fileName;
-    });
-
-    document.getElementById('ipvaFile').addEventListener('change', function(e) {
-        const fileName = e.target.files[0] ? e.target.files[0].name : 'Nenhum arquivo selecionado';
-        document.getElementById('ipvaText').value = fileName;
-    });
-
-    document.getElementById('insuranceFile').addEventListener('change', function(e) {
-        const fileName = e.target.files[0] ? e.target.files[0].name : 'Nenhum arquivo selecionado';
-        document.getElementById('insuranceText').value = fileName;
-    });
-
     // Image preview functionality
     document.getElementById('dropzone-file').addEventListener('change', function(e) {
         const previewContainer = document.getElementById('preview-container');
@@ -363,12 +369,7 @@
                     const previewDiv = document.createElement('div');
                     previewDiv.className = 'relative group';
 
-                    previewDiv.innerHTML = `
-                        <img src="${event.target.result}" class="h-32 w-full object-cover rounded-lg">
-                        <button type="button" class="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                            <i class="fas fa-times text-xs"></i>
-                        </button>
-                    `;
+                    previewDiv.innerHTML = `<img src="${event.target.result}" class="h-32 w-full object-cover rounded-lg">`;
 
                     previewContainer.appendChild(previewDiv);
                 }
@@ -376,16 +377,6 @@
                 reader.readAsDataURL(file);
             });
         }
-    });
-
-    // Form submission
-    document.getElementById('vehicleForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        // Here you would normally send the form data to the server
-        // For this example, we'll just show an alert
-        alert('Veículo cadastrado com sucesso!');
-        window.location.href = 'vehicles.html';
     });
 </script>
 </body>

@@ -1,7 +1,12 @@
 package com.matheus.VehicleManager.controller;
 
+import com.matheus.VehicleManager.enums.FileType;
+import com.matheus.VehicleManager.model.FileStore;
 import com.matheus.VehicleManager.model.Vehicle;
+import com.matheus.VehicleManager.repository.FileRepository;
 import com.matheus.VehicleManager.repository.VehicleRepository;
+import com.matheus.VehicleManager.service.FileStorageService;
+import com.matheus.VehicleManager.service.LocalFileStorageService;
 import com.matheus.VehicleManager.service.VehicleService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -11,8 +16,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -24,6 +31,12 @@ public class VehicleController {
 
     @Autowired
     private VehicleRepository vehicleRepository;
+
+    @Autowired
+    private FileRepository fileRepository;
+
+    @Autowired
+    private FileStorageService fileStorageService;
 
     @GetMapping("/veiculos")
     public ModelAndView vehicles() {
@@ -83,7 +96,7 @@ public class VehicleController {
     }
 
     @PostMapping("/veiculos/cadastrar")
-    public ModelAndView insert(@Valid Vehicle vehicle, BindingResult bindingResult) {
+    public ModelAndView insert(@Valid Vehicle vehicle, BindingResult bindingResult, @RequestParam("imagesInput") MultipartFile[] images) {
         ModelAndView modelAndView = new ModelAndView();
         if (bindingResult.hasErrors()) {
             modelAndView.setViewName("vehicles/vehicle_form");
@@ -91,6 +104,24 @@ public class VehicleController {
         } else {
             modelAndView.setViewName("redirect:/veiculos");
             vehicleRepository.save(vehicle);
+
+            for (MultipartFile image : images) {
+                try {
+                    String path = fileStorageService.storeFile(image);
+
+                    FileStore imageEntity = new FileStore();
+                    imageEntity.setFileName(image.getOriginalFilename());
+                    imageEntity.setContentType(image.getContentType());
+                    imageEntity.setPath(path);
+                    imageEntity.setType(FileType.IMAGE);
+                    imageEntity.setVehicle(vehicle);
+
+                    fileRepository.save(imageEntity);
+                } catch (IOException e) {
+                    continue;
+                }
+            }
+
         }
         return modelAndView;
     }
