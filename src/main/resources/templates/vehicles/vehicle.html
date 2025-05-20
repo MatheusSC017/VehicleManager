@@ -29,7 +29,7 @@
                             <div class="flex items-center">
                                 <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
                                 <a class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2"
-                                   href="vehicles.html">Veículos</a>
+                                   href="vehicles.html">Veículo</a>
                             </div>
                         </li>
                         <li aria-current="page">
@@ -55,31 +55,30 @@
 
         <main class="p-6">
             <!-- Vehicle Details Card -->
-            <div class="bg-white rounded-xl shadow overflow-hidden">
+            <div class="bg-white rounded-xl shadow overflow-hidden"
+                 th:object="${vehicleDTO}">
                 <!-- Vehicle Header -->
                 <div class="bg-blue-600 text-white px-6 py-4">
                     <div class="flex justify-between items-center">
                         <div>
-                            <h2 class="text-xl font-bold">Volkswagen Golf 1.4 TSI</h2>
-                            <p class="text-blue-100">Ano 2022 • 15.000 km</p>
+                            <h2 class="text-xl font-bold"><span th:text="*{vehicle.brand}"></span> <span th:text="*{vehicle.model}"></span> <span th:text="*{vehicle.motor}"></span> <span th:text="*{vehicle.power}"></span></h2>
+                            <p class="text-blue-100">Ano <span th:text="*{vehicle.year}"></span> • <span th:text="*{vehicle.mileage}"></span> km</p>
                         </div>
-                        <span class="bg-white text-blue-600 px-3 py-1 rounded-full text-sm font-semibold">Disponível</span>
+                        <span class="bg-white text-blue-600 px-3 py-1 rounded-full text-sm font-semibold" th:text="*{vehicle.vehicleStatus.getVehicleStatus()}"></span>
                     </div>
                 </div>
 
                 <!-- Vehicle Content -->
                 <div class="p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6"
-                         th:object="${vehicle}">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <!-- Vehicle Image -->
                         <div class="lg:col-span-1">
                             <div class="relative">
-                                <img alt="Volkswagen Golf"
-                                     class="vehicle-image w-full"
-                                     src="https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80">
+                                <img class="vehicle-image w-full"
+                                     th:src="${vehicleDTO.image?.path ?: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'}">
                                 <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
-                                    <div class="text-2xl font-bold">R$ <span th:text="*{price}"></span></div>
-                                    <div class="text-sm">Placa: <span th:text="*{plate}"></span></div>
+                                    <div class="text-2xl font-bold">R$ <span th:text="*{vehicle.price}"></span></div>
+                                    <div class="text-sm">Placa: <span th:text="*{vehicle.plate}"></span></div>
                                 </div>
                             </div>
                         </div>
@@ -94,27 +93,27 @@
                                 <div class="specs-grid">
                                     <div class="spec-card">
                                         <div class="text-sm text-gray-500">Marca</div>
-                                        <div class="font-medium" th:text="*{brand}"></div>
+                                        <div class="font-medium" th:text="*{vehicle.brand}"></div>
                                     </div>
                                     <div class="spec-card">
                                         <div class="text-sm text-gray-500">Modelo</div>
-                                        <div class="font-medium" th:text="*{model}"></div>
+                                        <div class="font-medium" th:text="*{vehicle.model}"></div>
                                     </div>
                                     <div class="spec-card">
                                         <div class="text-sm text-gray-500">Ano</div>
-                                        <div class="font-medium" th:text="*{year}"></div>
+                                        <div class="font-medium" th:text="*{vehicle.year}"></div>
                                     </div>
                                     <div class="spec-card">
                                         <div class="text-sm text-gray-500">Cor</div>
-                                        <div class="font-medium" th:text="*{color}"></div>
+                                        <div class="font-medium" th:text="*{vehicle.color}"></div>
                                     </div>
                                     <div class="spec-card">
                                         <div class="text-sm text-gray-500">Chassi</div>
-                                        <div class="font-medium" th:text="*{chassi}"></div>
+                                        <div class="font-medium" th:text="*{vehicle.chassi}"></div>
                                     </div>
                                     <div class="spec-card">
                                         <div class="text-sm text-gray-500">Quilometragem</div>
-                                        <div class="font-medium"><span th:text="*{mileage}"></span> km</div>
+                                        <div class="font-medium"><span th:text="*{vehicle.mileage}"></span> km</div>
                                     </div>
                                 </div>
                             </div>
@@ -127,27 +126,27 @@
                                 <div class="specs-grid">
                                     <div class="spec-card">
                                         <div class="text-sm text-gray-500">Tipo</div>
-                                        <div class="font-medium" th:text="*{vehicleType}"></div>
+                                        <div class="font-medium" th:text="*{vehicle.vehicleType}"></div>
                                     </div>
                                     <div class="spec-card">
                                         <div class="text-sm text-gray-500">Combustível</div>
-                                        <div class="font-medium" th:text="*{vehicleFuel}"></div>
+                                        <div class="font-medium" th:text="*{vehicle.vehicleFuel}"></div>
                                     </div>
                                     <div class="spec-card">
                                         <div class="text-sm text-gray-500">Câmbio</div>
-                                        <div class="font-medium" th:text="*{vehicleChange}"></div>
+                                        <div class="font-medium" th:text="*{vehicle.vehicleChange}"></div>
                                     </div>
                                     <div class="spec-card">
                                         <div class="text-sm text-gray-500">Portas</div>
-                                        <div class="font-medium" th:text="*{doors}"></div>
+                                        <div class="font-medium" th:text="*{vehicle.doors}"></div>
                                     </div>
                                     <div class="spec-card">
                                         <div class="text-sm text-gray-500">Motor</div>
-                                        <div class="font-medium" th:text="*{motor}"></div>
+                                        <div class="font-medium" th:text="*{vehicle.motor}"></div>
                                     </div>
                                     <div class="spec-card">
                                         <div class="text-sm text-gray-500">Potência</div>
-                                        <div class="font-medium" th:text="*{power}"></div>
+                                        <div class="font-medium" th:text="*{vehicle.power}"></div>
                                     </div>
                                 </div>
                             </div>

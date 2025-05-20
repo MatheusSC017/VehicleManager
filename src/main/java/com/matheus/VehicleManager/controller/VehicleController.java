@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
@@ -62,16 +61,7 @@ public class VehicleController {
                                        @RequestParam("priceMax") int priceMax) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicles");
-        List<Vehicle> vehicles = vehicleRepository.findAll();
-        // Move to vehicle service
-        vehicles = vehicles.stream()
-                .filter(v -> status.isEmpty() || v.getVehicleStatus().name().equalsIgnoreCase(status))
-                .filter(v -> type.isEmpty() || v.getVehicleType().name().equalsIgnoreCase(type))
-                .filter(v -> fuel.isEmpty() || v.getVehicleFuel().name().equalsIgnoreCase(fuel))
-                .filter(v -> priceMin == 0 || v.getPrice().compareTo(BigDecimal.valueOf(priceMin)) >= 0)
-                .filter(v -> priceMax == 0 || v.getPrice().compareTo(BigDecimal.valueOf(priceMax)) <= 0)
-                .toList();
-        List<VehicleWithOneImageDTO> vehiclesWithImage = vehicleService.getVehiclesImages(vehicles);
+        List<VehicleWithOneImageDTO> vehiclesWithImage = vehicleService.getFilteredVehiclesWithOneImage(status, type, fuel, priceMin, priceMax);
         modelAndView.addObject("statusFilter", status);
         modelAndView.addObject("typeFilter", type);
         modelAndView.addObject("fuelFilter", fuel);
@@ -85,8 +75,9 @@ public class VehicleController {
     public ModelAndView vehicle(@PathVariable("id") Long id) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicle");
-        Vehicle vehicle = vehicleRepository.getReferenceById(id);
-        modelAndView.addObject("vehicle", vehicle);
+        VehicleWithOneImageDTO vehicle = vehicleService.getVehicleWithImageById(id);
+        modelAndView.addObject("vehicleDTO", vehicle);
+        System.out.println(vehicle.getImage().getPath());
         return modelAndView;
     }
 
@@ -139,7 +130,7 @@ public class VehicleController {
     }
 
     @PostMapping("/veiculos/{id}/editar")
-    public ModelAndView update(@Valid Vehicle vehicle, BindingResult bindingResult) {
+    public ModelAndView update(@Valid Vehicle vehicle, BindingResult bindingResult, @RequestParam("imagesInput") MultipartFile[] images) {
         ModelAndView modelAndView = new ModelAndView();
         if (bindingResult.hasErrors()) {
             modelAndView.setViewName("vehicles/vehicle_form");
@@ -147,6 +138,23 @@ public class VehicleController {
         } else {
             modelAndView.setViewName("redirect:/veiculos/" + vehicle.getId());
             vehicleRepository.save(vehicle);
+
+            for (MultipartFile image : images) {
+                try {
+                    String path = fileStorageService.storeFile(image);
+
+                    FileStore imageEntity = new FileStore();
+                    imageEntity.setFileName(image.getOriginalFilename());
+                    imageEntity.setContentType(image.getContentType());
+                    imageEntity.setPath(path);
+                    imageEntity.setType(FileType.IMAGE);
+                    imageEntity.setVehicle(vehicle);
+
+                    fileRepository.save(imageEntity);
+                } catch (IOException e) {
+                    continue;
+                }
+            }
         }
         return modelAndView;
     }

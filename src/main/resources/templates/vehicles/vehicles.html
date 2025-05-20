@@ -112,7 +112,7 @@
                     <div class="relative">
                         <img alt="Vehicle"
                              class="w-full h-48 object-cover"
-                             th:src="${vehicleDTO.image?.path ?: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'}">
+                             th:src="${vehicleDTO.image?.path ?: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'}">
                         <div class="absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium"
                              th:classappend="${(vehicleDTO.vehicle.vehicleStatus.name() == 'AVAILABLE') ? ' status-available' : ((vehicleDTO.vehicle.vehicleStatus.name() == 'SOLD') ? ' status-sold' : ' status-reserved')}"
                              th:text="${vehicleDTO.vehicle.vehicleStatus.getVehicleStatus()}">

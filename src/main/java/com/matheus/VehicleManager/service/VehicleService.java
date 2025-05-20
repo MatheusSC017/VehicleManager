@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.matheus.VehicleManager.repository.VehicleRepository;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,11 @@ public class VehicleService {
 
     @Autowired
     private VehicleRepository vehicleRepository;
+
+    public VehicleWithOneImageDTO getVehicleWithImageById(Long id) {
+        Vehicle vehicle = this.vehicleRepository.getReferenceById(id);
+        return this.getVehicleWithImage(vehicle);
+    }
 
     public List<VehicleWithOneImageDTO> getVehiclesWithOneImage() {
         List<Vehicle> vehicles = this.vehicleRepository.findAll();
@@ -28,18 +34,33 @@ public class VehicleService {
         return this.getVehiclesImages(vehicles);
     }
 
-    public List<VehicleWithOneImageDTO> getVehiclesImages(List<Vehicle> vehicles) {
+    public List<VehicleWithOneImageDTO> getFilteredVehiclesWithOneImage(String status, String type, String fuel, int priceMin, int priceMax) {
+        List<Vehicle> vehicles = vehicleRepository.findAll();
+        vehicles = vehicles.stream()
+                .filter(v -> status.isEmpty() || v.getVehicleStatus().name().equalsIgnoreCase(status))
+                .filter(v -> type.isEmpty() || v.getVehicleType().name().equalsIgnoreCase(type))
+                .filter(v -> fuel.isEmpty() || v.getVehicleFuel().name().equalsIgnoreCase(fuel))
+                .filter(v -> priceMin == 0 || v.getPrice().compareTo(BigDecimal.valueOf(priceMin)) >= 0)
+                .filter(v -> priceMax == 0 || v.getPrice().compareTo(BigDecimal.valueOf(priceMax)) <= 0)
+                .toList();
+        return this.getVehiclesImages(vehicles);
+    }
+
+    private List<VehicleWithOneImageDTO> getVehiclesImages(List<Vehicle> vehicles) {
         List<VehicleWithOneImageDTO> vehiclesWithImage = new ArrayList<>();
 
         for (Vehicle vehicle : vehicles) {
-            Optional<FileStore> image = vehicle.getImages().stream()
-                    .filter(img -> img.getType().getFileType().equalsIgnoreCase(FileType.IMAGE.getFileType()))
-                    .findFirst();
-
-            vehiclesWithImage.add(new VehicleWithOneImageDTO(vehicle, image.orElse(null)));
+            vehiclesWithImage.add(this.getVehicleWithImage(vehicle));
         }
 
         return vehiclesWithImage;
+    }
+
+    private VehicleWithOneImageDTO getVehicleWithImage(Vehicle vehicle) {
+        Optional<FileStore> image = vehicle.getImages().stream()
+                .filter(img -> img.getType().getFileType().equalsIgnoreCase(FileType.IMAGE.getFileType()))
+                .findFirst();
+        return new VehicleWithOneImageDTO(vehicle, image.orElse(null));
     }
 
 }
