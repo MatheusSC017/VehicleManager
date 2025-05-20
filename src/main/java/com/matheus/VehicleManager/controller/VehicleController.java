@@ -1,5 +1,6 @@
 package com.matheus.VehicleManager.controller;
 
+import com.matheus.VehicleManager.dto.VehicleWithOneImageDTO;
 import com.matheus.VehicleManager.enums.FileType;
 import com.matheus.VehicleManager.model.FileStore;
 import com.matheus.VehicleManager.model.Vehicle;
@@ -42,7 +43,7 @@ public class VehicleController {
     public ModelAndView vehicles() {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicles");
-        modelAndView.addObject("vehiclesList", vehicleRepository.findAll());
+        modelAndView.addObject("vehiclesList", vehicleService.getVehiclesWithOneImage());
         return modelAndView;
     }
 
@@ -50,7 +51,7 @@ public class VehicleController {
     public ModelAndView searcVehicles(@RequestParam("searchInput") String search) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicles");
-        List<Vehicle> filteredVehicles = vehicleRepository.findByBrandAndModelIgnoreCase(search);
+        List<VehicleWithOneImageDTO> filteredVehicles = vehicleService.getByBrandAndModelIgnoreCaseWithOneImage(search);
         modelAndView.addObject("vehiclesList", filteredVehicles);
         return modelAndView;
     }
@@ -62,6 +63,7 @@ public class VehicleController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicles");
         List<Vehicle> vehicles = vehicleRepository.findAll();
+        // Move to vehicle service
         vehicles = vehicles.stream()
                 .filter(v -> status.isEmpty() || v.getVehicleStatus().name().equalsIgnoreCase(status))
                 .filter(v -> type.isEmpty() || v.getVehicleType().name().equalsIgnoreCase(type))
@@ -69,12 +71,13 @@ public class VehicleController {
                 .filter(v -> priceMin == 0 || v.getPrice().compareTo(BigDecimal.valueOf(priceMin)) >= 0)
                 .filter(v -> priceMax == 0 || v.getPrice().compareTo(BigDecimal.valueOf(priceMax)) <= 0)
                 .toList();
+        List<VehicleWithOneImageDTO> vehiclesWithImage = vehicleService.getVehiclesImages(vehicles);
         modelAndView.addObject("statusFilter", status);
         modelAndView.addObject("typeFilter", type);
         modelAndView.addObject("fuelFilter", fuel);
         modelAndView.addObject("priceMinFilter", priceMin);
         modelAndView.addObject("priceMaxFilter", priceMax);
-        modelAndView.addObject("vehiclesList", vehicles);
+        modelAndView.addObject("vehiclesList", vehiclesWithImage);
         return modelAndView;
     }
 
@@ -156,8 +159,7 @@ public class VehicleController {
         }
 
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("vehicles/vehicles");
-        modelAndView.addObject("vehiclesList", vehicleRepository.findAll());
+        modelAndView.setViewName("redirect:/veiculos");
         return modelAndView;
     }
 

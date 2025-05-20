@@ -82,7 +82,7 @@ public class Vehicle {
     @Size(max = 50, message = "O limite máximo de caracteres é 50")
     private String power;
 
-    @OneToMany(mappedBy = "vehicle")
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL)
     private List<FileStore> images;
 
     public Long getId() {
