@@ -10,6 +10,7 @@ import com.matheus.VehicleManager.repository.VehicleRepository;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,7 +22,7 @@ public class VehicleService {
 
     public VehicleWithOneImageDTO getVehicleWithImageById(Long id) {
         Vehicle vehicle = this.vehicleRepository.getReferenceById(id);
-        return this.getVehicleWithImage(vehicle);
+        return this.getVehicleWithOneImage(vehicle);
     }
 
     public List<VehicleWithOneImageDTO> getVehiclesWithOneImage() {
@@ -50,13 +51,13 @@ public class VehicleService {
         List<VehicleWithOneImageDTO> vehiclesWithImage = new ArrayList<>();
 
         for (Vehicle vehicle : vehicles) {
-            vehiclesWithImage.add(this.getVehicleWithImage(vehicle));
+            vehiclesWithImage.add(this.getVehicleWithOneImage(vehicle));
         }
 
         return vehiclesWithImage;
     }
 
-    private VehicleWithOneImageDTO getVehicleWithImage(Vehicle vehicle) {
+    private VehicleWithOneImageDTO getVehicleWithOneImage(Vehicle vehicle) {
         Optional<FileStore> image = vehicle.getImages().stream()
                 .filter(img -> img.getType().getFileType().equalsIgnoreCase(FileType.IMAGE.getFileType()))
                 .findFirst();

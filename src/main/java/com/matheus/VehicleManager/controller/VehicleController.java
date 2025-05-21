@@ -7,7 +7,6 @@ import com.matheus.VehicleManager.model.Vehicle;
 import com.matheus.VehicleManager.repository.FileRepository;
 import com.matheus.VehicleManager.repository.VehicleRepository;
 import com.matheus.VehicleManager.service.FileStorageService;
-import com.matheus.VehicleManager.service.LocalFileStorageService;
 import com.matheus.VehicleManager.service.VehicleService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -77,14 +76,13 @@ public class VehicleController {
         modelAndView.setViewName("vehicles/vehicle");
         VehicleWithOneImageDTO vehicle = vehicleService.getVehicleWithImageById(id);
         modelAndView.addObject("vehicleDTO", vehicle);
-        System.out.println(vehicle.getImage().getPath());
         return modelAndView;
     }
 
     @GetMapping("/veiculos/cadastrar")
     public ModelAndView getInsertForm(Vehicle vehicle) {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("vehicles/vehicle_form");
+        modelAndView.setViewName("vehicles/vehicle_register");
         modelAndView.addObject("vehicle", new Vehicle());
         return modelAndView;
     }
@@ -93,13 +91,17 @@ public class VehicleController {
     public ModelAndView insert(@Valid Vehicle vehicle, BindingResult bindingResult, @RequestParam("imagesInput") MultipartFile[] images) {
         ModelAndView modelAndView = new ModelAndView();
         if (bindingResult.hasErrors()) {
-            modelAndView.setViewName("vehicles/vehicle_form");
+            modelAndView.setViewName("vehicles/vehicle_register");
             modelAndView.addObject("vehicle", vehicle);
         } else {
             modelAndView.setViewName("redirect:/veiculos");
             vehicleRepository.save(vehicle);
 
             for (MultipartFile image : images) {
+                if (image.isEmpty()) {
+                    continue;
+                }
+
                 try {
                     String path = fileStorageService.storeFile(image);
 
@@ -123,23 +125,29 @@ public class VehicleController {
     @GetMapping("/veiculos/{id}/editar")
     public ModelAndView getUpdateForm(@PathVariable("id") Long id) {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("vehicles/vehicle_form");
+        modelAndView.setViewName("vehicles/vehicle_update");
         Vehicle vehicle = vehicleRepository.getReferenceById(id);
         modelAndView.addObject("vehicle", vehicle);
         return modelAndView;
     }
 
     @PostMapping("/veiculos/{id}/editar")
-    public ModelAndView update(@Valid Vehicle vehicle, BindingResult bindingResult, @RequestParam("imagesInput") MultipartFile[] images) {
+    public ModelAndView update(@Valid Vehicle vehicle, BindingResult bindingResult,
+                               @RequestParam("imagesInput") MultipartFile[] images,
+                               @RequestParam(value = "selectedImages", required = false) List<Long> selectedImageIds) {
         ModelAndView modelAndView = new ModelAndView();
         if (bindingResult.hasErrors()) {
-            modelAndView.setViewName("vehicles/vehicle_form");
+            modelAndView.setViewName("vehicles/vehicle_update");
             modelAndView.addObject("vehicle", vehicle);
         } else {
             modelAndView.setViewName("redirect:/veiculos/" + vehicle.getId());
             vehicleRepository.save(vehicle);
 
             for (MultipartFile image : images) {
+                if (image.isEmpty()) {
+                    continue;
+                }
+
                 try {
                     String path = fileStorageService.storeFile(image);
 
@@ -155,15 +163,26 @@ public class VehicleController {
                     continue;
                 }
             }
+
+            if (selectedImageIds != null) {
+                for (Long imageId : selectedImageIds) {
+                    try {
+                        fileRepository.deleteById(imageId);
+                    } catch (Exception e) {
+                        continue;
+                    }
+                }
+            }
         }
         return modelAndView;
     }
 
     @GetMapping("/veiculos/{id}/deletar")
     public ModelAndView delete(@PathVariable("id") Long id) {
-        Vehicle vehicle = vehicleRepository.getReferenceById(id);
-        if (vehicle != null) {
-            vehicleRepository.delete(vehicle);
+        try {
+            vehicleRepository.deleteById(id);
+        } catch (Exception e) {
+            // pass
         }
 
         ModelAndView modelAndView = new ModelAndView();

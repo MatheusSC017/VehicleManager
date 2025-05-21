@@ -14,7 +14,7 @@
     <div class="flex-1 overflow-auto">
         <header class="bg-white shadow-sm p-4 flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold text-gray-800">Cadastrar Novo Veículo</h1>
+                <h1 class="text-2xl font-bold text-gray-800">Atualizar Veículo</h1>
                 <nav aria-label="Breadcrumb" class="flex mt-1">
                     <ol class="inline-flex items-center space-x-1 md:space-x-2">
                         <li class="inline-flex items-center">
@@ -34,7 +34,7 @@
                         <li aria-current="page">
                             <div class="flex items-center">
                                 <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
-                                <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Cadastrar</span>
+                                <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2">Atualizar</span>
                             </div>
                         </li>
                     </ol>
@@ -313,6 +313,20 @@
 
                                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6"
                                      id="preview-container">
+                                </div>
+
+                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
+                                    <div th:if="${vehicle.images != null}" th:each="image : ${vehicle.images}" class="relative" th:attr="data-image-id=${image.id}">
+                                        <img th:src="${image.path}" class="w-full h-40 object-cover rounded" />
+
+                                        <input type="checkbox" th:id="'checkbox-' + ${image.id}" th:name="'selectedImages'" th:value="${image.id}" class="hidden peer" />
+
+                                        <label th:for="'checkbox-' + ${image.id}"
+                                               class="absolute top-1 right-1 bg-gray-400 peer-checked:bg-red-500 text-white rounded-full p-1 text-xs cursor-pointer transition-colors">
+                                            &times;
+                                        </label>
+
+                                    </div>
                                 </div>
                             </div>
                         </div>
