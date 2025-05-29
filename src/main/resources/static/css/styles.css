@@ -1,40 +1,76 @@
+/* Sidebar */
 .sidebar {
-            transition: all 0.3s ease;
-        }
-        .sidebar.collapsed {
-            width: 70px;
-        }
-        .sidebar.collapsed .menu-text {
-            display: none;
-        }
-        .sidebar.collapsed .logo-text {
-            display: none;
-        }
-        .sidebar.collapsed .menu-item {
-            justify-content: center;
-        }
-        .card-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        .status-available {
-            background-color: #d1fae5;
-            color: #065f46;
-        }
-        .status-reserved {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-        .status-sold {
-            background-color: #fee2e2;
-            color: #991b1b;
-        }
-        .form-section {
-            transition: all 0.3s ease;
-            max-height: 0;
-            overflow: hidden;
-        }
-        .form-section.active {
-            max-height: 1000px;
-            padding: 1.5rem;
-        }
+    transition: all 0.3s ease;
+}
+
+.sidebar.collapsed {
+    width: 70px;
+}
+
+.sidebar.collapsed .menu-text {
+    display: none;
+}
+
+.sidebar.collapsed .logo-text {
+    display: none;
+}
+
+.sidebar.collapsed .menu-item {
+    justify-content: center;
+}
+
+/* Vehicle Card */
+
+.card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.status-available {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-reserved {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-sold {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+/* Forms */
+
+.form-section {
+    transition: all 0.3s ease;
+    max-height: 0;
+    overflow: hidden;
+}
+
+.form-section.active {
+    max-height: 1000px;
+    padding: 1.5rem;
+}
+
+/* Login */
+
+.login-card {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.login-card:hover {
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.login-input:focus-within {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.password-strength {
+  height: 6px;
+  transition: background-color 0.3s ease;
+}

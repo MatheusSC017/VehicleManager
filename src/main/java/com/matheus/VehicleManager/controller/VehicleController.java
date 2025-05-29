@@ -114,10 +114,11 @@ public class VehicleController {
 
                     fileRepository.save(imageEntity);
                 } catch (IOException e) {
+                    System.err.println("Failed to store image: " + image.getOriginalFilename());
+                    e.printStackTrace();
                     continue;
                 }
             }
-
         }
         return modelAndView;
     }
@@ -160,6 +161,8 @@ public class VehicleController {
 
                     fileRepository.save(imageEntity);
                 } catch (IOException e) {
+                    System.err.println("Failed to store image: " + image.getOriginalFilename());
+                    e.printStackTrace();
                     continue;
                 }
             }
@@ -182,7 +185,8 @@ public class VehicleController {
         try {
             vehicleRepository.deleteById(id);
         } catch (Exception e) {
-            // pass
+            System.err.println("Failed to delete vehicle: ");
+            e.printStackTrace();
         }
 
         ModelAndView modelAndView = new ModelAndView();

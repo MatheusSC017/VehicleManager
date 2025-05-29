@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro - AutoGest</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" th:href="@{/css/styles.css}"/>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4">
+<div class="login-card bg-white rounded-xl w-full max-w-md overflow-hidden shadow-lg">
+
+  <div class="bg-blue-600 text-white px-8 py-6 text-center">
+    <div class="flex items-center justify-center space-x-3 mb-2">
+      <i class="fas fa-car text-3xl"></i>
+      <span class="text-2xl font-bold">Auto Gestão</span>
+    </div>
+    <p class="text-blue-100">Crie sua conta no sistema</p>
+  </div>
+
+  <form id="registerForm" class="p-6 md:p-8" th:object="${user}" method="post" action="">
+    <div class="space-y-4">
+
+      <div>
+        <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('role')}">
+          <label class="validation-message" th:erros="*{role}"></label>
+        </div>
+        <label for="user_role" class="block text-sm font-medium text-gray-700 mb-1">Tipo de usuário</label>
+        <div class="login-input relative border rounded-lg overflow-hidden transition-all duration-200">
+          <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                  id="user_role"
+                  th:field="*{role}">
+            <option value="">Selecione</option>
+            <option th:each="role : ${T(com.matheus.VehicleManager.enums.UserRole).values()}"
+                    th:text="${role.getUserRole()}" th:value="${role}"></option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('username')}">
+          <label class="validation-message" th:erros="*{username}"></label>
+        </div>
+        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Nome de usuário</label>
+        <div class="login-input relative border rounded-lg overflow-hidden transition-all duration-200">
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+            <i class="fas fa-user"></i>
+          </div>
+          <input
+                type="text"
+                id="username"
+                th:field="*{username}"
+                required
+                class="w-full pl-10 pr-4 py-2.5 focus:outline-none"
+                placeholder="nome.usuario"
+          >
+        </div>
+      </div>
+
+      <div>
+        <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('password')}">
+          <label class="validation-message" th:erros="*{password}"></label>
+        </div>
+        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+        <div class="login-input relative border rounded-lg overflow-hidden transition-all duration-200">
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+            <i class="fas fa-lock"></i>
+          </div>
+          <input
+                  type="password"
+                  id="password"
+                  th:field="*{password}"
+                  required
+                  class="w-full pl-10 pr-10 py-2.5 focus:outline-none"
+                  placeholder="Crie uma senha"
+          >
+          <button
+                  type="button"
+                  id="togglePassword"
+                  class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          >
+            <i class="fas fa-eye"></i>
+          </button>
+        </div>
+        <div class="mt-1 grid grid-cols-4 gap-1" style="height: 5px;">
+          <div id="strength-1" class="password-strength rounded"></div>
+          <div id="strength-2" class="password-strength rounded"></div>
+          <div id="strength-3" class="password-strength rounded"></div>
+          <div id="strength-4" class="password-strength rounded"></div>
+        </div>
+        <p id="password-hint" class="text-xs text-gray-500 mt-1 hidden">A senha deve conter pelo menos 8 caracteres, incluindo números e letras maiúsculas.</p>
+      </div>
+
+      <div>
+        <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Confirmar Senha</label>
+        <div class="login-input relative border rounded-lg overflow-hidden transition-all duration-200">
+          <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+            <i class="fas fa-lock"></i>
+          </div>
+          <input
+                  type="password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  required
+                  class="w-full pl-10 pr-4 py-2.5 focus:outline-none"
+                  placeholder="Confirme sua senha"
+          >
+        </div>
+        <p id="password-match" class="text-xs text-red-500 mt-1 hidden">As senhas não coincidem!</p>
+      </div>
+
+      <button
+              type="submit"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center space-x-2"
+              id="submitBtn"
+      >
+        <i class="fas fa-user-plus"></i>
+        <span>Criar conta</span>
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  const passwordInput = document.getElementById('password');
+  const confirmPasswordInput = document.getElementById('confirmPassword');
+  const passwordHint = document.getElementById('password-hint');
+  const passwordMatchMsg = document.getElementById('password-match');
+  const strengthBars = [
+    document.getElementById('strength-1'),
+    document.getElementById('strength-2'),
+    document.getElementById('strength-3'),
+    document.getElementById('strength-4')
+  ];
+
+  const togglePassword = document.getElementById('togglePassword');
+  togglePassword.addEventListener('click', () => {
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+    togglePassword.innerHTML = `<i class="fas fa-${type === 'password' ? 'eye' : 'eye-slash'}"></i>`;
+  });
+
+  function checkPasswordStrength(password) {
+    let score = 1;
+    if (password.length >= 8) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+
+    strengthBars.forEach(bar => {
+      bar.className = "password-strength rounded";
+    });
+
+    const strengthClasse = ["bg-red-200", "bg-yellow-200", "bg-blue-200", "bg-green-200"];
+
+    for (let i = 0; i < 4; i++) {
+      if (score > i) {
+        strengthBars[i].classList.add(strengthClasse[i]);
+      } else {
+        strengthBars[i].classList.add("bg-gray-200");
+      }
+    }
+
+    passwordHint.classList.toggle('hidden', score >= 3);
+
+    return score >= 3;
+  }
+
+  function checkPasswordsMatch() {
+    const match = passwordInput.value === confirmPasswordInput.value;
+    passwordMatchMsg.classList.toggle('hidden', match);
+    return match;
+  }
+
+  passwordInput.addEventListener('input', () => {
+    checkPasswordStrength(passwordInput.value);
+    checkPasswordsMatch();
+  });
+
+  confirmPasswordInput.addEventListener('input', () => {
+    checkPasswordsMatch();
+  });
+
+  document.getElementById('registerForm').addEventListener('submit', (e) => {
+    const isStrong = checkPasswordStrength(passwordInput.value);
+    const isMatch = checkPasswordsMatch();
+    if (!isStrong || !isMatch) {
+      e.preventDefault();
+    }
+  });
+</script>
+
+</body>
+</html>
