@@ -1,25 +1,17 @@
 package com.matheus.VehicleManager.controller;
 
-import com.matheus.VehicleManager.dto.LoginUserDto;
-import com.matheus.VehicleManager.dto.RecoveryJwtTokenDto;
 import com.matheus.VehicleManager.model.User;
 import com.matheus.VehicleManager.repository.UserRepository;
-import com.matheus.VehicleManager.security.config.SecurityConfiguration;
+import com.matheus.VehicleManager.security.SecurityConfiguration;
 import com.matheus.VehicleManager.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-@RequestMapping("/usuarios")
 public class UserController {
 
     @Autowired
@@ -28,9 +20,6 @@ public class UserController {
     @Autowired
     private SecurityConfiguration securityConfiguration;
 
-    @Autowired
-    private UserRepository userRepository;
-
     @GetMapping("/login")
     public ModelAndView authenticateUser() {
         ModelAndView modelAndView = new ModelAndView();
@@ -38,13 +27,7 @@ public class UserController {
         return modelAndView;
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<RecoveryJwtTokenDto> authenticateUser(@RequestBody LoginUserDto loginUserDto) {
-        RecoveryJwtTokenDto token = userService.authenticateUser(loginUserDto);
-        return new ResponseEntity<>(token, HttpStatus.OK);
-    }
-
-    @GetMapping("/cadastrar")
+    @GetMapping("/usuarios/cadastrar")
     public ModelAndView createUser(User user) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("user/register");
@@ -52,16 +35,16 @@ public class UserController {
         return modelAndView;
     }
 
-    @PostMapping("/cadastrar")
+    @PostMapping("/usuarios/cadastrar")
     public ModelAndView createUser(@Valid User user, BindingResult bindingResult) {
         ModelAndView modelAndView = new ModelAndView();
         if (bindingResult.hasErrors()) {
             modelAndView.setViewName("user/register");
-            modelAndView.addObject("user", new User());
+            modelAndView.addObject("user", user);
         } else {
-            modelAndView.setViewName("redirect:/usuarios/login");
             user.setPassword(securityConfiguration.passwordEncoder().encode(user.getPassword()));
-            userRepository.save(user);
+            userService.saveUser(user);
+            modelAndView.setViewName("redirect:/login");
         }
         return modelAndView;
     }

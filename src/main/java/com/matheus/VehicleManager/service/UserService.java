@@ -1,39 +1,36 @@
 package com.matheus.VehicleManager.service;
 
-import com.matheus.VehicleManager.dto.CreateUserDto;
-import com.matheus.VehicleManager.dto.LoginUserDto;
-import com.matheus.VehicleManager.dto.RecoveryJwtTokenDto;
-import com.matheus.VehicleManager.enums.UserRole;
 import com.matheus.VehicleManager.model.User;
 import com.matheus.VehicleManager.repository.UserRepository;
-import com.matheus.VehicleManager.security.authentication.JwtTokenService;
-import com.matheus.VehicleManager.security.config.SecurityConfiguration;
-import com.matheus.VehicleManager.security.userdetails.UserDetailsImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+    private UserRepository userRepository;
 
-    @Autowired
-    private JwtTokenService jwtTokenService;
-
-    public RecoveryJwtTokenDto authenticateUser(LoginUserDto loginUserDto) {
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(loginUserDto.username(), loginUserDto.password());
-
-        Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
-
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-        return new RecoveryJwtTokenDto(jwtTokenService.generateToken(userDetails));
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+        );
     }
+
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
+
 }
