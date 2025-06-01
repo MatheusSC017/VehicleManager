@@ -17,7 +17,13 @@ public class SecurityConfiguration {
     };
 
     public static final String [] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
-            "/veiculos"
+            "/veiculos",
+            "/veiculos/pesquisa",
+            "/veiculos/filtro",
+            "/veiculos/{id}",
+            "/veiculos/cadastrar",
+            "/veiculos/{id}/editar",
+            "/veiculos/{id}/deletar"
     };
 
     public static final String [] ENDPOINTS_USER = {

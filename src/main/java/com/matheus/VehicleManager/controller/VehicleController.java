@@ -12,10 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -23,6 +20,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Controller
+@RequestMapping("/veiculos")
 public class VehicleController {
 
     @Autowired
@@ -37,7 +35,7 @@ public class VehicleController {
     @Autowired
     private FileStorageService fileStorageService;
 
-    @GetMapping("/veiculos")
+    @GetMapping
     public ModelAndView vehicles() {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicles");
@@ -45,7 +43,7 @@ public class VehicleController {
         return modelAndView;
     }
 
-    @PostMapping("/veiculos/pesquisa")
+    @GetMapping("/pesquisa")
     public ModelAndView searcVehicles(@RequestParam("searchInput") String search) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicles");
@@ -54,7 +52,7 @@ public class VehicleController {
         return modelAndView;
     }
 
-    @GetMapping("/veiculos/filtro")
+    @GetMapping("/filtro")
     public ModelAndView filterVehicles(@RequestParam("status") String status, @RequestParam("type") String type,
                                        @RequestParam("fuel") String fuel, @RequestParam("priceMin") int priceMin,
                                        @RequestParam("priceMax") int priceMax) {
@@ -70,7 +68,7 @@ public class VehicleController {
         return modelAndView;
     }
 
-    @GetMapping("/veiculos/{id}")
+    @GetMapping("/{id}")
     public ModelAndView vehicle(@PathVariable("id") Long id) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicle");
@@ -79,7 +77,7 @@ public class VehicleController {
         return modelAndView;
     }
 
-    @GetMapping("/veiculos/cadastrar")
+    @GetMapping("/cadastrar")
     public ModelAndView getInsertForm(Vehicle vehicle) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicle_register");
@@ -87,7 +85,7 @@ public class VehicleController {
         return modelAndView;
     }
 
-    @PostMapping("/veiculos/cadastrar")
+    @PostMapping("/cadastrar")
     public ModelAndView insert(@Valid Vehicle vehicle, BindingResult bindingResult, @RequestParam("imagesInput") MultipartFile[] images) {
         ModelAndView modelAndView = new ModelAndView();
         if (bindingResult.hasErrors()) {
@@ -123,7 +121,7 @@ public class VehicleController {
         return modelAndView;
     }
 
-    @GetMapping("/veiculos/{id}/editar")
+    @GetMapping("/{id}/editar")
     public ModelAndView getUpdateForm(@PathVariable("id") Long id) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicle_update");
@@ -132,7 +130,7 @@ public class VehicleController {
         return modelAndView;
     }
 
-    @PostMapping("/veiculos/{id}/editar")
+    @PostMapping("/{id}/editar")
     public ModelAndView update(@Valid Vehicle vehicle, BindingResult bindingResult,
                                @RequestParam("imagesInput") MultipartFile[] images,
                                @RequestParam(value = "selectedImages", required = false) List<Long> selectedImageIds) {
@@ -180,7 +178,7 @@ public class VehicleController {
         return modelAndView;
     }
 
-    @GetMapping("/veiculos/{id}/deletar")
+    @GetMapping("/{id}/deletar")
     public ModelAndView delete(@PathVariable("id") Long id) {
         try {
             vehicleRepository.deleteById(id);

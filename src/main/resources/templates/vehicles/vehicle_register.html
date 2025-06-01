@@ -62,7 +62,8 @@
                 </div>
 
                 <!-- Form Content -->
-                <form action="" class="p-6" id="vehicleForm" method="post" th:object="${vehicle}" enctype='multipart/form-data'>
+                <form action="" class="p-6" enctype='multipart/form-data' id="vehicleForm" method="post"
+                      th:object="${vehicle}">
                     <!-- Basic Information Section -->
                     <div class="mb-8">
                         <div class="flex items-center justify-between cursor-pointer"
@@ -308,7 +309,8 @@
                                                 ou arraste e solte</p>
                                             <p class="text-xs text-gray-500">PNG, JPG ou JPEG (MAX. 5MB cada)</p>
                                         </div>
-                                        <input class="hidden" id="dropzone-file" multiple type="file" name="imagesInput"/>
+                                        <input class="hidden" id="dropzone-file" multiple name="imagesInput"
+                                               type="file"/>
                                     </label>
                                 </div>
 
@@ -334,6 +336,7 @@
                             <span>Salvar Veículo</span>
                         </button>
                     </div>
+                    <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden"/>
                 </form>
             </div>
         </main>

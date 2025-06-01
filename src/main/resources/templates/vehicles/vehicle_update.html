@@ -62,7 +62,8 @@
                 </div>
 
                 <!-- Form Content -->
-                <form action="" class="p-6" id="vehicleForm" method="post" th:object="${vehicle}" enctype='multipart/form-data'>
+                <form action="" class="p-6" enctype='multipart/form-data' id="vehicleForm" method="post"
+                      th:object="${vehicle}">
                     <!-- Basic Information Section -->
                     <div class="mb-8">
                         <div class="flex items-center justify-between cursor-pointer"
@@ -307,7 +308,8 @@
                                                 ou arraste e solte</p>
                                             <p class="text-xs text-gray-500">PNG, JPG ou JPEG (MAX. 5MB cada)</p>
                                         </div>
-                                        <input class="hidden" id="dropzone-file" multiple type="file" name="imagesInput"/>
+                                        <input class="hidden" id="dropzone-file" multiple name="imagesInput"
+                                               type="file"/>
                                     </label>
                                 </div>
 
@@ -316,13 +318,15 @@
                                 </div>
 
                                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
-                                    <div th:if="${vehicle.images != null}" th:each="image : ${vehicle.images}" class="relative" th:attr="data-image-id=${image.id}">
-                                        <img th:src="${image.path}" class="w-full h-40 object-cover rounded" />
+                                    <div class="relative" th:attr="data-image-id=${image.id}"
+                                         th:each="image : ${vehicle.images}" th:if="${vehicle.images != null}">
+                                        <img class="w-full h-40 object-cover rounded" th:src="${image.path}"/>
 
-                                        <input type="checkbox" th:id="'checkbox-' + ${image.id}" th:name="'selectedImages'" th:value="${image.id}" class="hidden peer" />
+                                        <input class="hidden peer" th:id="'checkbox-' + ${image.id}"
+                                               th:name="'selectedImages'" th:value="${image.id}" type="checkbox"/>
 
-                                        <label th:for="'checkbox-' + ${image.id}"
-                                               class="absolute top-1 right-1 bg-gray-400 peer-checked:bg-red-500 text-white rounded-full p-1 text-xs cursor-pointer transition-colors">
+                                        <label class="absolute top-1 right-1 bg-gray-400 peer-checked:bg-red-500 text-white rounded-full p-1 text-xs cursor-pointer transition-colors"
+                                               th:for="'checkbox-' + ${image.id}">
                                             &times;
                                         </label>
 
@@ -347,6 +351,7 @@
                             <span>Salvar Veículo</span>
                         </button>
                     </div>
+                    <input th:name="${_csrf.parameterName}" th:value="${_csrf.token}" type="hidden"/>
                 </form>
             </div>
         </main>
