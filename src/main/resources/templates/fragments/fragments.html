@@ -17,6 +17,21 @@
             <span class="logo-text font-bold text-xl">AutoGest</span>
         </div>
 
+        <div class="p-4 flex justify-between items-center border-b border-blue-700">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div>
+                    <div class="font-medium" th:text="${username}">Admin</div>
+                    <div class="text-xs text-blue-200" th:text="${role}">Administrador</div>
+                </div>
+            </div>
+            <button id="toggleSidebar" class="text-blue-200 hover:text-white">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
         <nav class="flex-1 overflow-y-auto p-4 space-y-2">
 
             <div class="mt-6 text-xs uppercase text-blue-300 px-2 menu-text">Gerenciamento</div>
