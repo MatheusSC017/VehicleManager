@@ -17,20 +17,6 @@
             <h1 class="text-2xl font-bold text-gray-800">Veículos</h1>
 
             <div class="flex space-x-4">
-                <form action="/veiculos/pesquisa" class="flex flex-row space-x-4" method="get">
-                    <div class="relative">
-                        <input class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                               name="searchInput"
-                               placeholder="Buscar veículo..."
-                               type="text">
-                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                    </div>
-
-                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
-                        <i class="fas fa-search"></i>
-                        <span>Buscar</span>
-                    </button>
-                </form>
 
                 <a href="\veiculos\cadastrar">
                     <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2">
@@ -44,64 +30,77 @@
         <main class="p-6">
             <!-- Filters -->
             <div class="bg-white p-6 rounded-2xl shadow-md mb-6 max-w-7xl mx-auto">
-                <form action="/veiculos/filtro"
-                      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
-                      method="get">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
-                        <select class="w-full border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                                name="status">
-                            <option value="">Todos</option>
-                            <option th:each="status : ${T(com.matheus.VehicleManager.enums.VehicleStatus).values()}"
-                                    th:selected="${statusFilter == status.name()}"
-                                    th:text="${status.getVehicleStatus()}"
-                                    th:value="${status}"></option>
-                        </select>
-                    </div>
+                <form action="/veiculos" class="flex flex-row space-x-4" method="get">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo</label>
-                        <select class="w-full border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                                name="type">
-                            <option value="">Todos</option>
-                            <option th:each="type : ${T(com.matheus.VehicleManager.enums.VehicleType).values()}"
-                                    th:selected="${typeFilter == type.name()}" th:text="${type.getVehicleType()}"
-                                    th:value="${type}"></option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Combustível</label>
-                        <select class="w-full border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                                name="fuel">
-                            <option value="">Todos</option>
-                            <option th:each="fuel : ${T(com.matheus.VehicleManager.enums.VehicleFuel).values()}"
-                                    th:selected="${fuelFilter == fuel.name()}" th:text="${fuel.getVehicleFuel()}"
-                                    th:value="${fuel}"></option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Faixa de Preço (R$)</label>
-                        <div class="flex gap-2">
-                            <input class="w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                                   max="200000000" min="0" name="priceMin" placeholder="Mín"
-                                   required
-                                   th:value="*{priceMinFilter ?: '0'}" type="number"
-                                   value="0"/>
-                            <input class="w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-                                   max="200000000" min="0" name="priceMax" placeholder="Máx"
-                                   required
-                                   th:value="*{priceMaxFilter ?: '0'}" type="number"
-                                   value="0"/>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Persquisar por</label>
+                            <div class="relative">
+                                <input class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                       name="searchInput"
+                                       placeholder="Buscar veículo..."
+                                       type="text"
+                                       th:value="*{searchFilter ?: ''}">
+                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="sm:col-span-2 md:col-span-3 lg:col-span-4 flex justify-end">
-                        <button class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-xl shadow transition"
-                                type="submit">
-                            Aplicar Filtros
-                        </button>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                            <select class="w-full border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                    name="status">
+                                <option value="">Todos</option>
+                                <option th:each="status : ${T(com.matheus.VehicleManager.enums.VehicleStatus).values()}"
+                                        th:selected="${statusFilter == status.name()}"
+                                        th:text="${status.getVehicleStatus()}"
+                                        th:value="${status}"></option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Tipo</label>
+                            <select class="w-full border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                    name="type">
+                                <option value="">Todos</option>
+                                <option th:each="type : ${T(com.matheus.VehicleManager.enums.VehicleType).values()}"
+                                        th:selected="${typeFilter == type.name()}" th:text="${type.getVehicleType()}"
+                                        th:value="${type}"></option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Combustível</label>
+                            <select class="w-full border rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                    name="fuel">
+                                <option value="">Todos</option>
+                                <option th:each="fuel : ${T(com.matheus.VehicleManager.enums.VehicleFuel).values()}"
+                                        th:selected="${fuelFilter == fuel.name()}" th:text="${fuel.getVehicleFuel()}"
+                                        th:value="${fuel}"></option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Faixa de Preço (R$)</label>
+                            <div class="flex gap-2">
+                                <input class="w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                       max="200000000" min="0" name="priceMin" placeholder="Mín"
+                                       required
+                                       th:value="*{priceMinFilter ?: '0'}" type="number"
+                                       value="0"/>
+                                <input class="w-full border rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                                       max="200000000" min="0" name="priceMax" placeholder="Máx"
+                                       required
+                                       th:value="*{priceMaxFilter ?: '0'}" type="number"
+                                       value="0"/>
+                            </div>
+                        </div>
+
+                        <div class="sm:col-span-2 md:col-span-3 lg:col-span-4 flex justify-end">
+                            <button class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-xl shadow transition"
+                                    type="submit">
+                                Aplicar Filtros
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>

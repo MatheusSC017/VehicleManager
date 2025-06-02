@@ -38,32 +38,24 @@ public class VehicleController {
     private FileStorageService fileStorageService;
 
     @GetMapping
-    public ModelAndView vehicles(@RequestParam(value="searchInput") Optional<String> search) {
+    public ModelAndView vehicles(@RequestParam(value="searchInput") Optional<String> search,
+                                 @RequestParam("status") Optional<String> status,
+                                 @RequestParam("type") Optional<String> type,
+                                 @RequestParam("fuel") Optional<String> fuel,
+                                 @RequestParam(value="priceMin", defaultValue="0") int priceMin,
+                                 @RequestParam(value="priceMax", defaultValue="0") int priceMax) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicles");
         List<VehicleWithOneImageDTO> vehicles;
-        if (search.isEmpty()) {
-            vehicles = vehicleService.getVehiclesWithOneImage();
-        } else {
-            vehicles = vehicleService.getByBrandAndModelIgnoreCaseWithOneImage(search.orElse(""));
-        }
-        modelAndView.addObject("vehiclesList", vehicles);
-        return modelAndView;
-    }
-
-    @GetMapping("/filtro")
-    public ModelAndView filterVehicles(@RequestParam("status") String status, @RequestParam("type") String type,
-                                       @RequestParam("fuel") String fuel, @RequestParam("priceMin") int priceMin,
-                                       @RequestParam("priceMax") int priceMax) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("vehicles/vehicles");
-        List<VehicleWithOneImageDTO> vehiclesWithImage = vehicleService.getFilteredVehiclesWithOneImage(status, type, fuel, priceMin, priceMax);
-        modelAndView.addObject("statusFilter", status);
-        modelAndView.addObject("typeFilter", type);
-        modelAndView.addObject("fuelFilter", fuel);
+        vehicles = vehicleService.getFilteredVehiclesWithOneImage(search.orElse(""), status.orElse(""),
+                type.orElse(""), fuel.orElse(""), priceMin, priceMax);
+        modelAndView.addObject("searchFilter", search.orElse(""));
+        modelAndView.addObject("statusFilter", status.orElse(""));
+        modelAndView.addObject("typeFilter", type.orElse(""));
+        modelAndView.addObject("fuelFilter", fuel.orElse(""));
         modelAndView.addObject("priceMinFilter", priceMin);
         modelAndView.addObject("priceMaxFilter", priceMax);
-        modelAndView.addObject("vehiclesList", vehiclesWithImage);
+        modelAndView.addObject("vehiclesList", vehicles);
         return modelAndView;
     }
 
