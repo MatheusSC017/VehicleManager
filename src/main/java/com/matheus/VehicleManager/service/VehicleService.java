@@ -1,5 +1,6 @@
 package com.matheus.VehicleManager.service;
 
+import com.matheus.VehicleManager.dto.VehicleWithImagesDTO;
 import com.matheus.VehicleManager.dto.VehicleWithOneImageDTO;
 import com.matheus.VehicleManager.enums.FileType;
 import com.matheus.VehicleManager.model.FileStore;
@@ -19,19 +20,19 @@ public class VehicleService {
     @Autowired
     private VehicleRepository vehicleRepository;
 
-    public VehicleWithOneImageDTO getVehicleWithImageById(Long id) {
+    public VehicleWithImagesDTO getVehicleWithImagesById(Long id) {
         Vehicle vehicle = this.vehicleRepository.getReferenceById(id);
-        return this.getVehicleWithOneImage(vehicle);
+        return this.getVehicleWithImages(vehicle);
     }
 
     public List<VehicleWithOneImageDTO> getVehiclesWithOneImage() {
         List<Vehicle> vehicles = this.vehicleRepository.findAll();
-        return this.getVehiclesImages(vehicles);
+        return this.getVehiclesImage(vehicles);
     }
 
     public List<VehicleWithOneImageDTO> getByBrandAndModelIgnoreCaseWithOneImage(String search) {
         List<Vehicle> vehicles = this.vehicleRepository.findByBrandAndModelIgnoreCase(search);
-        return this.getVehiclesImages(vehicles);
+        return this.getVehiclesImage(vehicles);
     }
 
     public List<VehicleWithOneImageDTO> getFilteredVehiclesWithOneImage(String status, String type, String fuel, int priceMin, int priceMax) {
@@ -43,17 +44,17 @@ public class VehicleService {
                 .filter(v -> priceMin == 0 || v.getPrice().compareTo(BigDecimal.valueOf(priceMin)) >= 0)
                 .filter(v -> priceMax == 0 || v.getPrice().compareTo(BigDecimal.valueOf(priceMax)) <= 0)
                 .toList();
-        return this.getVehiclesImages(vehicles);
+        return this.getVehiclesImage(vehicles);
     }
 
-    private List<VehicleWithOneImageDTO> getVehiclesImages(List<Vehicle> vehicles) {
-        List<VehicleWithOneImageDTO> vehiclesWithImage = new ArrayList<>();
+    private List<VehicleWithOneImageDTO> getVehiclesImage(List<Vehicle> vehicles) {
+        List<VehicleWithOneImageDTO> vehiclesWithOneImage = new ArrayList<>();
 
         for (Vehicle vehicle : vehicles) {
-            vehiclesWithImage.add(this.getVehicleWithOneImage(vehicle));
+            vehiclesWithOneImage.add(this.getVehicleWithOneImage(vehicle));
         }
 
-        return vehiclesWithImage;
+        return vehiclesWithOneImage;
     }
 
     private VehicleWithOneImageDTO getVehicleWithOneImage(Vehicle vehicle) {
@@ -61,6 +62,11 @@ public class VehicleService {
                 .filter(img -> img.getType().getFileType().equalsIgnoreCase(FileType.IMAGE.getFileType()))
                 .findFirst();
         return new VehicleWithOneImageDTO(vehicle, image.orElse(null));
+    }
+
+    private VehicleWithImagesDTO getVehicleWithImages(Vehicle vehicle) {
+        List<FileStore> images = vehicle.getImages();
+        return new VehicleWithImagesDTO(vehicle, images);
     }
 
 }

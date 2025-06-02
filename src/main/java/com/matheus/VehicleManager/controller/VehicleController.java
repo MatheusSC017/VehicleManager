@@ -1,5 +1,6 @@
 package com.matheus.VehicleManager.controller;
 
+import com.matheus.VehicleManager.dto.VehicleWithImagesDTO;
 import com.matheus.VehicleManager.dto.VehicleWithOneImageDTO;
 import com.matheus.VehicleManager.enums.FileType;
 import com.matheus.VehicleManager.model.FileStore;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/veiculos")
@@ -36,19 +38,16 @@ public class VehicleController {
     private FileStorageService fileStorageService;
 
     @GetMapping
-    public ModelAndView vehicles() {
+    public ModelAndView vehicles(@RequestParam(value="searchInput") Optional<String> search) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicles");
-        modelAndView.addObject("vehiclesList", vehicleService.getVehiclesWithOneImage());
-        return modelAndView;
-    }
-
-    @GetMapping("/pesquisa")
-    public ModelAndView searcVehicles(@RequestParam("searchInput") String search) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("vehicles/vehicles");
-        List<VehicleWithOneImageDTO> filteredVehicles = vehicleService.getByBrandAndModelIgnoreCaseWithOneImage(search);
-        modelAndView.addObject("vehiclesList", filteredVehicles);
+        List<VehicleWithOneImageDTO> vehicles;
+        if (search.isEmpty()) {
+            vehicles = vehicleService.getVehiclesWithOneImage();
+        } else {
+            vehicles = vehicleService.getByBrandAndModelIgnoreCaseWithOneImage(search.orElse(""));
+        }
+        modelAndView.addObject("vehiclesList", vehicles);
         return modelAndView;
     }
 
@@ -72,7 +71,7 @@ public class VehicleController {
     public ModelAndView vehicle(@PathVariable("id") Long id) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicle");
-        VehicleWithOneImageDTO vehicle = vehicleService.getVehicleWithImageById(id);
+        VehicleWithImagesDTO vehicle = vehicleService.getVehicleWithImagesById(id);
         modelAndView.addObject("vehicleDTO", vehicle);
         return modelAndView;
     }

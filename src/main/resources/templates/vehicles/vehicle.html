@@ -70,97 +70,94 @@
 
                 <!-- Vehicle Content -->
                 <div class="p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- Vehicle Image -->
-                        <div class="lg:col-span-1">
-                            <div class="relative">
-                                <img class="vehicle-image w-full"
-                                     th:src="${vehicleDTO.image != null ? vehicleDTO.image.path : 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'}">
-                                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 text-white">
-                                    <div class="text-2xl font-bold">R$ <span th:text="*{vehicle.price}"></span></div>
-                                    <div class="text-sm">Placa: <span th:text="*{vehicle.plate}"></span></div>
-                                </div>
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                            Informações Básicas
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            <div class="field-card">
+                                <div class="text-sm text-gray-500">Marca</div>
+                                <div class="font-medium" th:text="*{vehicle.brand}"></div>
+                            </div>
+                            <div class="field-card">
+                                <div class="text-sm text-gray-500">Modelo</div>
+                                <div class="font-medium" th:text="*{vehicle.model}"></div>
+                            </div>
+                            <div class="field-card">
+                                <div class="text-sm text-gray-500">Ano</div>
+                                <div class="font-medium" th:text="*{vehicle.year}"></div>
+                            </div>
+                            <div class="field-card">
+                                <div class="text-sm text-gray-500">Cor</div>
+                                <div class="font-medium" th:text="*{vehicle.color}"></div>
+                            </div>
+                            <div class="field-card">
+                                <div class="text-sm text-gray-500">Chassi</div>
+                                <div class="font-medium" th:text="*{vehicle.chassi}"></div>
+                            </div>
+                            <div class="field-card">
+                                <div class="text-sm text-gray-500">Quilometragem</div>
+                                <div class="font-medium"><span th:text="*{vehicle.mileage}"></span> km</div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Vehicle Details -->
-                        <div class="lg:col-span-2">
-                            <div class="mb-6">
-                                <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                                    <i class="fas fa-info-circle mr-2 text-blue-500"></i>
-                                    Informações Básicas
-                                </h3>
-                                <div class="specs-grid">
-                                    <div class="spec-card">
-                                        <div class="text-sm text-gray-500">Marca</div>
-                                        <div class="font-medium" th:text="*{vehicle.brand}"></div>
-                                    </div>
-                                    <div class="spec-card">
-                                        <div class="text-sm text-gray-500">Modelo</div>
-                                        <div class="font-medium" th:text="*{vehicle.model}"></div>
-                                    </div>
-                                    <div class="spec-card">
-                                        <div class="text-sm text-gray-500">Ano</div>
-                                        <div class="font-medium" th:text="*{vehicle.year}"></div>
-                                    </div>
-                                    <div class="spec-card">
-                                        <div class="text-sm text-gray-500">Cor</div>
-                                        <div class="font-medium" th:text="*{vehicle.color}"></div>
-                                    </div>
-                                    <div class="spec-card">
-                                        <div class="text-sm text-gray-500">Chassi</div>
-                                        <div class="font-medium" th:text="*{vehicle.chassi}"></div>
-                                    </div>
-                                    <div class="spec-card">
-                                        <div class="text-sm text-gray-500">Quilometragem</div>
-                                        <div class="font-medium"><span th:text="*{vehicle.mileage}"></span> km</div>
-                                    </div>
-                                </div>
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-cogs mr-2 text-blue-500"></i>
+                            Especificações Técnicas
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            <div class="field-card">
+                                <div class="text-sm text-gray-500">Tipo</div>
+                                <div class="font-medium" th:text="*{vehicle.vehicleType}"></div>
                             </div>
-
-                            <div class="mb-6">
-                                <h3 class="text-lg font-semibold text-gray-800 mb-4">
-                                    <i class="fas fa-cogs mr-2 text-blue-500"></i>
-                                    Especificações Técnicas
-                                </h3>
-                                <div class="specs-grid">
-                                    <div class="spec-card">
-                                        <div class="text-sm text-gray-500">Tipo</div>
-                                        <div class="font-medium" th:text="*{vehicle.vehicleType}"></div>
-                                    </div>
-                                    <div class="spec-card">
-                                        <div class="text-sm text-gray-500">Combustível</div>
-                                        <div class="font-medium" th:text="*{vehicle.vehicleFuel}"></div>
-                                    </div>
-                                    <div class="spec-card">
-                                        <div class="text-sm text-gray-500">Câmbio</div>
-                                        <div class="font-medium" th:text="*{vehicle.vehicleChange}"></div>
-                                    </div>
-                                    <div class="spec-card">
-                                        <div class="text-sm text-gray-500">Portas</div>
-                                        <div class="font-medium" th:text="*{vehicle.doors}"></div>
-                                    </div>
-                                    <div class="spec-card">
-                                        <div class="text-sm text-gray-500">Motor</div>
-                                        <div class="font-medium" th:text="*{vehicle.motor}"></div>
-                                    </div>
-                                    <div class="spec-card">
-                                        <div class="text-sm text-gray-500">Potência</div>
-                                        <div class="font-medium" th:text="*{vehicle.power}"></div>
-                                    </div>
-                                </div>
+                            <div class="field-card">
+                                <div class="text-sm text-gray-500">Combustível</div>
+                                <div class="font-medium" th:text="*{vehicle.vehicleFuel}"></div>
                             </div>
-
-                            <div class="flex justify-end pt-6 border-t border-gray-200">
-                                <a th:href="@{/veiculos/{id}/editar(id=${id})}">
-                                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center space-x-2"
-                                            onclick="window.location.href='edit-vehicle.html'">
-                                        <i class="fas fa-edit"></i>
-                                        <span>Editar Veículo</span>
-                                    </button>
-                                </a>
+                            <div class="field-card">
+                                <div class="text-sm text-gray-500">Câmbio</div>
+                                <div class="font-medium" th:text="*{vehicle.vehicleChange}"></div>
+                            </div>
+                            <div class="field-card">
+                                <div class="text-sm text-gray-500">Portas</div>
+                                <div class="font-medium" th:text="*{vehicle.doors}"></div>
+                            </div>
+                            <div class="field-card">
+                                <div class="text-sm text-gray-500">Motor</div>
+                                <div class="font-medium" th:text="*{vehicle.motor}"></div>
+                            </div>
+                            <div class="field-card">
+                                <div class="text-sm text-gray-500">Potência</div>
+                                <div class="font-medium" th:text="*{vehicle.power}"></div>
                             </div>
                         </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                            <i class="fas fa-images mr-2 text-blue-500"></i>
+                            Galeria
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                            <div class="relative group" th:each="image : ${vehicleDTO.images}">
+                                <img th:src="${image?.path ?: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80'}"
+                                     class="w-full h-40 object-cover rounded-lg"
+                                     onclick="openModal(this.src)">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-6 border-t border-gray-200">
+                        <a th:href="@{/veiculos/{id}/editar(id=${id})}">
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg flex items-center space-x-2"
+                                    onclick="window.location.href='edit-vehicle.html'">
+                                <i class="fas fa-edit"></i>
+                                <span>Editar Veículo</span>
+                            </button>
+                        </a>
                     </div>
                 </div>
             </div>
