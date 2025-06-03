@@ -1,5 +1,6 @@
 package com.matheus.VehicleManager.model;
 
+import com.matheus.VehicleManager.validators.UniqueEmail;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
@@ -9,7 +10,7 @@ public class Client {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String id;
+    private Long id;
 
     @Size(min = 2, max = 50, message = "O limite máximo de caracteres é 50")
     private String first_name;
@@ -18,6 +19,7 @@ public class Client {
     private String last_name;
 
     @Column(unique = true)
+    @UniqueEmail
     @Email
     @Size(min = 5, max = 50, message = "O limite máximo de caracteres é 50")
     private String email;
@@ -25,11 +27,11 @@ public class Client {
     @Size(min = 10, max = 20, message = "O limite mínimo de caracteres é 10 e o máximo é 20")
     private String phone;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

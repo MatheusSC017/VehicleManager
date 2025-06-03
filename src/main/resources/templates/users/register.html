@@ -23,8 +23,8 @@
         <div class="space-y-4">
 
             <div>
-                <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('role')}">
-                    <label class="validation-message" th:erros="*{role}"></label>
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative" th:if="${#fields.hasErrors('role')}">
+                    <label class="block text-sm" th:errors="*{role}"></label>
                 </div>
                 <label class="block text-sm font-medium text-gray-700 mb-1" for="user_role">Tipo de usuário</label>
                 <div class="login-input relative border rounded-lg overflow-hidden transition-all duration-200">
@@ -39,8 +39,8 @@
                 </div>
             </div>
             <div>
-                <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('username')}">
-                    <label class="validation-message" th:erros="*{username}"></label>
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative" th:if="${#fields.hasErrors('username')}">
+                    <label class="block text-sm" th:errors="*{username}"></label>
                 </div>
                 <label class="block text-sm font-medium text-gray-700 mb-1" for="username">Nome de usuário</label>
                 <div class="login-input relative border rounded-lg overflow-hidden transition-all duration-200">
@@ -59,8 +59,8 @@
             </div>
 
             <div>
-                <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('password')}">
-                    <label class="validation-message" th:erros="*{password}"></label>
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative" th:if="${#fields.hasErrors('password')}">
+                    <label class="block text-sm" th:errors="*{password}"></label>
                 </div>
                 <label class="block text-sm font-medium text-gray-700 mb-1" for="password">Senha</label>
                 <div class="login-input relative border rounded-lg overflow-hidden transition-all duration-200">

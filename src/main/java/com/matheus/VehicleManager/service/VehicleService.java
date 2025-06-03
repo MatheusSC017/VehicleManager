@@ -25,11 +25,6 @@ public class VehicleService {
         return this.getVehicleWithImages(vehicle);
     }
 
-    public List<VehicleWithOneImageDTO> getVehiclesWithOneImage() {
-        List<Vehicle> vehicles = this.vehicleRepository.findAll();
-        return this.getVehiclesImage(vehicles);
-    }
-
     public List<VehicleWithOneImageDTO> getFilteredVehiclesWithOneImage(String search,String status, String type,
                                                                         String fuel, int priceMin, int priceMax) {
         List<Vehicle> vehicles = vehicleRepository.findByBrandAndModelIgnoreCase(search);

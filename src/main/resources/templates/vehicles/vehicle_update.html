@@ -10,7 +10,7 @@
 </head>
 <body class="bg-gray-50">
 <div class="flex h-screen overflow-hidden">
-    <div th:replace="fragments/fragments :: sidebar"></div>
+    <div th:replace="~{fragments/fragments :: sidebar}"></div>
     <div class="flex-1 overflow-auto">
         <header class="bg-white shadow-sm p-4 flex justify-between items-center">
             <div>
@@ -78,8 +78,8 @@
                         <div class="form-section active" id="basicInfo">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
                                 <div>
-                                    <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('brand')}">
-                                        <label class="validation-message" th:erros="*{brand}"></label>
+                                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative" th:if="${#fields.hasErrors('brand')}">
+                                        <label class="block text-sm" th:errors="*{brand}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Marca*</label>
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -90,8 +90,8 @@
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('model')}">
-                                        <label class="validation-message" th:erros="*{model}"></label>
+                                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative" th:if="${#fields.hasErrors('model')}">
+                                        <label class="block text-sm" th:errors="*{model}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Modelo*</label>
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -102,8 +102,8 @@
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('year')}">
-                                        <label class="validation-message" th:erros="*{year}"></label>
+                                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative" th:if="${#fields.hasErrors('year')}">
+                                        <label class="block text-sm" th:errors="*{year}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Ano*</label>
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -114,8 +114,8 @@
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('plate')}">
-                                        <label class="validation-message" th:erros="*{plate}"></label>
+                                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative" th:if="${#fields.hasErrors('plate')}">
+                                        <label class="block text-sm" th:errors="*{plate}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Placa</label>
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -125,8 +125,8 @@
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('chassi')}">
-                                        <label class="validation-message" th:erros="*{chassi}"></label>
+                                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative" th:if="${#fields.hasErrors('chassi')}">
+                                        <label class="block text-sm" th:errors="*{chassi}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Chassi</label>
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -136,8 +136,8 @@
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('color')}">
-                                        <label class="validation-message" th:erros="*{color}"></label>
+                                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative" th:if="${#fields.hasErrors('color')}">
+                                        <label class="block text-sm" th:errors="*{color}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Cor*</label>
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -148,9 +148,9 @@
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert"
+                                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative"
                                          th:if="${#fields.hasErrors('mileage')}">
-                                        <label class="validation-message" th:erros="*{mileage}"></label>
+                                        <label class="block text-sm" th:errors="*{mileage}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Quilometragem*</label>
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -161,9 +161,9 @@
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert"
+                                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative"
                                          th:if="${#fields.hasErrors('vehicleStatus')}">
-                                        <label class="validation-message" th:erros="*{vehicleStatus}"></label>
+                                        <label class="block text-sm" th:errors="*{vehicleStatus}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Status*</label>
                                     <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -176,8 +176,8 @@
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('price')}">
-                                        <label class="validation-message" th:erros="*{price}"></label>
+                                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative" th:if="${#fields.hasErrors('price')}">
+                                        <label class="block text-sm" th:errors="*{price}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Preço*</label>
                                     <div class="relative">
@@ -186,7 +186,8 @@
                                                placeholder="0,00"
                                                required
                                                th:field="*{price}"
-                                               type="text">
+                                               type="number"
+                                               step="0.01">
                                     </div>
                                 </div>
                             </div>
@@ -207,9 +208,9 @@
                         <div class="form-section" id="techSpecs">
                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
                                 <div>
-                                    <div class="alert alert-danger" role="alert"
+                                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative"
                                          th:if="${#fields.hasErrors('vehicleType')}">
-                                        <label class="validation-message" th:erros="*{vehicleType}"></label>
+                                        <label class="block text-sm" th:errors="*{vehicleType}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Veículo*</label>
                                     <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -222,9 +223,9 @@
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert"
+                                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative"
                                          th:if="${#fields.hasErrors('vehicleFuel')}">
-                                        <label class="validation-message" th:erros="*{vehicleFuel}"></label>
+                                        <label class="block text-sm" th:errors="*{vehicleFuel}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Combustível</label>
                                     <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -236,9 +237,9 @@
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert"
+                                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative"
                                          th:if="${#fields.hasErrors('vehicleChange')}">
-                                        <label class="validation-message" th:erros="*{vehicleChange}"></label>
+                                        <label class="block text-sm" th:errors="*{vehicleChange}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Câmbio</label>
                                     <select class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -250,8 +251,8 @@
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('doors')}">
-                                        <label class="validation-message" th:erros="*{doors}"></label>
+                                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative" th:if="${#fields.hasErrors('doors')}">
+                                        <label class="block text-sm" th:errors="*{doors}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Portas</label>
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -263,8 +264,8 @@
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('motor')}">
-                                        <label class="validation-message" th:erros="*{motor}"></label>
+                                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative" th:if="${#fields.hasErrors('motor')}">
+                                        <label class="block text-sm" th:errors="*{motor}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Motor</label>
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -274,8 +275,8 @@
                                 </div>
 
                                 <div>
-                                    <div class="alert alert-danger" role="alert" th:if="${#fields.hasErrors('power')}">
-                                        <label class="validation-message" th:erros="*{power}"></label>
+                                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative" th:if="${#fields.hasErrors('power')}">
+                                        <label class="block text-sm" th:errors="*{power}"></label>
                                     </div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Potência (cv)</label>
                                     <input class="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
