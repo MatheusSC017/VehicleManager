@@ -2,6 +2,7 @@ package com.matheus.VehicleManager.model;
 
 import com.matheus.VehicleManager.enums.UserRole;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")
@@ -11,7 +12,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
+    @Size(min = 1, max = 50, message = "O limite máximo de caracteres é 50")
     private String username;
+
+    @Size(min = 1, max = 200, message = "O limite máximo de caracteres é 200")
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -25,19 +30,19 @@ public class User {
         this.id = id;
     }
 
-    public String getUsername() {
+    public @Size(min = 1, max = 50, message = "O limite máximo de caracteres é 50") String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
+    public void setUsername(@Size(min = 1, max = 50, message = "O limite máximo de caracteres é 50") String username) {
         this.username = username;
     }
 
-    public String getPassword() {
+    public @Size(min = 1, max = 200, message = "O limite máximo de caracteres é 200") String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public void setPassword(@Size(min = 1, max = 200, message = "O limite máximo de caracteres é 200") String password) {
         this.password = password;
     }
 

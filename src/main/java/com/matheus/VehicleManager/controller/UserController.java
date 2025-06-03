@@ -23,14 +23,14 @@ public class UserController {
     @GetMapping("/login")
     public ModelAndView authenticateUser() {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("user/login");
+        modelAndView.setViewName("users/login");
         return modelAndView;
     }
 
     @GetMapping("/usuarios/cadastrar")
     public ModelAndView createUser(User user) {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("user/register");
+        modelAndView.setViewName("users/register");
         modelAndView.addObject("user", new User());
         return modelAndView;
     }
@@ -39,7 +39,7 @@ public class UserController {
     public ModelAndView createUser(@Valid User user, BindingResult bindingResult) {
         ModelAndView modelAndView = new ModelAndView();
         if (bindingResult.hasErrors()) {
-            modelAndView.setViewName("user/register");
+            modelAndView.setViewName("users/register");
             modelAndView.addObject("user", user);
         } else {
             user.setPassword(securityConfiguration.passwordEncoder().encode(user.getPassword()));
