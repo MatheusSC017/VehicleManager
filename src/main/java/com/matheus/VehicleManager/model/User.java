@@ -1,6 +1,7 @@
 package com.matheus.VehicleManager.model;
 
 import com.matheus.VehicleManager.enums.UserRole;
+import com.matheus.VehicleManager.validators.UniqueUsername;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 
@@ -13,6 +14,7 @@ public class User {
     private Long id;
 
     @Column(unique = true)
+    @UniqueUsername
     @Size(min = 1, max = 50, message = "O limite máximo de caracteres é 50")
     private String username;
 
@@ -30,12 +32,12 @@ public class User {
         this.id = id;
     }
 
-    public @Size(min = 1, max = 50, message = "O limite máximo de caracteres é 50") String getUsername() {
-        return username;
+    public UserRole getRole() {
+        return role;
     }
 
-    public void setUsername(@Size(min = 1, max = 50, message = "O limite máximo de caracteres é 50") String username) {
-        this.username = username;
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 
     public @Size(min = 1, max = 200, message = "O limite máximo de caracteres é 200") String getPassword() {
@@ -46,11 +48,11 @@ public class User {
         this.password = password;
     }
 
-    public UserRole getRole() {
-        return role;
+    public @Size(min = 1, max = 50, message = "O limite máximo de caracteres é 50") String getUsername() {
+        return username;
     }
 
-    public void setRole(UserRole role) {
-        this.role = role;
+    public void setUsername(@Size(min = 1, max = 50, message = "O limite máximo de caracteres é 50") String username) {
+        this.username = username;
     }
 }

@@ -6,12 +6,11 @@ import jakarta.validation.Payload;
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = UniqueEmailValidator.class)
+@Constraint(validatedBy = UniqueUsernameValidator.class)
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface UniqueEmail {
-    String message() default "O email já está em uso";
+public @interface UniqueUsername {
+    String message() default "O nome de usuário já está em uso";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
-

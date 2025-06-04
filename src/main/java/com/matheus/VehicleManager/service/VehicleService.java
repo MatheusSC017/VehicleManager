@@ -28,7 +28,6 @@ public class VehicleService {
     public List<VehicleWithOneImageDTO> getFilteredVehiclesWithOneImage(String search,String status, String type,
                                                                         String fuel, int priceMin, int priceMax) {
         List<Vehicle> vehicles = vehicleRepository.findByBrandAndModelIgnoreCase(search);
-        System.out.println(vehicles);
         vehicles = vehicles.stream()
                 .filter(v -> status.isEmpty() || v.getVehicleStatus().name().equalsIgnoreCase(status))
                 .filter(v -> type.isEmpty() || v.getVehicleType().name().equalsIgnoreCase(type))
