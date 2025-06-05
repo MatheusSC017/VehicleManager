@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 @Entity
+@UniqueEmail
 public class Client {
 
     @Id
@@ -20,7 +21,6 @@ public class Client {
     private String last_name;
 
     @NotBlank(message = "Email is mandatory")
-    @UniqueEmail
     @Column(unique = true)
     @Email
     @Size(min = 5, max = 50, message = "O limite máximo de caracteres é 50")
