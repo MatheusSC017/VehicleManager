@@ -1,7 +1,6 @@
 package com.matheus.VehicleManager.controller;
 
 import com.matheus.VehicleManager.model.User;
-import com.matheus.VehicleManager.repository.UserRepository;
 import com.matheus.VehicleManager.security.SecurityConfiguration;
 import com.matheus.VehicleManager.service.UserService;
 import jakarta.validation.Valid;

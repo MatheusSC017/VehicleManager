@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -40,6 +41,28 @@ public class ClientController {
 
     @PostMapping("/cadastrar")
     public ModelAndView register(@Valid Client client, BindingResult bindingResult) {
+        ModelAndView modelAndView = new ModelAndView();
+        if (bindingResult.hasErrors()) {
+            modelAndView.setViewName("clients/client_form");
+            modelAndView.addObject("client", client);
+        } else {
+            modelAndView.setViewName("redirect:/clientes");
+            clientRepository.save(client);
+        }
+        return modelAndView;
+    }
+
+
+    @GetMapping("/{id}/editar")
+    public ModelAndView update(@PathVariable("id") Long clientId) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("clients/client_form");
+        modelAndView.addObject("client", clientRepository.getReferenceById(clientId));
+        return modelAndView;
+    }
+
+    @PostMapping("/{id}/editar")
+    public ModelAndView update(@Valid Client client, BindingResult bindingResult) {
         ModelAndView modelAndView = new ModelAndView();
         if (bindingResult.hasErrors()) {
             modelAndView.setViewName("clients/client_form");

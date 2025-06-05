@@ -25,7 +25,8 @@ public class SecurityConfiguration {
             "/veiculos/{id}/editar",
             "/veiculos/{id}/deletar",
             "/clientes",
-            "/clientes/cadastrar"
+            "/clientes/cadastrar",
+            "/clientes/{id}/editar"
     };
 
     public static final String [] ENDPOINTS_USER = {

@@ -10,4 +10,8 @@ public class ClientService {
     @Autowired
     private ClientRepository clientRepository;
 
+    public boolean isEmailUnique(String email) {
+        return email != null && clientRepository.findByEmail(email) == null;
+    }
+
 }
