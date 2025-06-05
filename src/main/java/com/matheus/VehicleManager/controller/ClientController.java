@@ -74,4 +74,17 @@ public class ClientController {
         return modelAndView;
     }
 
+    @GetMapping("/{id}/deletar")
+    public ModelAndView delete(@PathVariable("id") Long clientId) {
+        try {
+            clientRepository.deleteById(clientId);
+        } catch (Exception e) {
+            System.err.println("Failed to delete Client: ");
+            e.printStackTrace();
+        }
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("redirect:/clientes");
+        return modelAndView;
+    }
+
 }
