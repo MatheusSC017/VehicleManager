@@ -3,8 +3,13 @@ package com.matheus.VehicleManager.service;
 import com.matheus.VehicleManager.dto.VehicleWithImagesDTO;
 import com.matheus.VehicleManager.dto.VehicleWithOneImageDTO;
 import com.matheus.VehicleManager.enums.FileType;
+import com.matheus.VehicleManager.enums.VehicleFuel;
+import com.matheus.VehicleManager.enums.VehicleStatus;
+import com.matheus.VehicleManager.enums.VehicleType;
 import com.matheus.VehicleManager.model.FileStore;
 import com.matheus.VehicleManager.model.Vehicle;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.matheus.VehicleManager.repository.VehicleRepository;
@@ -25,27 +30,16 @@ public class VehicleService {
         return this.getVehicleWithImages(vehicle);
     }
 
-    public List<VehicleWithOneImageDTO> getFilteredVehiclesWithOneImage(String search,String status, String type,
-                                                                        String fuel, int priceMin, int priceMax) {
-        List<Vehicle> vehicles = vehicleRepository.findByBrandAndModelIgnoreCase(search);
-        vehicles = vehicles.stream()
-                .filter(v -> status.isEmpty() || v.getVehicleStatus().name().equalsIgnoreCase(status))
-                .filter(v -> type.isEmpty() || v.getVehicleType().name().equalsIgnoreCase(type))
-                .filter(v -> fuel.isEmpty() || v.getVehicleFuel().name().equalsIgnoreCase(fuel))
-                .filter(v -> priceMin == 0 || v.getPrice().compareTo(BigDecimal.valueOf(priceMin)) >= 0)
-                .filter(v -> priceMax == 0 || v.getPrice().compareTo(BigDecimal.valueOf(priceMax)) <= 0)
-                .toList();
-        return this.getVehiclesImage(vehicles);
-    }
+    public Page<VehicleWithOneImageDTO> getFilteredVehiclesWithOneImage(String search, String status, String type,
+                                                                        String fuel, int priceMin, int priceMax, Pageable paging) {
+        VehicleStatus statusEnum = (status != null && !status.isEmpty()) ? VehicleStatus.valueOf(status) : null;
+        VehicleType typeEnum = (type != null && !type.isEmpty()) ? VehicleType.valueOf(type) : null;
+        VehicleFuel fuelEnum = (fuel != null && !fuel.isEmpty()) ? VehicleFuel.valueOf(fuel) : null;
+        Integer min = priceMin > 0 ? priceMin : null;
+        Integer max = priceMax > 0 ? priceMax : null;
 
-    private List<VehicleWithOneImageDTO> getVehiclesImage(List<Vehicle> vehicles) {
-        List<VehicleWithOneImageDTO> vehiclesWithOneImage = new ArrayList<>();
-
-        for (Vehicle vehicle : vehicles) {
-            vehiclesWithOneImage.add(this.getVehicleWithOneImage(vehicle));
-        }
-
-        return vehiclesWithOneImage;
+        Page<Vehicle> vehicles = vehicleRepository.searchVehiclesWithFilters(search, statusEnum, typeEnum, fuelEnum, min, max, paging);
+        return vehicles.map(this::getVehicleWithOneImage);
     }
 
     private VehicleWithOneImageDTO getVehicleWithOneImage(Vehicle vehicle) {

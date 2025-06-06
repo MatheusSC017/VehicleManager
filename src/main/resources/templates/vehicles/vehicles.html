@@ -159,6 +159,21 @@
             </div>
 
             <!-- Pagination -->
+            <div class="mt-8 flex justify-center">
+                <nav class="inline-flex rounded-md shadow">
+                    <a th:if="${currentPage > 0}" th:href="@{|?page=${currentPage - 1}|}" class="px-3 py-2 rounded-l-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+
+                    <a th:each="i : ${#numbers.sequence(0, totalPages - 1)}" th:href="@{|?page=${i}|}"
+                       th:text="${i + 1}" th:classappend="${i == currentPage} ? 'active' : ''" class="px-4 py-2 border-t border-b border-gray-300 bg-white text-blue-600 font-medium">1</a>
+
+                    <a th:if="${currentPage < totalPages - 1}" th:href="@{|?page=${currentPage + 1}|}" class="px-3 py-2 rounded-r-md border border-gray-300 bg-white text-gray-500 hover:bg-gray-50">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </nav>
+            </div>
+
         </main>
     </div>
 </div>

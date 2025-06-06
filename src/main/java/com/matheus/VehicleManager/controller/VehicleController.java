@@ -10,6 +10,9 @@ import com.matheus.VehicleManager.repository.VehicleRepository;
 import com.matheus.VehicleManager.service.FileStorageService;
 import com.matheus.VehicleManager.service.VehicleService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
@@ -43,19 +46,25 @@ public class VehicleController {
                                  @RequestParam("type") Optional<String> type,
                                  @RequestParam("fuel") Optional<String> fuel,
                                  @RequestParam(value="priceMin", defaultValue="0") int priceMin,
-                                 @RequestParam(value="priceMax", defaultValue="0") int priceMax) {
+                                 @RequestParam(value="priceMax", defaultValue="0") int priceMax,
+                                 @RequestParam(value = "page", defaultValue = "0") int page,
+                                 @RequestParam(value = "size", defaultValue = "10") int size) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicles");
-        List<VehicleWithOneImageDTO> vehicles;
-        vehicles = vehicleService.getFilteredVehiclesWithOneImage(search.orElse(""), status.orElse(""),
-                type.orElse(""), fuel.orElse(""), priceMin, priceMax);
+
+        Pageable paging = PageRequest.of(page, size);
+        Page<VehicleWithOneImageDTO> vehiclesPage;
+        vehiclesPage = vehicleService.getFilteredVehiclesWithOneImage(search.orElse(""), status.orElse(""),
+                type.orElse(""), fuel.orElse(""), priceMin, priceMax, paging);
         modelAndView.addObject("searchFilter", search.orElse(""));
         modelAndView.addObject("statusFilter", status.orElse(""));
         modelAndView.addObject("typeFilter", type.orElse(""));
         modelAndView.addObject("fuelFilter", fuel.orElse(""));
         modelAndView.addObject("priceMinFilter", priceMin);
         modelAndView.addObject("priceMaxFilter", priceMax);
-        modelAndView.addObject("vehiclesList", vehicles);
+        modelAndView.addObject("currentPage", page);
+        modelAndView.addObject("totalPages", vehiclesPage.getTotalPages());
+        modelAndView.addObject("vehiclesList", vehiclesPage);
         return modelAndView;
     }
 
