@@ -1,7 +1,7 @@
 package com.matheus.VehicleManager.controller;
 
-import com.matheus.VehicleManager.dto.VehicleWithImagesDTO;
-import com.matheus.VehicleManager.dto.VehicleWithOneImageDTO;
+import com.matheus.VehicleManager.dto.VehicleImageDTO;
+import com.matheus.VehicleManager.dto.VehicleImagesDTO;
 import com.matheus.VehicleManager.enums.FileType;
 import com.matheus.VehicleManager.model.FileStore;
 import com.matheus.VehicleManager.model.Vehicle;
@@ -53,7 +53,7 @@ public class VehicleController {
         modelAndView.setViewName("vehicles/vehicles");
 
         Pageable paging = PageRequest.of(page, size);
-        Page<VehicleWithOneImageDTO> vehiclesPage;
+        Page<VehicleImageDTO> vehiclesPage;
         vehiclesPage = vehicleService.getFilteredVehiclesWithOneImage(search.orElse(""), status.orElse(""),
                 type.orElse(""), fuel.orElse(""), priceMin, priceMax, paging);
         modelAndView.addObject("searchFilter", search.orElse(""));
@@ -72,7 +72,7 @@ public class VehicleController {
     public ModelAndView vehicle(@PathVariable("id") Long id) {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("vehicles/vehicle");
-        VehicleWithImagesDTO vehicle = vehicleService.getVehicleWithImagesById(id);
+        VehicleImagesDTO vehicle = vehicleService.getVehicleWithImagesById(id);
         modelAndView.addObject("vehicleDTO", vehicle);
         return modelAndView;
     }

@@ -3,30 +3,32 @@ package com.matheus.VehicleManager.dto;
 import com.matheus.VehicleManager.model.FileStore;
 import com.matheus.VehicleManager.model.Vehicle;
 
-public class VehicleWithOneImageDTO {
+import java.util.List;
+
+public class VehicleImagesDTO {
 
     private Vehicle vehicle;
-    private FileStore image;
+    private List<FileStore> images;
 
-    public VehicleWithOneImageDTO(Vehicle vehicle, FileStore image) {
+    public VehicleImagesDTO(Vehicle vehicle, List<FileStore> images) {
         this.vehicle = vehicle;
-        this.image = image;
+        this.images = images;
     }
 
     public Vehicle getVehicle() {
         return vehicle;
     }
 
-    public FileStore getImage() {
-        return image;
+    public List<FileStore> getImages() {
+        return images;
     }
 
     public void setVehicle(Vehicle vehicle) {
         this.vehicle = vehicle;
     }
 
-    public void setImage(FileStore image) {
-        this.image = image;
+    public void setImages(List<FileStore> images) {
+        this.images = images;
     }
 
 }
