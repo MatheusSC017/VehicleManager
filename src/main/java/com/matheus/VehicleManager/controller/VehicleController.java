@@ -104,8 +104,6 @@ public class VehicleController {
                     String path = fileStorageService.storeFile(image);
 
                     FileStore imageEntity = new FileStore();
-                    imageEntity.setFileName(image.getOriginalFilename());
-                    imageEntity.setContentType(image.getContentType());
                     imageEntity.setPath(path);
                     imageEntity.setType(FileType.IMAGE);
                     imageEntity.setVehicle(vehicle);
@@ -151,8 +149,6 @@ public class VehicleController {
                     String path = fileStorageService.storeFile(image);
 
                     FileStore imageEntity = new FileStore();
-                    imageEntity.setFileName(image.getOriginalFilename());
-                    imageEntity.setContentType(image.getContentType());
                     imageEntity.setPath(path);
                     imageEntity.setType(FileType.IMAGE);
                     imageEntity.setVehicle(vehicle);

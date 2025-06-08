@@ -1,18 +1,16 @@
 package com.matheus.VehicleManager.model;
 
 import com.matheus.VehicleManager.enums.FileType;
+import com.matheus.VehicleManager.events.FileStoreEventHandler;
 import jakarta.persistence.*;
 
 @Entity
+@EntityListeners(FileStoreEventHandler.class)
 public class FileStore {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String fileName;
-
-    private String contentType;
 
     private String path;
 
@@ -25,14 +23,6 @@ public class FileStore {
 
     public Long getId() {
         return id;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public String getContentType() {
-        return contentType;
     }
 
     public String getPath() {
@@ -51,14 +41,6 @@ public class FileStore {
         this.id = id;
     }
 
-    public void setFileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public void setContentType(String contentType) {
-        this.contentType = contentType;
-    }
-
     public void setPath(String path) {
         this.path = path;
     }
@@ -70,4 +52,5 @@ public class FileStore {
     public void setVehicle(Vehicle vehicle) {
         this.vehicle = vehicle;
     }
+
 }

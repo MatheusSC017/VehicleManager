@@ -34,4 +34,11 @@ public class LocalFileStorageService implements FileStorageService {
 
         return "/documents/" + fileName;
     }
+
+    @Override
+    public void deleteFile(String filePath) throws IOException {
+        String fileName = Paths.get(filePath).getFileName().toString();
+        Path absolutePath = Paths.get(uploadDir, fileName);
+        Files.deleteIfExists(absolutePath);
+    }
 }
