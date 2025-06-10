@@ -1,34 +1,28 @@
 package com.matheus.VehicleManager.dto;
 
-import com.matheus.VehicleManager.model.FileStore;
-import com.matheus.VehicleManager.model.Vehicle;
+import com.matheus.VehicleManager.enums.VehicleChange;
+import com.matheus.VehicleManager.enums.VehicleFuel;
+import com.matheus.VehicleManager.enums.VehicleStatus;
+import com.matheus.VehicleManager.enums.VehicleType;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-public class VehicleImagesDTO {
-
-    private Vehicle vehicle;
-    private List<FileStore> images;
-
-    public VehicleImagesDTO(Vehicle vehicle, List<FileStore> images) {
-        this.vehicle = vehicle;
-        this.images = images;
-    }
-
-    public Vehicle getVehicle() {
-        return vehicle;
-    }
-
-    public List<FileStore> getImages() {
-        return images;
-    }
-
-    public void setVehicle(Vehicle vehicle) {
-        this.vehicle = vehicle;
-    }
-
-    public void setImages(List<FileStore> images) {
-        this.images = images;
-    }
-
-}
+public record VehicleImagesDTO(
+        Long id,
+        VehicleType vehicleType,
+        VehicleStatus vehicleStatus,
+        String model,
+        String brand,
+        Integer year,
+        String color,
+        String plate,
+        String chassi,
+        BigDecimal mileage,
+        BigDecimal price,
+        VehicleFuel vehicleFuel,
+        VehicleChange vehicleChange,
+        Integer doors,
+        String motor,
+        String power,
+        List<FileDTO> images) {}

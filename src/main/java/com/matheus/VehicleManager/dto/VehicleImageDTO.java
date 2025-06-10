@@ -4,7 +4,6 @@ import com.matheus.VehicleManager.enums.VehicleChange;
 import com.matheus.VehicleManager.enums.VehicleFuel;
 import com.matheus.VehicleManager.enums.VehicleStatus;
 import com.matheus.VehicleManager.enums.VehicleType;
-import com.matheus.VehicleManager.model.FileStore;
 
 import java.math.BigDecimal;
 

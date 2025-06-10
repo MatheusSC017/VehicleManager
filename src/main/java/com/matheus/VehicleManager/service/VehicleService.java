@@ -1,5 +1,6 @@
 package com.matheus.VehicleManager.service;
 
+import com.matheus.VehicleManager.dto.FileDTO;
 import com.matheus.VehicleManager.dto.VehicleImageDTO;
 import com.matheus.VehicleManager.dto.VehicleImagesDTO;
 import com.matheus.VehicleManager.enums.VehicleFuel;
@@ -40,7 +41,29 @@ public class VehicleService {
 
     private VehicleImagesDTO getVehicleWithImages(Vehicle vehicle) {
         List<FileStore> images = vehicle.getImages();
-        return new VehicleImagesDTO(vehicle, images);
+        return new VehicleImagesDTO(
+                vehicle.getId(),
+                vehicle.getVehicleType(),
+                vehicle.getVehicleStatus(),
+                vehicle.getModel(),
+                vehicle.getBrand(),
+                vehicle.getYear(),
+                vehicle.getColor(),
+                vehicle.getPlate(),
+                vehicle.getChassi(),
+                vehicle.getMileage(),
+                vehicle.getPrice(),
+                vehicle.getVehicleFuel(),
+                vehicle.getVehicleChange(),
+                vehicle.getDoors(),
+                vehicle.getMotor(),
+                vehicle.getPower(),
+                images.stream().map(image -> new FileDTO(
+                        image.getId(),
+                        image.getPath(),
+                        image.getType()
+                )).toList()
+        );
     }
 
 }

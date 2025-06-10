@@ -1,0 +1,72 @@
+package com.matheus.VehicleManager.controller;
+
+import com.matheus.VehicleManager.dto.VehicleImageDTO;
+import com.matheus.VehicleManager.repository.VehicleRepository;
+import com.matheus.VehicleManager.service.VehicleService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/vehicles")
+public class VehicleRestController {
+
+    @Autowired
+    private VehicleService vehicleService;
+
+    @Autowired
+    private VehicleRepository vehicleRepository;
+
+    @GetMapping
+    public ResponseEntity<Page<VehicleImageDTO>> get_vehicles(@RequestParam(value="searchInput") Optional<String> search,
+                                 @RequestParam("status") Optional<String> status,
+                                 @RequestParam("type") Optional<String> type,
+                                 @RequestParam("fuel") Optional<String> fuel,
+                                 @RequestParam(value="priceMin", defaultValue="0") int priceMin,
+                                 @RequestParam(value="priceMax", defaultValue="0") int priceMax,
+                                 @RequestParam(value = "page", defaultValue = "0") int page,
+                                 @RequestParam(value = "size", defaultValue = "10") int size) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("vehicles/vehicles");
+
+        Pageable paging = PageRequest.of(page, size);
+        Page<VehicleImageDTO> vehiclesPage;
+        vehiclesPage = vehicleService.getFilteredVehiclesWithOneImage(
+                search.orElse(""),
+                status.orElse(""),
+                type.orElse(""),
+                fuel.orElse(""),
+                priceMin,
+                priceMax,
+                paging
+        );
+        return ResponseEntity.ok(vehiclesPage);
+    }
+
+    @GetMapping("/{id}")
+    public void get_vehicle(@RequestParam(value="id") Integer vehicleId) {
+
+    }
+
+    @PostMapping
+    public void register_vehicle() {
+
+    }
+
+    @PutMapping("/{id}")
+    public void update_vehicle(@RequestParam(value="id") Integer vehicleId) {
+
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete_vehicle(@RequestParam(value="id") Integer vehicleId) {
+
+    }
+
+}
