@@ -8,26 +8,22 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
 
     public static final String [] ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED = {
-            "/api/vehicles"
+            "/api/vehicles",
+            "/api/vehicles/**"
     };
 
     public static final String [] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
             "/veiculos",
-            "/veiculos/pesquisa",
-            "/veiculos/filtro",
-            "/veiculos/{id}",
-            "/veiculos/cadastrar",
-            "/veiculos/{id}/editar",
-            "/veiculos/{id}/deletar",
+            "/veiculos/**",
             "/clientes",
-            "/clientes/cadastrar",
-            "/clientes/{id}/editar"
+            "/clientes/**"
     };
 
     public static final String [] ENDPOINTS_USER = {
@@ -40,7 +36,10 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(Customizer.withDefaults())
+        http.csrf(csrf -> csrf
+                        .ignoringRequestMatchers(
+                                new AntPathRequestMatcher("/api/vehicles/**")
+                        ))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED).permitAll()
                         .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_REQUIRED).authenticated()
@@ -51,7 +50,7 @@ public class SecurityConfiguration {
                 .formLogin(form -> form.loginPage("/login").permitAll()
                         .defaultSuccessUrl("/veiculos", true)
                 );
-
+        System.out.println(ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED);
 
         return http.build();
     }
