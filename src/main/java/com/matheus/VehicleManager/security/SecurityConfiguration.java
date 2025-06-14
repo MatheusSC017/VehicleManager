@@ -10,14 +10,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
-
-    public static final String [] ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED = {
-            "/api/vehicles",
-            "/api/vehicles/**"
-    };
 
     public static final String [] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
             "/veiculos",
@@ -36,21 +33,21 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf
+        http.cors(withDefaults())
+//                .csrf(csrf -> csrf.disable())
+                .csrf(csrf -> csrf
                         .ignoringRequestMatchers(
-                                new AntPathRequestMatcher("/api/vehicles/**")
+                                new AntPathRequestMatcher("/api/**")
                         ))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED).permitAll()
                         .requestMatchers(ENDPOINTS_WITH_AUTHENTICATION_REQUIRED).authenticated()
                         .requestMatchers(ENDPOINTS_USER).hasRole("USER")
                         .requestMatchers(ENDPOINTS_ADMIN).hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .formLogin(form -> form.loginPage("/login").permitAll()
                         .defaultSuccessUrl("/veiculos", true)
                 );
-        System.out.println(ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED);
 
         return http.build();
     }

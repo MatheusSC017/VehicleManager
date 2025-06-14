@@ -22,8 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/vehicles")
@@ -76,32 +75,44 @@ public class VehicleRestController {
     @PostMapping
     public ResponseEntity<?> insertVehicle(@Valid @ModelAttribute Vehicle vehicle,
                                            BindingResult bindingResult,
-                                           @RequestParam("imagesInput") MultipartFile[] images) {
+                                           @RequestParam(value="imagesInput", required = false) MultipartFile[] images) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body("Invalid vehicle data");
+            Map<String, Object> response = new HashMap<>();
+            response.put("vehicle", vehicle);
+
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+            );
+            response.put("errors", errors);
+
+            return ResponseEntity.badRequest().body(response);
         }
+
 
         vehicleRepository.save(vehicle);
 
-        for (MultipartFile image : images) {
-            if (image.isEmpty()) continue;
+        if (images != null) {
+            for (MultipartFile image : images) {
+                if (image.isEmpty()) continue;
 
-            try {
-                String path = fileStorageService.storeFile(image);
+                try {
+                    String path = fileStorageService.storeFile(image);
 
-                FileStore imageEntity = new FileStore();
-                imageEntity.setPath(path);
-                imageEntity.setType(FileType.IMAGE);
-                imageEntity.setVehicle(vehicle);
+                    FileStore imageEntity = new FileStore();
+                    imageEntity.setPath(path);
+                    imageEntity.setType(FileType.IMAGE);
+                    imageEntity.setVehicle(vehicle);
 
-                fileRepository.save(imageEntity);
-            } catch (IOException e) {
-                System.err.println("Failed to store image: " + image.getOriginalFilename());
-                e.printStackTrace();
+                    fileRepository.save(imageEntity);
+                } catch (IOException e) {
+                    System.err.println("Failed to store image: " + image.getOriginalFilename());
+                    e.printStackTrace();
+                }
             }
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(vehicle.getId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(vehicle);
     }
 
     @PutMapping("/{id}")
