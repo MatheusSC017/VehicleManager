@@ -18,10 +18,12 @@ public class Vehicle {
     private Long id;
 
     @Column(name = "vehicle_type")
+    @NotNull(message = "Campo obrigatório")
     @Enumerated(EnumType.STRING)
     private VehicleType vehicleType;
 
     @Column(name = "vehicle_status")
+    @NotNull(message = "Campo obrigatório")
     @Enumerated(EnumType.STRING)
     private VehicleStatus vehicleStatus;
 
@@ -62,6 +64,7 @@ public class Vehicle {
     private BigDecimal price;
 
     @Column(name = "vehicle_fuel")
+    @NotNull(message = "Campo obrigatório")
     @Enumerated(EnumType.STRING)
     private VehicleFuel vehicleFuel;
 

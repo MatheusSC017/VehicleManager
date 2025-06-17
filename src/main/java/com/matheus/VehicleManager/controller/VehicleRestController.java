@@ -78,7 +78,7 @@ public class VehicleRestController {
                                            @RequestParam(value="imagesInput", required = false) MultipartFile[] images) {
         if (bindingResult.hasErrors()) {
             Map<String, Object> response = new HashMap<>();
-            response.put("vehicle", vehicle);
+            response.put("content", vehicle);
 
             Map<String, String> errors = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
