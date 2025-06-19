@@ -175,11 +175,11 @@ public class VehicleRestController {
     public ResponseEntity<?> deleteVehicle(@PathVariable("id") Long vehicleId) {
         try {
             vehicleRepository.deleteById(vehicleId);
-            return ResponseEntity.ok("Vehicle deleted");
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             System.err.println("Failed to delete vehicle: ");
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete vehicle");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
