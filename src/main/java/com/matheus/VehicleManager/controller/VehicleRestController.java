@@ -119,30 +119,41 @@ public class VehicleRestController {
     public ResponseEntity<?> updateVehicle(@PathVariable Long id,
                                            @Valid @ModelAttribute Vehicle vehicle,
                                            BindingResult bindingResult,
-                                           @RequestParam("imagesInput") MultipartFile[] images,
+                                           @RequestParam(value = "imagesInput", required = false) MultipartFile[] images,
                                            @RequestParam(value = "selectedImages", required = false) List<Long> selectedImageIds) {
         if (bindingResult.hasErrors()) {
-            return ResponseEntity.badRequest().body("Invalid vehicle data");
+            Map<String, Object> response = new HashMap<>();
+            response.put("content", vehicle);
+
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errors.put(error.getField(), error.getDefaultMessage())
+            );
+            response.put("errors", errors);
+
+            return ResponseEntity.badRequest().body(response);
         }
 
         vehicle.setId(id);
         vehicleRepository.save(vehicle);
 
-        for (MultipartFile image : images) {
-            if (image.isEmpty()) continue;
+        if (images != null) {
+            for (MultipartFile image : images) {
+                if (image.isEmpty()) continue;
 
-            try {
-                String path = fileStorageService.storeFile(image);
+                try {
+                    String path = fileStorageService.storeFile(image);
 
-                FileStore imageEntity = new FileStore();
-                imageEntity.setPath(path);
-                imageEntity.setType(FileType.IMAGE);
-                imageEntity.setVehicle(vehicle);
+                    FileStore imageEntity = new FileStore();
+                    imageEntity.setPath(path);
+                    imageEntity.setType(FileType.IMAGE);
+                    imageEntity.setVehicle(vehicle);
 
-                fileRepository.save(imageEntity);
-            } catch (IOException e) {
-                System.err.println("Failed to store image: " + image.getOriginalFilename());
-                e.printStackTrace();
+                    fileRepository.save(imageEntity);
+                } catch (IOException e) {
+                    System.err.println("Failed to store image: " + image.getOriginalFilename());
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -157,7 +168,7 @@ public class VehicleRestController {
             }
         }
 
-        return ResponseEntity.ok("Vehicle updated");
+        return ResponseEntity.ok(vehicle);
     }
 
     @DeleteMapping("/{id}")
