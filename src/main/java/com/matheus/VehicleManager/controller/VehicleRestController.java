@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.util.*;
@@ -49,9 +48,6 @@ public class VehicleRestController {
                                  @RequestParam(value="priceMax", defaultValue="0") int priceMax,
                                  @RequestParam(value = "page", defaultValue = "0") int page,
                                  @RequestParam(value = "size", defaultValue = "10") int size) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("vehicles/vehicles");
-
         Pageable paging = PageRequest.of(page, size);
         Page<VehicleImageDTO> vehiclesPage;
         vehiclesPage = vehicleService.getFilteredVehiclesWithOneImage(
