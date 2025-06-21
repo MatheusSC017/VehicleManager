@@ -15,10 +15,10 @@ public class Client {
     private Long id;
 
     @Size(min = 2, max = 50, message = "O limite máximo de caracteres é 50")
-    private String first_name;
+    private String firstName;
 
     @Size(min = 2, max = 50, message = "O limite máximo de caracteres é 50")
-    private String last_name;
+    private String lastName;
 
     @NotBlank(message = "Email is mandatory")
     @Column(unique = true)
@@ -37,20 +37,20 @@ public class Client {
         this.id = id;
     }
 
-    public @Size(min = 2, max = 50, message = "O limite máximo de caracteres é 50") String getFirst_name() {
-        return first_name;
+    public @Size(min = 2, max = 50, message = "O limite máximo de caracteres é 50") String getFirstName() {
+        return firstName;
     }
 
-    public void setFirst_name(@Size(min = 2, max = 50, message = "O limite máximo de caracteres é 50") String first_name) {
-        this.first_name = first_name;
+    public void setFirstName(@Size(min = 2, max = 50, message = "O limite máximo de caracteres é 50") String firstName) {
+        this.firstName = firstName;
     }
 
-    public @Size(min = 2, max = 50, message = "O limite máximo de caracteres é 50") String getLast_name() {
-        return last_name;
+    public @Size(min = 2, max = 50, message = "O limite máximo de caracteres é 50") String getLastName() {
+        return lastName;
     }
 
-    public void setLast_name(@Size(min = 2, max = 50, message = "O limite máximo de caracteres é 50") String last_name) {
-        this.last_name = last_name;
+    public void setLastName(@Size(min = 2, max = 50, message = "O limite máximo de caracteres é 50") String lastName) {
+        this.lastName = lastName;
     }
 
     public @Email @Size(min = 5, max = 50, message = "O limite máximo de caracteres é 50") String getEmail() {

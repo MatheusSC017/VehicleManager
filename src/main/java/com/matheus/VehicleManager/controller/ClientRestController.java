@@ -30,6 +30,12 @@ public class ClientRestController {
         return ResponseEntity.ok(clients);
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Client> client(@PathVariable("id") Long clientId) {
+        Client client = clientRepository.getReferenceById(clientId);
+        return ResponseEntity.ok(client);
+    }
+
     @PostMapping
     public ResponseEntity<?> register(@Valid Client client, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -71,7 +77,7 @@ public class ClientRestController {
         return ResponseEntity.ok(client);
     }
 
-    @GetMapping("/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long clientId) {
         try {
             clientRepository.deleteById(clientId);
