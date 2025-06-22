@@ -1,20 +1,22 @@
 package com.matheus.VehicleManager.controller;
 
+import com.matheus.VehicleManager.dto.ClientDTO;
 import com.matheus.VehicleManager.model.Client;
 import com.matheus.VehicleManager.repository.ClientRepository;
 import com.matheus.VehicleManager.service.ClientService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/clientes")
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/clients")
 public class ClientController {
 
     @Autowired
@@ -23,68 +25,82 @@ public class ClientController {
     @Autowired
     private ClientRepository clientRepository;
 
+    private ClientDTO toDTO(Client client) {
+        return new ClientDTO(
+                client.getId(),
+                client.getFirstName(),
+                client.getLastName(),
+                client.getEmail(),
+                client.getPhone()
+        );
+    }
+
     @GetMapping
-    public ModelAndView clients() {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("clients/clients");
-        modelAndView.addObject("clients", clientRepository.findAll());
-        return modelAndView;
+    public ResponseEntity<List<ClientDTO>> clients() {
+        List<Client> clients = clientRepository.findAll();
+        List<ClientDTO> clientsDtos = clients.stream()
+                .map(this::toDTO)
+                .toList();
+        return ResponseEntity.ok(clientsDtos);
     }
 
-    @GetMapping("/cadastrar")
-    public ModelAndView register(Client client) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("clients/client_form");
-        modelAndView.addObject("client", new Client());
-        return modelAndView;
+    @GetMapping("/{id}")
+    public ResponseEntity<ClientDTO> client(@PathVariable("id") Long clientId) {
+        Client client = clientRepository.getReferenceById(clientId);
+        return ResponseEntity.ok(toDTO(client));
     }
 
-    @PostMapping("/cadastrar")
-    public ModelAndView register(@Valid Client client, BindingResult bindingResult) {
-        ModelAndView modelAndView = new ModelAndView();
+    @PostMapping
+    public ResponseEntity<?> register(@Valid Client client, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            modelAndView.setViewName("clients/client_form");
-            modelAndView.addObject("client", client);
-        } else {
-            modelAndView.setViewName("redirect:/clientes");
-            clientRepository.save(client);
+            Map<String, Object> response = new HashMap<>();
+            response.put("content", toDTO(client));
+
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+            );
+            response.put("errors", errors);
+
+            return ResponseEntity.badRequest().body(response);
         }
-        return modelAndView;
+
+        clientRepository.save(client);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(client));
     }
 
 
-    @GetMapping("/{id}/editar")
-    public ModelAndView update(@PathVariable("id") Long clientId) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("clients/client_form");
-        modelAndView.addObject("client", clientRepository.getReferenceById(clientId));
-        return modelAndView;
-    }
-
-    @PostMapping("/{id}/editar")
-    public ModelAndView update(@Valid Client client, BindingResult bindingResult) {
-        ModelAndView modelAndView = new ModelAndView();
+    @PutMapping("/{id}")
+    public ResponseEntity<?> update(@Valid Client client, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            modelAndView.setViewName("clients/client_form");
-            modelAndView.addObject("client", client);
-        } else {
-            modelAndView.setViewName("redirect:/clientes");
-            clientRepository.save(client);
+            Map<String, Object> response = new HashMap<>();
+            response.put("content", toDTO(client));
+
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+            );
+            response.put("errors", errors);
+
+            return ResponseEntity.badRequest().body(response);
         }
-        return modelAndView;
+
+        clientRepository.save(client);
+
+        return ResponseEntity.ok(toDTO(client));
     }
 
-    @GetMapping("/{id}/deletar")
-    public ModelAndView delete(@PathVariable("id") Long clientId) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long clientId) {
         try {
             clientRepository.deleteById(clientId);
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             System.err.println("Failed to delete Client: ");
             e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("redirect:/clientes");
-        return modelAndView;
     }
 
 }

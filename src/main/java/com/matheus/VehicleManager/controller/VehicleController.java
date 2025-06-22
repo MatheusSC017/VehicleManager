@@ -10,26 +10,28 @@ import com.matheus.VehicleManager.repository.VehicleRepository;
 import com.matheus.VehicleManager.service.FileStorageService;
 import com.matheus.VehicleManager.service.VehicleService;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Controller;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
-@Controller
-@RequestMapping("/veiculos")
+@RestController
+@RequestMapping("/api/vehicles")
 public class VehicleController {
 
     @Autowired
     private VehicleService vehicleService;
+
+    @Autowired
+    private FileStorageService fileStorageService;
 
     @Autowired
     private VehicleRepository vehicleRepository;
@@ -37,11 +39,8 @@ public class VehicleController {
     @Autowired
     private FileRepository fileRepository;
 
-    @Autowired
-    private FileStorageService fileStorageService;
-
     @GetMapping
-    public ModelAndView vehicles(@RequestParam(value="searchInput") Optional<String> search,
+    public ResponseEntity<Page<VehicleImageDTO>> get_vehicles(@RequestParam(value="searchInput") Optional<String> search,
                                  @RequestParam("status") Optional<String> status,
                                  @RequestParam("type") Optional<String> type,
                                  @RequestParam("fuel") Optional<String> fuel,
@@ -49,56 +48,49 @@ public class VehicleController {
                                  @RequestParam(value="priceMax", defaultValue="0") int priceMax,
                                  @RequestParam(value = "page", defaultValue = "0") int page,
                                  @RequestParam(value = "size", defaultValue = "10") int size) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("vehicles/vehicles");
-
         Pageable paging = PageRequest.of(page, size);
         Page<VehicleImageDTO> vehiclesPage;
-        vehiclesPage = vehicleService.getFilteredVehiclesWithOneImage(search.orElse(""), status.orElse(""),
-                type.orElse(""), fuel.orElse(""), priceMin, priceMax, paging);
-        modelAndView.addObject("searchFilter", search.orElse(""));
-        modelAndView.addObject("statusFilter", status.orElse(""));
-        modelAndView.addObject("typeFilter", type.orElse(""));
-        modelAndView.addObject("fuelFilter", fuel.orElse(""));
-        modelAndView.addObject("priceMinFilter", priceMin);
-        modelAndView.addObject("priceMaxFilter", priceMax);
-        modelAndView.addObject("currentPage", page);
-        modelAndView.addObject("totalPages", vehiclesPage.getTotalPages());
-        modelAndView.addObject("vehiclesList", vehiclesPage);
-        return modelAndView;
+        vehiclesPage = vehicleService.getFilteredVehiclesWithOneImage(
+                search.orElse(""),
+                status.orElse(""),
+                type.orElse(""),
+                fuel.orElse(""),
+                priceMin,
+                priceMax,
+                paging
+        );
+        return ResponseEntity.ok(vehiclesPage);
     }
 
     @GetMapping("/{id}")
-    public ModelAndView vehicle(@PathVariable("id") Long id) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("vehicles/vehicle");
-        VehicleImagesDTO vehicle = vehicleService.getVehicleWithImagesById(id);
-        modelAndView.addObject("vehicleDTO", vehicle);
-        return modelAndView;
+    public ResponseEntity<VehicleImagesDTO> get_vehicle(@PathVariable(value="id") Long vehicleId) {
+        VehicleImagesDTO vehicle = vehicleService.getVehicleWithImagesById(vehicleId);
+        return ResponseEntity.ok(vehicle);
     }
 
-    @GetMapping("/cadastrar")
-    public ModelAndView getInsertForm(Vehicle vehicle) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("vehicles/vehicle_register");
-        modelAndView.addObject("vehicle", new Vehicle());
-        return modelAndView;
-    }
-
-    @PostMapping("/cadastrar")
-    public ModelAndView insert(@Valid Vehicle vehicle, BindingResult bindingResult, @RequestParam("imagesInput") MultipartFile[] images) {
-        ModelAndView modelAndView = new ModelAndView();
+    @PostMapping
+    public ResponseEntity<?> insertVehicle(@Valid @ModelAttribute Vehicle vehicle,
+                                           BindingResult bindingResult,
+                                           @RequestParam(value="imagesInput", required = false) MultipartFile[] images) {
         if (bindingResult.hasErrors()) {
-            modelAndView.setViewName("vehicles/vehicle_register");
-            modelAndView.addObject("vehicle", vehicle);
-        } else {
-            modelAndView.setViewName("redirect:/veiculos");
-            vehicleRepository.save(vehicle);
+            Map<String, Object> response = new HashMap<>();
+            response.put("content", vehicle);
 
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage())
+            );
+            response.put("errors", errors);
+
+            return ResponseEntity.badRequest().body(response);
+        }
+
+
+        vehicleRepository.save(vehicle);
+
+        if (images != null) {
             for (MultipartFile image : images) {
-                if (image.isEmpty()) {
-                    continue;
-                }
+                if (image.isEmpty()) continue;
 
                 try {
                     String path = fileStorageService.storeFile(image);
@@ -112,38 +104,38 @@ public class VehicleController {
                 } catch (IOException e) {
                     System.err.println("Failed to store image: " + image.getOriginalFilename());
                     e.printStackTrace();
-                    continue;
                 }
             }
         }
-        return modelAndView;
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(vehicle);
     }
 
-    @GetMapping("/{id}/editar")
-    public ModelAndView getUpdateForm(@PathVariable("id") Long id) {
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("vehicles/vehicle_update");
-        Vehicle vehicle = vehicleRepository.getReferenceById(id);
-        modelAndView.addObject("vehicle", vehicle);
-        return modelAndView;
-    }
-
-    @PostMapping("/{id}/editar")
-    public ModelAndView update(@Valid Vehicle vehicle, BindingResult bindingResult,
-                               @RequestParam("imagesInput") MultipartFile[] images,
-                               @RequestParam(value = "selectedImages", required = false) List<Long> selectedImageIds) {
-        ModelAndView modelAndView = new ModelAndView();
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateVehicle(@PathVariable Long id,
+                                           @Valid @ModelAttribute Vehicle vehicle,
+                                           BindingResult bindingResult,
+                                           @RequestParam(value = "imagesInput", required = false) MultipartFile[] images,
+                                           @RequestParam(value = "selectedImages", required = false) List<Long> selectedImageIds) {
         if (bindingResult.hasErrors()) {
-            modelAndView.setViewName("vehicles/vehicle_update");
-            modelAndView.addObject("vehicle", vehicle);
-        } else {
-            modelAndView.setViewName("redirect:/veiculos/" + vehicle.getId());
-            vehicleRepository.save(vehicle);
+            Map<String, Object> response = new HashMap<>();
+            response.put("content", vehicle);
 
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errors.put(error.getField(), error.getDefaultMessage())
+            );
+            response.put("errors", errors);
+
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        vehicle.setId(id);
+        vehicleRepository.save(vehicle);
+
+        if (images != null) {
             for (MultipartFile image : images) {
-                if (image.isEmpty()) {
-                    continue;
-                }
+                if (image.isEmpty()) continue;
 
                 try {
                     String path = fileStorageService.storeFile(image);
@@ -157,35 +149,34 @@ public class VehicleController {
                 } catch (IOException e) {
                     System.err.println("Failed to store image: " + image.getOriginalFilename());
                     e.printStackTrace();
-                    continue;
-                }
-            }
-
-            if (selectedImageIds != null) {
-                for (Long imageId : selectedImageIds) {
-                    try {
-                        fileRepository.deleteById(imageId);
-                    } catch (Exception e) {
-                        continue;
-                    }
                 }
             }
         }
-        return modelAndView;
+
+        if (selectedImageIds != null) {
+            for (Long imageId : selectedImageIds) {
+                try {
+                    fileRepository.deleteById(imageId);
+                } catch (Exception e) {
+                    System.err.println("Failed to delete image with ID: " + imageId);
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return ResponseEntity.ok(vehicle);
     }
 
-    @GetMapping("/{id}/deletar")
-    public ModelAndView delete(@PathVariable("id") Long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteVehicle(@PathVariable("id") Long vehicleId) {
         try {
-            vehicleRepository.deleteById(id);
+            vehicleRepository.deleteById(vehicleId);
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             System.err.println("Failed to delete vehicle: ");
             e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("redirect:/veiculos");
-        return modelAndView;
     }
 
 }
