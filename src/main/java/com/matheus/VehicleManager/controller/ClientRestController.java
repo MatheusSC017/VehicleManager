@@ -1,5 +1,6 @@
 package com.matheus.VehicleManager.controller;
 
+import com.matheus.VehicleManager.dto.ClientDTO;
 import com.matheus.VehicleManager.model.Client;
 import com.matheus.VehicleManager.repository.ClientRepository;
 import com.matheus.VehicleManager.service.ClientService;
@@ -24,23 +25,36 @@ public class ClientRestController {
     @Autowired
     private ClientRepository clientRepository;
 
+    private ClientDTO toDTO(Client client) {
+        return new ClientDTO(
+                client.getId(),
+                client.getFirstName(),
+                client.getLastName(),
+                client.getEmail(),
+                client.getPhone()
+        );
+    }
+
     @GetMapping
-    public ResponseEntity<List<Client>> clients() {
+    public ResponseEntity<List<ClientDTO>> clients() {
         List<Client> clients = clientRepository.findAll();
-        return ResponseEntity.ok(clients);
+        List<ClientDTO> clientsDtos = clients.stream()
+                .map(this::toDTO)
+                .toList();
+        return ResponseEntity.ok(clientsDtos);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Client> client(@PathVariable("id") Long clientId) {
+    public ResponseEntity<ClientDTO> client(@PathVariable("id") Long clientId) {
         Client client = clientRepository.getReferenceById(clientId);
-        return ResponseEntity.ok(client);
+        return ResponseEntity.ok(toDTO(client));
     }
 
     @PostMapping
     public ResponseEntity<?> register(@Valid Client client, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, Object> response = new HashMap<>();
-            response.put("content", client);
+            response.put("content", toDTO(client));
 
             Map<String, String> errors = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
@@ -53,7 +67,7 @@ public class ClientRestController {
 
         clientRepository.save(client);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(client);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(client));
     }
 
 
@@ -61,7 +75,7 @@ public class ClientRestController {
     public ResponseEntity<?> update(@Valid Client client, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, Object> response = new HashMap<>();
-            response.put("content", client);
+            response.put("content", toDTO(client));
 
             Map<String, String> errors = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
@@ -74,7 +88,7 @@ public class ClientRestController {
 
         clientRepository.save(client);
 
-        return ResponseEntity.ok(client);
+        return ResponseEntity.ok(toDTO(client));
     }
 
     @DeleteMapping("/{id}")
