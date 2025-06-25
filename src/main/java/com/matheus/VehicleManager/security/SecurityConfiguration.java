@@ -28,7 +28,8 @@ public class SecurityConfiguration {
     private CustomUserDetailsService userDetailsService;
 
     public static final String [] ENDPOINTS_WITH_AUTHENTICATION_NOT_REQUIRED = {
-            "/auth/login"
+            "/auth/login",
+            "/documents/**"
     };
 
     public static final String [] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
