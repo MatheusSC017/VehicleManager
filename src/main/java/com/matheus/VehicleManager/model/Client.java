@@ -4,6 +4,7 @@ import com.matheus.VehicleManager.validators.UniqueEmail;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -15,9 +16,11 @@ public class Client {
     private Long id;
 
     @Size(min = 2, max = 50, message = "O limite máximo de caracteres é 50")
+    @NotNull(message = "Campo obrigatório")
     private String firstName;
 
     @Size(min = 2, max = 50, message = "O limite máximo de caracteres é 50")
+    @NotNull(message = "Campo obrigatório")
     private String lastName;
 
     @NotBlank(message = "Email is mandatory")
@@ -27,6 +30,7 @@ public class Client {
     private String email;
 
     @Size(min = 10, max = 20, message = "O limite mínimo de caracteres é 10 e o máximo é 20")
+    @NotNull(message = "Campo obrigatório")
     private String phone;
 
     public Long getId() {

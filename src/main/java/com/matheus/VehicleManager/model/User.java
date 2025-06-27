@@ -3,6 +3,7 @@ package com.matheus.VehicleManager.model;
 import com.matheus.VehicleManager.enums.UserRole;
 import com.matheus.VehicleManager.validators.UniqueUsername;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -16,12 +17,15 @@ public class User {
     @Column(unique = true)
     @UniqueUsername
     @Size(min = 1, max = 50, message = "O limite máximo de caracteres é 50")
+    @NotNull(message = "Campo obrigatório")
     private String username;
 
     @Size(min = 1, max = 200, message = "O limite máximo de caracteres é 200")
+    @NotNull(message = "Campo obrigatório")
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "Campo obrigatório")
     private UserRole role;
 
     public Long getId() {
