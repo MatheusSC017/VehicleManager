@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDate;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -27,6 +29,20 @@ public class User {
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Campo obrigatório")
     private UserRole role;
+
+    private LocalDate createdAt;
+    private LocalDate updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDate.now();
+        this.updatedAt = LocalDate.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDate.now();
+    }
 
     public Long getId() {
         return id;

@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.time.LocalDate;
+
 @Entity
 @UniqueEmail
 public class Client {
@@ -32,6 +34,20 @@ public class Client {
     @Size(min = 10, max = 20, message = "O limite mínimo de caracteres é 10 e o máximo é 20")
     @NotNull(message = "Campo obrigatório")
     private String phone;
+
+    private LocalDate createdAt;
+    private LocalDate updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDate.now();
+        this.updatedAt = LocalDate.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDate.now();
+    }
 
     public Long getId() {
         return id;

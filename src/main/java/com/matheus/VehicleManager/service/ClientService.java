@@ -15,8 +15,4 @@ public class ClientService {
         return clientRepository.findByEmail(email);
     }
 
-    public boolean isEmailUnique(String email) {
-        return email != null && clientRepository.findByEmail(email) == null;
-    }
-
 }

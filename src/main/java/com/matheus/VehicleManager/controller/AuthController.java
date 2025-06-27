@@ -2,10 +2,10 @@ package com.matheus.VehicleManager.controller;
 
 import com.matheus.VehicleManager.dto.AuthRequest;
 import com.matheus.VehicleManager.dto.AuthResponse;
+import com.matheus.VehicleManager.repository.UserRepository;
 import com.matheus.VehicleManager.security.CustomUserDetailsService;
 import com.matheus.VehicleManager.security.JwtUtil;
 import com.matheus.VehicleManager.model.User;
-import com.matheus.VehicleManager.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +30,6 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private AuthenticationManager authenticationManager;
 
     @Autowired
@@ -40,6 +37,9 @@ public class AuthController {
 
     @Autowired
     private CustomUserDetailsService userDetailsService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody AuthRequest request) {
@@ -73,7 +73,7 @@ public class AuthController {
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userService.saveUser(user);
+        userRepository.save(user);
 
         return ResponseEntity.noContent().build();
     }

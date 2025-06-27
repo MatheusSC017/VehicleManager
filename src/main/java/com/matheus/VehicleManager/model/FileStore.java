@@ -4,6 +4,8 @@ import com.matheus.VehicleManager.enums.FileType;
 import com.matheus.VehicleManager.events.FileStoreEventHandler;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+
 @Entity
 @EntityListeners(FileStoreEventHandler.class)
 public class FileStore {
@@ -20,6 +22,20 @@ public class FileStore {
     @ManyToOne
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
+
+    private LocalDate createdAt;
+    private LocalDate updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDate.now();
+        this.updatedAt = LocalDate.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDate.now();
+    }
 
     public Long getId() {
         return id;

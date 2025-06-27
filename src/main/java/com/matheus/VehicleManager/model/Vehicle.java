@@ -8,6 +8,7 @@ import com.matheus.VehicleManager.enums.VehicleType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -87,6 +88,20 @@ public class Vehicle {
 
     @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL)
     private List<FileStore> images;
+
+    private LocalDate createdAt;
+    private LocalDate updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDate.now();
+        this.updatedAt = LocalDate.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDate.now();
+    }
 
     public Long getId() {
         return id;
