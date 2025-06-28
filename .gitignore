@@ -34,3 +34,6 @@ build/
 
 ### LOCAL STORE ###
 static/
+
+### Profiles ###
+src/main/resources/application-dev.properties
