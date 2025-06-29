@@ -2,22 +2,21 @@ package com.matheus.VehicleManager.controller;
 
 import com.matheus.VehicleManager.dto.AuthRequest;
 import com.matheus.VehicleManager.dto.AuthResponse;
+import com.matheus.VehicleManager.dto.UsernameRequest;
 import com.matheus.VehicleManager.repository.UserRepository;
 import com.matheus.VehicleManager.security.CustomUserDetailsService;
 import com.matheus.VehicleManager.security.JwtUtil;
 import com.matheus.VehicleManager.model.User;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -76,5 +75,27 @@ public class AuthController {
         userRepository.save(user);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String authHeader, @RequestBody UsernameRequest request) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Authorization header");
+        }
+
+        String token = authHeader.substring(7);
+
+        try {
+            String tokenUsername = jwtUtil.extractUsername(token);
+            if (jwtUtil.validateToken(token) && tokenUsername.equals(request.getUsername())) {
+                String newToken = jwtUtil.generateToken(tokenUsername);
+                return ResponseEntity.ok(new AuthResponse(newToken));
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Token validation failed");
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid or expired");
+        }
     }
 }

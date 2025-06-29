@@ -33,6 +33,7 @@ public class SecurityConfiguration {
     };
 
     public static final String [] ENDPOINTS_WITH_AUTHENTICATION_REQUIRED = {
+            "/auth/refresh",
             "/api/vehicles",
             "/api/vehicles/**",
             "/api/clients",
