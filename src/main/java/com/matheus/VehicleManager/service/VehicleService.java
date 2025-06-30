@@ -1,8 +1,8 @@
 package com.matheus.VehicleManager.service;
 
-import com.matheus.VehicleManager.dto.FileDTO;
-import com.matheus.VehicleManager.dto.VehicleImageDTO;
-import com.matheus.VehicleManager.dto.VehicleImagesDTO;
+import com.matheus.VehicleManager.dto.FileResponseDTO;
+import com.matheus.VehicleManager.dto.VehicleImageResponseDTO;
+import com.matheus.VehicleManager.dto.VehicleImagesResponseDTO;
 import com.matheus.VehicleManager.enums.VehicleFuel;
 import com.matheus.VehicleManager.enums.VehicleStatus;
 import com.matheus.VehicleManager.enums.VehicleType;
@@ -22,26 +22,26 @@ public class VehicleService {
     @Autowired
     private VehicleRepository vehicleRepository;
 
-    public VehicleImagesDTO getVehicleWithImagesById(Long id) {
+    public VehicleImagesResponseDTO getVehicleWithImagesById(Long id) {
         Vehicle vehicle = this.vehicleRepository.getReferenceById(id);
         return this.getVehicleWithImages(vehicle);
     }
 
-    public Page<VehicleImageDTO> getFilteredVehiclesWithOneImage(String search, String status, String type,
-                                                                        String fuel, int priceMin, int priceMax, Pageable paging) {
+    public Page<VehicleImageResponseDTO> getFilteredVehiclesWithOneImage(String search, String status, String type,
+                                                                         String fuel, int priceMin, int priceMax, Pageable paging) {
         VehicleStatus statusEnum = (status != null && !status.isEmpty()) ? VehicleStatus.valueOf(status) : null;
         VehicleType typeEnum = (type != null && !type.isEmpty()) ? VehicleType.valueOf(type) : null;
         VehicleFuel fuelEnum = (fuel != null && !fuel.isEmpty()) ? VehicleFuel.valueOf(fuel) : null;
         Integer min = priceMin > 0 ? priceMin : null;
         Integer max = priceMax > 0 ? priceMax : null;
 
-        Page<VehicleImageDTO> vehicles = vehicleRepository.searchVehiclesWithFilters(search, statusEnum, typeEnum, fuelEnum, min, max, paging);
+        Page<VehicleImageResponseDTO> vehicles = vehicleRepository.searchVehiclesWithFilters(search, statusEnum, typeEnum, fuelEnum, min, max, paging);
         return vehicles;
     }
 
-    private VehicleImagesDTO getVehicleWithImages(Vehicle vehicle) {
+    private VehicleImagesResponseDTO getVehicleWithImages(Vehicle vehicle) {
         List<FileStore> images = vehicle.getImages();
-        return new VehicleImagesDTO(
+        return new VehicleImagesResponseDTO(
                 vehicle.getId(),
                 vehicle.getVehicleType(),
                 vehicle.getVehicleStatus(),
@@ -58,7 +58,7 @@ public class VehicleService {
                 vehicle.getDoors(),
                 vehicle.getMotor(),
                 vehicle.getPower(),
-                images.stream().map(image -> new FileDTO(
+                images.stream().map(image -> new FileResponseDTO(
                         image.getId(),
                         image.getPath(),
                         image.getType()

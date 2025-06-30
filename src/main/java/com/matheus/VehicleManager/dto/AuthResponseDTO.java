@@ -1,9 +1,9 @@
 package com.matheus.VehicleManager.dto;
 
-public class AuthResponse {
+public class AuthResponseDTO {
     private String token;
 
-    public AuthResponse(String token) { this.token = token; }
+    public AuthResponseDTO(String token) { this.token = token; }
 
     public String getToken() {
         return token;

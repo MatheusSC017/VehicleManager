@@ -1,7 +1,7 @@
 package com.matheus.VehicleManager.controller;
 
-import com.matheus.VehicleManager.dto.VehicleImageDTO;
-import com.matheus.VehicleManager.dto.VehicleImagesDTO;
+import com.matheus.VehicleManager.dto.VehicleImageResponseDTO;
+import com.matheus.VehicleManager.dto.VehicleImagesResponseDTO;
 import com.matheus.VehicleManager.enums.FileType;
 import com.matheus.VehicleManager.model.FileStore;
 import com.matheus.VehicleManager.model.Vehicle;
@@ -40,16 +40,16 @@ public class VehicleController {
     private FileRepository fileRepository;
 
     @GetMapping
-    public ResponseEntity<Page<VehicleImageDTO>> get_vehicles(@RequestParam(value="searchInput") Optional<String> search,
-                                 @RequestParam("status") Optional<String> status,
-                                 @RequestParam("type") Optional<String> type,
-                                 @RequestParam("fuel") Optional<String> fuel,
-                                 @RequestParam(value="priceMin", defaultValue="0") int priceMin,
-                                 @RequestParam(value="priceMax", defaultValue="0") int priceMax,
-                                 @RequestParam(value = "page", defaultValue = "0") int page,
-                                 @RequestParam(value = "size", defaultValue = "10") int size) {
+    public ResponseEntity<Page<VehicleImageResponseDTO>> get_vehicles(@RequestParam(value="searchInput") Optional<String> search,
+                                                                      @RequestParam("status") Optional<String> status,
+                                                                      @RequestParam("type") Optional<String> type,
+                                                                      @RequestParam("fuel") Optional<String> fuel,
+                                                                      @RequestParam(value="priceMin", defaultValue="0") int priceMin,
+                                                                      @RequestParam(value="priceMax", defaultValue="0") int priceMax,
+                                                                      @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                      @RequestParam(value = "size", defaultValue = "10") int size) {
         Pageable paging = PageRequest.of(page, size);
-        Page<VehicleImageDTO> vehiclesPage;
+        Page<VehicleImageResponseDTO> vehiclesPage;
         vehiclesPage = vehicleService.getFilteredVehiclesWithOneImage(
                 search.orElse(""),
                 status.orElse(""),
@@ -63,8 +63,8 @@ public class VehicleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<VehicleImagesDTO> get_vehicle(@PathVariable(value="id") Long vehicleId) {
-        VehicleImagesDTO vehicle = vehicleService.getVehicleWithImagesById(vehicleId);
+    public ResponseEntity<VehicleImagesResponseDTO> get_vehicle(@PathVariable(value="id") Long vehicleId) {
+        VehicleImagesResponseDTO vehicle = vehicleService.getVehicleWithImagesById(vehicleId);
         return ResponseEntity.ok(vehicle);
     }
 

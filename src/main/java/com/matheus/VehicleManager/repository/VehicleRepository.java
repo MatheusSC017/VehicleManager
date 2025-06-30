@@ -1,6 +1,6 @@
 package com.matheus.VehicleManager.repository;
 
-import com.matheus.VehicleManager.dto.VehicleImageDTO;
+import com.matheus.VehicleManager.dto.VehicleImageResponseDTO;
 import com.matheus.VehicleManager.enums.VehicleFuel;
 import com.matheus.VehicleManager.enums.VehicleStatus;
 import com.matheus.VehicleManager.enums.VehicleType;
@@ -48,7 +48,7 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
       AND (:priceMin IS NULL OR v.price >= :priceMin)
       AND (:priceMax IS NULL OR v.price <= :priceMax)
     """)
-    Page<VehicleImageDTO> searchVehiclesWithFilters(
+    Page<VehicleImageResponseDTO> searchVehiclesWithFilters(
             @Param("search") String search,
             @Param("status") VehicleStatus status,
             @Param("type") VehicleType type,

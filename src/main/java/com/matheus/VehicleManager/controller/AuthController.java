@@ -1,8 +1,8 @@
 package com.matheus.VehicleManager.controller;
 
-import com.matheus.VehicleManager.dto.AuthRequest;
-import com.matheus.VehicleManager.dto.AuthResponse;
-import com.matheus.VehicleManager.dto.UsernameRequest;
+import com.matheus.VehicleManager.dto.AuthRequestDTO;
+import com.matheus.VehicleManager.dto.AuthResponseDTO;
+import com.matheus.VehicleManager.dto.UsernameRequestDTO;
 import com.matheus.VehicleManager.repository.UserRepository;
 import com.matheus.VehicleManager.security.CustomUserDetailsService;
 import com.matheus.VehicleManager.security.JwtUtil;
@@ -41,14 +41,14 @@ public class AuthController {
     private UserRepository userRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticate(@RequestBody AuthRequest request) {
+    public ResponseEntity<?> authenticate(@RequestBody AuthRequestDTO request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
 
         if (authentication.isAuthenticated()) {
             final String token = jwtUtil.generateToken(request.getUsername());
-            return ResponseEntity.ok(new AuthResponse(token));
+            return ResponseEntity.ok(new AuthResponseDTO(token));
         } else {
             throw new RuntimeException("Invalid credentials");
         }
@@ -78,7 +78,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String authHeader, @RequestBody UsernameRequest request) {
+    public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String authHeader, @RequestBody UsernameRequestDTO request) {
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Authorization header");
         }
@@ -89,7 +89,7 @@ public class AuthController {
             String tokenUsername = jwtUtil.extractUsername(token);
             if (jwtUtil.validateToken(token) && tokenUsername.equals(request.getUsername())) {
                 String newToken = jwtUtil.generateToken(tokenUsername);
-                return ResponseEntity.ok(new AuthResponse(newToken));
+                return ResponseEntity.ok(new AuthResponseDTO(newToken));
             } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Token validation failed");
             }

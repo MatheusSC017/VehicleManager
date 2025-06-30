@@ -1,6 +1,6 @@
 package com.matheus.VehicleManager.controller;
 
-import com.matheus.VehicleManager.dto.ClientDTO;
+import com.matheus.VehicleManager.dto.ClientResponseDTO;
 import com.matheus.VehicleManager.model.Client;
 import com.matheus.VehicleManager.repository.ClientRepository;
 import com.matheus.VehicleManager.service.ClientService;
@@ -25,8 +25,8 @@ public class ClientController {
     @Autowired
     private ClientRepository clientRepository;
 
-    private ClientDTO toDTO(Client client) {
-        return new ClientDTO(
+    private ClientResponseDTO toDTO(Client client) {
+        return new ClientResponseDTO(
                 client.getId(),
                 client.getFirstName(),
                 client.getLastName(),
@@ -36,16 +36,16 @@ public class ClientController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ClientDTO>> clients() {
+    public ResponseEntity<List<ClientResponseDTO>> clients() {
         List<Client> clients = clientRepository.findAll();
-        List<ClientDTO> clientsDtos = clients.stream()
+        List<ClientResponseDTO> clientsDtos = clients.stream()
                 .map(this::toDTO)
                 .toList();
         return ResponseEntity.ok(clientsDtos);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ClientDTO> client(@PathVariable("id") Long clientId) {
+    public ResponseEntity<ClientResponseDTO> client(@PathVariable("id") Long clientId) {
         Client client = clientRepository.getReferenceById(clientId);
         return ResponseEntity.ok(toDTO(client));
     }
