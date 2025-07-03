@@ -15,12 +15,12 @@ public class Financing {
     private Long id;
 
     @NotNull(message = "Cliente  é obrigatório")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "client_id")
     private Client client;
 
     @NotNull(message = "Veiculo é obrigatório")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 

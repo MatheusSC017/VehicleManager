@@ -1,8 +1,13 @@
 package com.matheus.VehicleManager.controller;
 
+import com.matheus.VehicleManager.dto.FinancingRequestDTO;
 import com.matheus.VehicleManager.dto.FinancingResponseDTO;
+import com.matheus.VehicleManager.model.Client;
 import com.matheus.VehicleManager.model.Financing;
+import com.matheus.VehicleManager.model.Vehicle;
+import com.matheus.VehicleManager.repository.ClientRepository;
 import com.matheus.VehicleManager.repository.FinancingRepository;
+import com.matheus.VehicleManager.repository.VehicleRepository;
 import com.matheus.VehicleManager.service.FinancingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/financings")
@@ -27,6 +33,12 @@ public class FinancingController {
     @Autowired
     private FinancingRepository financingRepository;
 
+    @Autowired
+    private ClientRepository clientRepository;
+
+    @Autowired
+    private VehicleRepository vehicleRepository;
+
     private FinancingResponseDTO toDTO(Financing financing) {
         return  new FinancingResponseDTO(
                 financing.getId(),
@@ -36,7 +48,7 @@ public class FinancingController {
                 financing.getDownPayment(),
                 financing.getInstallmentCount(),
                 financing.getInstallmentValue(),
-                financing.getDownPayment(),
+                financing.getAnnualInterestRate(),
                 financing.getContractDate(),
                 financing.getFirstInstallmentDate(),
                 financing.getStatus()
@@ -45,7 +57,7 @@ public class FinancingController {
 
     @GetMapping
     public ResponseEntity<Page<FinancingResponseDTO>> getAll(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                                 @RequestParam(value = "size", defaultValue = "10") int size) {
+                                                             @RequestParam(value = "size", defaultValue = "10") int size) {
         Pageable paging = PageRequest.of(page, size);
         Page<Financing> financings = financingRepository.findAll(paging);
         Page<FinancingResponseDTO> financingsFtoPage = financings.map(this::toDTO);
@@ -59,19 +71,40 @@ public class FinancingController {
     }
 
     @PostMapping
-    public  ResponseEntity<?> insert(@Valid @RequestBody Financing financing, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("content", toDTO(financing));
+    public  ResponseEntity<?> insert(@Valid @RequestBody FinancingRequestDTO financingDto, BindingResult bindingResult) {
+        Map<String, Object> response = new HashMap<>();
 
+        if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
+                    errors.put(error.getField(), error.getDefaultMessage())
             );
             response.put("errors", errors);
-
             return ResponseEntity.badRequest().body(response);
         }
+
+        Optional<Client> clientOpt = clientRepository.findById(financingDto.client);
+        Optional<Vehicle> vehicleOpt = vehicleRepository.findById(financingDto.vehicle);
+
+        if (clientOpt.isEmpty() || vehicleOpt.isEmpty()) {
+            Map<String, String> errors = new HashMap<>();
+            if (clientOpt.isEmpty()) errors.put("client", "Cliente não encontrado");
+            if (vehicleOpt.isEmpty()) errors.put("vehicle", "Veículo não encontrado");
+            response.put("errors", errors);
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        Financing financing = new Financing();
+        financing.setClient(clientOpt.get());
+        financing.setVehicle(vehicleOpt.get());
+        financing.setTotalAmount(financingDto.totalAmount);
+        financing.setDownPayment(financingDto.downPayment);
+        financing.setInstallmentCount(financingDto.installmentCount);
+        financing.setInstallmentValue(financingDto.installmentValue);
+        financing.setAnnualInterestRate(financingDto.annualInterestRate);
+        financing.setContractDate(financingDto.contractDate);
+        financing.setFirstInstallmentDate(financingDto.firstInstallmentDate);
+        financing.setStatus(financingDto.financingStatus);
 
         financingRepository.save(financing);
 
@@ -79,14 +112,14 @@ public class FinancingController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@Valid Financing financing, BindingResult bindingResult) {
+    public ResponseEntity<?> update(@PathVariable("id") Long financingId, @Valid Financing financing, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, Object> response = new HashMap<>();
             response.put("content", toDTO(financing));
 
             Map<String, String> errors = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
+                    errors.put(error.getField(), error.getDefaultMessage())
             );
             response.put("errors", errors);
 
@@ -98,8 +131,8 @@ public class FinancingController {
         return ResponseEntity.ok(toDTO(financing));
     }
 
-    @DeleteMapping("/id")
-    public ResponseEntity<?> delete(@PathVariable Long financingId) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long financingId) {
         try {
             financingRepository.deleteById(financingId);
             return ResponseEntity.noContent().build();
