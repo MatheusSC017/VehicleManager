@@ -36,7 +36,7 @@ public class ClientController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ClientResponseDTO>> clients() {
+    public ResponseEntity<List<ClientResponseDTO>> getAll() {
         List<Client> clients = clientRepository.findAll();
         List<ClientResponseDTO> clientsDtos = clients.stream()
                 .map(this::toDTO)
@@ -44,14 +44,20 @@ public class ClientController {
         return ResponseEntity.ok(clientsDtos);
     }
 
+    @GetMapping("/email/{email}")
+    public ResponseEntity<ClientResponseDTO> getByEmail(@PathVariable("email") String email) {
+        Client client = clientRepository.findByEmail(email);
+        return ResponseEntity.ok(toDTO(client));
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<ClientResponseDTO> client(@PathVariable("id") Long clientId) {
+    public ResponseEntity<ClientResponseDTO> get(@PathVariable("id") Long clientId) {
         Client client = clientRepository.getReferenceById(clientId);
         return ResponseEntity.ok(toDTO(client));
     }
 
     @PostMapping
-    public ResponseEntity<?> register(@Valid Client client, BindingResult bindingResult) {
+    public ResponseEntity<?> insert(@Valid Client client, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, Object> response = new HashMap<>();
             response.put("content", toDTO(client));

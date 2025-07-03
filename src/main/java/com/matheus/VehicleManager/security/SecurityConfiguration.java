@@ -38,6 +38,8 @@ public class SecurityConfiguration {
             "/api/vehicles/**",
             "/api/clients",
             "/api/clients/**",
+            "/api/financings/**",
+            "/api/financings/**",
     };
 
     public static final String [] ENDPOINTS_USER = {

@@ -6,17 +6,19 @@ import com.matheus.VehicleManager.repository.FinancingRepository;
 import com.matheus.VehicleManager.service.FinancingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/financing")
+@RequestMapping("/api/financings")
 public class FinancingController {
 
     @Autowired
@@ -42,22 +44,22 @@ public class FinancingController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FinancingResponseDTO>> financings() {
-        List<Financing> financings = financingRepository.findAll();
-        List<FinancingResponseDTO> financingsDtos = financings.stream()
-                .map(this::toDTO)
-                .toList();
-        return ResponseEntity.ok(financingsDtos);
+    public ResponseEntity<Page<FinancingResponseDTO>> getAll(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                                 @RequestParam(value = "size", defaultValue = "10") int size) {
+        Pageable paging = PageRequest.of(page, size);
+        Page<Financing> financings = financingRepository.findAll(paging);
+        Page<FinancingResponseDTO> financingsFtoPage = financings.map(this::toDTO);
+        return ResponseEntity.ok(financingsFtoPage);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FinancingResponseDTO> financing(@PathVariable("id") Long financingId) {
+    public ResponseEntity<FinancingResponseDTO> get(@PathVariable("id") Long financingId) {
         Financing financing = financingRepository.getReferenceById(financingId);
         return ResponseEntity.ok(toDTO(financing));
     }
 
     @PostMapping
-    public  ResponseEntity<?> register(@Valid Financing financing, BindingResult bindingResult) {
+    public  ResponseEntity<?> insert(@Valid @RequestBody Financing financing, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, Object> response = new HashMap<>();
             response.put("content", toDTO(financing));

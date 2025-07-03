@@ -6,9 +6,8 @@ import com.matheus.VehicleManager.enums.VehicleStatus;
 import com.matheus.VehicleManager.enums.VehicleType;
 
 import java.math.BigDecimal;
-import java.util.List;
 
-public record VehicleImagesResponseDTO(
+public record VehicleResponseDTO(
     Long id,
     VehicleType vehicleType,
     VehicleStatus vehicleStatus,
@@ -24,6 +23,6 @@ public record VehicleImagesResponseDTO(
     VehicleChange vehicleChange,
     Integer doors,
     String motor,
-    String power,
-    List<FileResponseDTO> images
-) {}
+    String power
+) {
+}

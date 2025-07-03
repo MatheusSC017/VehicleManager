@@ -24,4 +24,5 @@ public record VehicleImageResponseDTO(
     Integer doors,
     String motor,
     String power,
-    String image) {}
+    String image
+) {}

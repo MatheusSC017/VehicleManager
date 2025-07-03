@@ -5,6 +5,7 @@ import com.matheus.VehicleManager.enums.VehicleFuel;
 import com.matheus.VehicleManager.enums.VehicleStatus;
 import com.matheus.VehicleManager.enums.VehicleType;
 
+import com.matheus.VehicleManager.validators.UniqueChassi;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
+@UniqueChassi
 public class Vehicle {
 
     @Id
@@ -50,7 +52,8 @@ public class Vehicle {
     @Size(max = 8, message = "O limite máximo de caracteres é 8")
     private String plate;
 
-    @Column(name = "chassi")
+    @NotBlank(message = "Chassi is mandatory")
+    @Column(unique = true)
     @Size(max = 50, message = "O limite máximo de caracteres é 50")
     private String chassi;
 

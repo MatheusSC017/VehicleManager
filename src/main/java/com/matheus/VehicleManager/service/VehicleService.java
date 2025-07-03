@@ -22,9 +22,25 @@ public class VehicleService {
     @Autowired
     private VehicleRepository vehicleRepository;
 
+    public Vehicle findByChassi(String chassi) {
+        return vehicleRepository.findByChassi(chassi);
+    }
+
     public VehicleImagesResponseDTO getVehicleWithImagesById(Long id) {
         Vehicle vehicle = this.vehicleRepository.getReferenceById(id);
         return this.getVehicleWithImages(vehicle);
+    }
+
+    public Page<Vehicle> getFilteredVehicles(String search, String status, String type,
+                                                             String fuel, int priceMin, int priceMax, Pageable paging) {
+        VehicleStatus statusEnum = (status != null && !status.isEmpty()) ? VehicleStatus.valueOf(status) : null;
+        VehicleType typeEnum = (type != null && !type.isEmpty()) ? VehicleType.valueOf(type) : null;
+        VehicleFuel fuelEnum = (fuel != null && !fuel.isEmpty()) ? VehicleFuel.valueOf(fuel) : null;
+        Integer min = priceMin > 0 ? priceMin : null;
+        Integer max = priceMax > 0 ? priceMax : null;
+
+        Page<Vehicle> vehicles = vehicleRepository.searchVehicles(search, statusEnum, typeEnum, fuelEnum, min, max, paging);
+        return vehicles;
     }
 
     public Page<VehicleImageResponseDTO> getFilteredVehiclesWithOneImage(String search, String status, String type,

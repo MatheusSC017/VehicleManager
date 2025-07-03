@@ -1,8 +1,11 @@
 package com.matheus.VehicleManager.controller;
 
+import com.matheus.VehicleManager.dto.ClientResponseDTO;
 import com.matheus.VehicleManager.dto.VehicleImageResponseDTO;
 import com.matheus.VehicleManager.dto.VehicleImagesResponseDTO;
+import com.matheus.VehicleManager.dto.VehicleResponseDTO;
 import com.matheus.VehicleManager.enums.FileType;
+import com.matheus.VehicleManager.model.Client;
 import com.matheus.VehicleManager.model.FileStore;
 import com.matheus.VehicleManager.model.Vehicle;
 import com.matheus.VehicleManager.repository.FileRepository;
@@ -39,15 +42,36 @@ public class VehicleController {
     @Autowired
     private FileRepository fileRepository;
 
-    @GetMapping
-    public ResponseEntity<Page<VehicleImageResponseDTO>> get_vehicles(@RequestParam(value="searchInput") Optional<String> search,
-                                                                      @RequestParam("status") Optional<String> status,
-                                                                      @RequestParam("type") Optional<String> type,
-                                                                      @RequestParam("fuel") Optional<String> fuel,
-                                                                      @RequestParam(value="priceMin", defaultValue="0") int priceMin,
-                                                                      @RequestParam(value="priceMax", defaultValue="0") int priceMax,
-                                                                      @RequestParam(value = "page", defaultValue = "0") int page,
-                                                                      @RequestParam(value = "size", defaultValue = "10") int size) {
+    private VehicleResponseDTO toDTO(Vehicle vehicle) {
+        return new VehicleResponseDTO(
+                vehicle.getId(),
+                vehicle.getVehicleType(),
+                vehicle.getVehicleStatus(),
+                vehicle.getModel(),
+                vehicle.getBrand(),
+                vehicle.getYear(),
+                vehicle.getColor(),
+                vehicle.getPlate(),
+                vehicle.getChassi(),
+                vehicle.getMileage(),
+                vehicle.getPrice(),
+                vehicle.getVehicleFuel(),
+                vehicle.getVehicleChange(),
+                vehicle.getDoors(),
+                vehicle.getMotor(),
+                vehicle.getPower()
+        );
+    }
+
+    @GetMapping("/images")
+    public ResponseEntity<Page<VehicleImageResponseDTO>> getAllWithImages(@RequestParam(value="searchInput") Optional<String> search,
+                                                                            @RequestParam("status") Optional<String> status,
+                                                                            @RequestParam("type") Optional<String> type,
+                                                                            @RequestParam("fuel") Optional<String> fuel,
+                                                                            @RequestParam(value="priceMin", defaultValue="0") int priceMin,
+                                                                            @RequestParam(value="priceMax", defaultValue="0") int priceMax,
+                                                                            @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                            @RequestParam(value = "size", defaultValue = "10") int size) {
         Pageable paging = PageRequest.of(page, size);
         Page<VehicleImageResponseDTO> vehiclesPage;
         vehiclesPage = vehicleService.getFilteredVehiclesWithOneImage(
@@ -62,14 +86,43 @@ public class VehicleController {
         return ResponseEntity.ok(vehiclesPage);
     }
 
+    @GetMapping
+    public ResponseEntity<Page<VehicleResponseDTO>> getAll(@RequestParam(value="searchInput") Optional<String> search,
+                                                           @RequestParam("status") Optional<String> status,
+                                                           @RequestParam("type") Optional<String> type,
+                                                           @RequestParam("fuel") Optional<String> fuel,
+                                                           @RequestParam(value="priceMin", defaultValue="0") int priceMin,
+                                                           @RequestParam(value="priceMax", defaultValue="0") int priceMax,
+                                                           @RequestParam(value = "page", defaultValue = "0") int page,
+                                                           @RequestParam(value = "size", defaultValue = "10") int size) {
+        Pageable paging = PageRequest.of(page, size);
+        Page<Vehicle> vehicles = vehicleService.getFilteredVehicles(
+                search.orElse(""),
+                status.orElse(""),
+                type.orElse(""),
+                fuel.orElse(""),
+                priceMin,
+                priceMax,
+                paging
+        );
+        Page<VehicleResponseDTO> vehiclesPage = vehicles.map(this::toDTO);
+        return ResponseEntity.ok(vehiclesPage);
+    }
+
+    @GetMapping("/chassi/{chassi}")
+    public ResponseEntity<VehicleResponseDTO> getByChassi(@PathVariable(value="chassi") String chassi) {
+        Vehicle vehicle = vehicleService.findByChassi(chassi);
+        return ResponseEntity.ok(toDTO(vehicle));
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<VehicleImagesResponseDTO> get_vehicle(@PathVariable(value="id") Long vehicleId) {
+    public ResponseEntity<VehicleImagesResponseDTO> get(@PathVariable(value="id") Long vehicleId) {
         VehicleImagesResponseDTO vehicle = vehicleService.getVehicleWithImagesById(vehicleId);
         return ResponseEntity.ok(vehicle);
     }
 
     @PostMapping
-    public ResponseEntity<?> insertVehicle(@Valid @ModelAttribute Vehicle vehicle,
+    public ResponseEntity<?> insert(@Valid @ModelAttribute Vehicle vehicle,
                                            BindingResult bindingResult,
                                            @RequestParam(value="imagesInput", required = false) MultipartFile[] images) {
         if (bindingResult.hasErrors()) {
@@ -112,7 +165,7 @@ public class VehicleController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateVehicle(@PathVariable Long id,
+    public ResponseEntity<?> update(@PathVariable Long id,
                                            @Valid @ModelAttribute Vehicle vehicle,
                                            BindingResult bindingResult,
                                            @RequestParam(value = "imagesInput", required = false) MultipartFile[] images,
@@ -168,7 +221,7 @@ public class VehicleController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteVehicle(@PathVariable("id") Long vehicleId) {
+    public ResponseEntity<?> delete(@PathVariable("id") Long vehicleId) {
         try {
             vehicleRepository.deleteById(vehicleId);
             return ResponseEntity.noContent().build();

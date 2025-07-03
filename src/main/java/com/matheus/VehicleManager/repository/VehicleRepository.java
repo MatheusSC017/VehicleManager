@@ -13,8 +13,10 @@ import org.springframework.data.repository.query.Param;
 
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
+    Vehicle findByChassi(String chassi);
+
     @Query("""
-    SELECT new com.matheus.VehicleManager.dto.VehicleImageDTO(
+    SELECT new com.matheus.VehicleManager.dto.VehicleImageResponseDTO(
         v.id,
         v.vehicleType,
         v.vehicleStatus,
@@ -49,6 +51,26 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
       AND (:priceMax IS NULL OR v.price <= :priceMax)
     """)
     Page<VehicleImageResponseDTO> searchVehiclesWithFilters(
+            @Param("search") String search,
+            @Param("status") VehicleStatus status,
+            @Param("type") VehicleType type,
+            @Param("fuel") VehicleFuel fuel,
+            @Param("priceMin") Integer priceMin,
+            @Param("priceMax") Integer priceMax,
+            @Param("paging") Pageable paging
+    );
+
+    @Query("""
+    SELECT v FROM Vehicle v
+    WHERE (LOWER(v.brand) LIKE LOWER(CONCAT('%', :search, '%'))
+           OR LOWER(v.model) LIKE LOWER(CONCAT('%', :search, '%')))
+      AND (:status IS NULL OR v.vehicleStatus = :status)
+      AND (:type IS NULL OR v.vehicleType = :type)
+      AND (:fuel IS NULL OR v.vehicleFuel = :fuel)
+      AND (:priceMin IS NULL OR v.price >= :priceMin)
+      AND (:priceMax IS NULL OR v.price <= :priceMax)
+    """)
+    Page<Vehicle> searchVehicles(
             @Param("search") String search,
             @Param("status") VehicleStatus status,
             @Param("type") VehicleType type,
