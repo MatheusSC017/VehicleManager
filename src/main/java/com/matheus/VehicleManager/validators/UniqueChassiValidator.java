@@ -6,7 +6,7 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class UniqueChassiValidator implements ConstraintValidator<UniqueEmail, Vehicle> {
+public class UniqueChassiValidator implements ConstraintValidator<UniqueChassi, Vehicle> {
 
     @Autowired
     private VehicleService vehicleService;

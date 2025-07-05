@@ -2,6 +2,7 @@ package com.matheus.VehicleManager.dto;
 
 import com.matheus.VehicleManager.enums.FinancingStatus;
 
+import com.matheus.VehicleManager.model.Client;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
@@ -9,37 +10,117 @@ import java.time.LocalDate;
 
 public class FinancingRequestDTO {
     @NotNull(message = "Cliente é obrigatório")
-    public Long client;
+    private Client client;
 
     @NotNull(message = "Veículo é obrigatório")
-    public Long vehicle;
+    private VehicleMinimalDTO vehicle;
 
     @NotNull(message = "Valor total é obrigatório")
     @DecimalMin(value = "0.0", inclusive = false)
-    public BigDecimal totalAmount;
+    private BigDecimal totalAmount;
 
     @NotNull(message = "Entrada é obrigatória")
     @DecimalMin(value = "0.0")
-    public BigDecimal downPayment;
+    private BigDecimal downPayment;
 
     @NotNull(message = "Número de parcelas é obrigatório")
     @Min(1)
-    public Integer installmentCount;
+    private Integer installmentCount;
 
     @NotNull(message = "Valor da parcela é obrigatório")
     @DecimalMin(value = "0.0")
-    public BigDecimal installmentValue;
+    private BigDecimal installmentValue;
 
     @NotNull(message = "Taxa de juros anual é obrigatória")
     @DecimalMin(value = "0.0")
-    public BigDecimal annualInterestRate;
+    private BigDecimal annualInterestRate;
 
     @NotNull(message = "Data do contrato é obrigatória")
-    public LocalDate contractDate;
+    private LocalDate contractDate;
 
     @NotNull(message = "Data do primeiro pagamento é obrigatória")
-    public LocalDate firstInstallmentDate;
+    private LocalDate firstInstallmentDate;
 
     @NotNull(message = "Status do financiamento é obrigatório")
-    public FinancingStatus financingStatus;
+    private FinancingStatus financingStatus;
+
+    public @NotNull(message = "Cliente é obrigatório") Client getClient() {
+        return client;
+    }
+
+    public void setClient(@NotNull(message = "Cliente é obrigatório") Client client) {
+        this.client = client;
+    }
+
+    public @NotNull(message = "Veículo é obrigatório") VehicleMinimalDTO getVehicle() {
+        return vehicle;
+    }
+
+    public void setVehicle(@NotNull(message = "Veículo é obrigatório") VehicleMinimalDTO vehicle) {
+        this.vehicle = vehicle;
+    }
+
+    public @NotNull(message = "Valor total é obrigatório") @DecimalMin(value = "0.0", inclusive = false) BigDecimal getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(@NotNull(message = "Valor total é obrigatório") @DecimalMin(value = "0.0", inclusive = false) BigDecimal totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public @NotNull(message = "Entrada é obrigatória") @DecimalMin(value = "0.0") BigDecimal getDownPayment() {
+        return downPayment;
+    }
+
+    public void setDownPayment(@NotNull(message = "Entrada é obrigatória") @DecimalMin(value = "0.0") BigDecimal downPayment) {
+        this.downPayment = downPayment;
+    }
+
+    public @NotNull(message = "Número de parcelas é obrigatório") @Min(1) Integer getInstallmentCount() {
+        return installmentCount;
+    }
+
+    public void setInstallmentCount(@NotNull(message = "Número de parcelas é obrigatório") @Min(1) Integer installmentCount) {
+        this.installmentCount = installmentCount;
+    }
+
+    public @NotNull(message = "Valor da parcela é obrigatório") @DecimalMin(value = "0.0") BigDecimal getInstallmentValue() {
+        return installmentValue;
+    }
+
+    public void setInstallmentValue(@NotNull(message = "Valor da parcela é obrigatório") @DecimalMin(value = "0.0") BigDecimal installmentValue) {
+        this.installmentValue = installmentValue;
+    }
+
+    public @NotNull(message = "Taxa de juros anual é obrigatória") @DecimalMin(value = "0.0") BigDecimal getAnnualInterestRate() {
+        return annualInterestRate;
+    }
+
+    public void setAnnualInterestRate(@NotNull(message = "Taxa de juros anual é obrigatória") @DecimalMin(value = "0.0") BigDecimal annualInterestRate) {
+        this.annualInterestRate = annualInterestRate;
+    }
+
+    public @NotNull(message = "Data do contrato é obrigatória") LocalDate getContractDate() {
+        return contractDate;
+    }
+
+    public void setContractDate(@NotNull(message = "Data do contrato é obrigatória") LocalDate contractDate) {
+        this.contractDate = contractDate;
+    }
+
+    public @NotNull(message = "Data do primeiro pagamento é obrigatória") LocalDate getFirstInstallmentDate() {
+        return firstInstallmentDate;
+    }
+
+    public void setFirstInstallmentDate(@NotNull(message = "Data do primeiro pagamento é obrigatória") LocalDate firstInstallmentDate) {
+        this.firstInstallmentDate = firstInstallmentDate;
+    }
+
+    public @NotNull(message = "Status do financiamento é obrigatório") FinancingStatus getFinancingStatus() {
+        return financingStatus;
+    }
+
+    public void setFinancingStatus(@NotNull(message = "Status do financiamento é obrigatório") FinancingStatus financingStatus) {
+        this.financingStatus = financingStatus;
+    }
 }
