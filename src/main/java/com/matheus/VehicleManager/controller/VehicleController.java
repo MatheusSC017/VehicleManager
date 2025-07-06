@@ -1,10 +1,8 @@
 package com.matheus.VehicleManager.controller;
 
-import com.matheus.VehicleManager.dto.ClientResponseDTO;
-import com.matheus.VehicleManager.dto.VehicleImageResponseDTO;
-import com.matheus.VehicleManager.dto.VehicleImagesResponseDTO;
-import com.matheus.VehicleManager.dto.VehicleResponseDTO;
+import com.matheus.VehicleManager.dto.*;
 import com.matheus.VehicleManager.enums.FileType;
+import com.matheus.VehicleManager.enums.VehicleStatus;
 import com.matheus.VehicleManager.model.Client;
 import com.matheus.VehicleManager.model.FileStore;
 import com.matheus.VehicleManager.model.Vehicle;
@@ -122,12 +120,12 @@ public class VehicleController {
     }
 
     @PostMapping
-    public ResponseEntity<?> insert(@Valid @ModelAttribute Vehicle vehicle,
+    public ResponseEntity<?> insert(@Valid @ModelAttribute VehicleRequestDTO vehicleDto,
                                            BindingResult bindingResult,
                                            @RequestParam(value="imagesInput", required = false) MultipartFile[] images) {
         if (bindingResult.hasErrors()) {
             Map<String, Object> response = new HashMap<>();
-            response.put("content", vehicle);
+            response.put("content", vehicleDto);
 
             Map<String, String> errors = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
@@ -138,6 +136,21 @@ public class VehicleController {
             return ResponseEntity.badRequest().body(response);
         }
 
+        Vehicle vehicle = new Vehicle();
+        vehicle.setVehicleType(vehicleDto.getVehicleType());
+        vehicle.setModel(vehicleDto.getModel());
+        vehicle.setBrand(vehicleDto.getBrand());
+        vehicle.setYear(vehicleDto.getYear());
+        vehicle.setColor(vehicleDto.getColor());
+        vehicle.setPlate(vehicleDto.getPlate());
+        vehicle.setChassi(vehicleDto.getChassi());
+        vehicle.setMileage(vehicleDto.getMileage());
+        vehicle.setPrice(vehicleDto.getPrice());
+        vehicle.setVehicleFuel(vehicleDto.getVehicleFuel());
+        vehicle.setVehicleChange(vehicleDto.getVehicleChange());
+        vehicle.setDoors(vehicleDto.getDoors());
+        vehicle.setMotor(vehicleDto.getMotor());
+        vehicle.setPower(vehicleDto.getPower());
 
         vehicleRepository.save(vehicle);
 
@@ -166,13 +179,13 @@ public class VehicleController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id,
-                                           @Valid @ModelAttribute Vehicle vehicle,
+                                           @Valid @ModelAttribute VehicleRequestDTO vehicleDto,
                                            BindingResult bindingResult,
                                            @RequestParam(value = "imagesInput", required = false) MultipartFile[] images,
                                            @RequestParam(value = "selectedImages", required = false) List<Long> selectedImageIds) {
         if (bindingResult.hasErrors()) {
             Map<String, Object> response = new HashMap<>();
-            response.put("content", vehicle);
+            response.put("content", vehicleDto);
 
             Map<String, String> errors = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
@@ -183,7 +196,22 @@ public class VehicleController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        vehicle.setId(id);
+        Vehicle vehicle = vehicleRepository.getReferenceById(id);
+        vehicle.setVehicleType(vehicleDto.getVehicleType());
+        vehicle.setModel(vehicleDto.getModel());
+        vehicle.setBrand(vehicleDto.getBrand());
+        vehicle.setYear(vehicleDto.getYear());
+        vehicle.setColor(vehicleDto.getColor());
+        vehicle.setPlate(vehicleDto.getPlate());
+        vehicle.setChassi(vehicleDto.getChassi());
+        vehicle.setMileage(vehicleDto.getMileage());
+        vehicle.setPrice(vehicleDto.getPrice());
+        vehicle.setVehicleFuel(vehicleDto.getVehicleFuel());
+        vehicle.setVehicleChange(vehicleDto.getVehicleChange());
+        vehicle.setDoors(vehicleDto.getDoors());
+        vehicle.setMotor(vehicleDto.getMotor());
+        vehicle.setPower(vehicleDto.getPower());
+
         vehicleRepository.save(vehicle);
 
         if (images != null) {
@@ -217,7 +245,14 @@ public class VehicleController {
             }
         }
 
-        return ResponseEntity.ok(vehicle);
+        return ResponseEntity.ok(toDTO(vehicle));
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<Void> updateStatus(@PathVariable Long id,
+                                             @RequestBody VehicleStatus newStatus) {
+        vehicleService.updateStatus(id, newStatus);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

@@ -19,7 +19,7 @@ public class FileStore {
     @Enumerated(EnumType.STRING)
     private FileType type;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 

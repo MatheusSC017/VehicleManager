@@ -8,6 +8,7 @@ import com.matheus.VehicleManager.enums.VehicleStatus;
 import com.matheus.VehicleManager.enums.VehicleType;
 import com.matheus.VehicleManager.model.FileStore;
 import com.matheus.VehicleManager.model.Vehicle;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -80,6 +81,14 @@ public class VehicleService {
                         image.getType()
                 )).toList()
         );
+    }
+
+    @Transactional
+    public void updateStatus(Long id, VehicleStatus status) {
+        int rows = vehicleRepository.updateStatus(id, status);
+        if (rows == 0) {
+            throw new IllegalArgumentException("Vehicle " + id + " not found");
+        }
     }
 
 }

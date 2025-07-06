@@ -20,35 +20,27 @@ public class Vehicle {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "vehicle_type")
     @NotNull(message = "Campo obrigatório")
     @Enumerated(EnumType.STRING)
     private VehicleType vehicleType;
 
-    @Column(name = "vehicle_status")
-    @NotNull(message = "Campo obrigatório")
     @Enumerated(EnumType.STRING)
     private VehicleStatus vehicleStatus;
 
-    @Column(name = "model")
     @NotBlank(message = "O modelo não poder estar vazia")
     @Size(min = 1, max = 100, message = "O limite máximo de caracteres é 100")
     private String model;
 
-    @Column(name = "brand")
     @NotBlank(message = "A marca não poder estar vazia")
     @Size(min = 1, max = 100, message = "O limite máximo de caracteres é 100")
     private String brand;
 
-    @Column(name = "year")
     @Min(value = 1886, message = "Ano inválido")
     private int year;
 
-    @Column(name = "color")
     @NotBlank(message = "A cor do veiculo não pode estar vazia")
     private String color;
 
-    @Column(name = "plate")
     @Size(max = 8, message = "O limite máximo de caracteres é 8")
     private String plate;
 
@@ -57,39 +49,34 @@ public class Vehicle {
     @Size(max = 50, message = "O limite máximo de caracteres é 50")
     private String chassi;
 
-    @Column(name = "mileage", precision = 10, scale = 1)
+    @Column(precision = 10, scale = 1)
     @NotNull(message = "A quilometragem não pode ser nula")
     @DecimalMin(value = "0.00", inclusive = false, message = "A quilometragem deve ser maior que 0")
     private BigDecimal mileage;
 
-    @Column(name = "price", precision = 10, scale = 2)
+    @Column(precision = 10, scale = 2)
     @NotNull(message = "O preço não pode ser nulo")
     @DecimalMin(value = "0.00", inclusive = false, message = "O preço deve ser maior que 0")
     private BigDecimal price;
 
-    @Column(name = "vehicle_fuel")
     @NotNull(message = "Campo obrigatório")
     @Enumerated(EnumType.STRING)
     private VehicleFuel vehicleFuel;
 
-    @Column(name = "vehicle_change")
     @Enumerated(EnumType.STRING)
     private VehicleChange vehicleChange;
 
-    @Column(name = "doors")
     @Min(value = 0, message = "Número de portas inválido")
     @Max(value = 4, message = "Número de portas inválido")
     private int doors;
 
-    @Column(name = "motor")
     @Size(max = 50, message = "O limite máximo de caracteres é 50")
     private String motor;
 
-    @Column(name = "power")
     @Size(max = 50, message = "O limite máximo de caracteres é 50")
     private String power;
 
-    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<FileStore> images;
 
     private LocalDate createdAt;
@@ -99,6 +86,7 @@ public class Vehicle {
     protected void onCreate() {
         this.createdAt = LocalDate.now();
         this.updatedAt = LocalDate.now();
+        this.vehicleStatus = VehicleStatus.AVAILABLE;
     }
 
     @PreUpdate

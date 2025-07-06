@@ -4,10 +4,12 @@ import com.matheus.VehicleManager.dto.VehicleImageResponseDTO;
 import com.matheus.VehicleManager.enums.VehicleFuel;
 import com.matheus.VehicleManager.enums.VehicleStatus;
 import com.matheus.VehicleManager.enums.VehicleType;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.matheus.VehicleManager.model.Vehicle;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -79,4 +81,14 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
             @Param("priceMax") Integer priceMax,
             @Param("paging") Pageable paging
     );
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Transactional
+    @Query("""
+           UPDATE Vehicle v
+              SET v.vehicleStatus = :status
+            WHERE v.id = :id
+           """)
+    int updateStatus(@Param("id") Long id, @Param("status") VehicleStatus status);
+
 }

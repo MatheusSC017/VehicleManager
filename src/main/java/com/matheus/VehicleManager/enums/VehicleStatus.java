@@ -3,9 +3,9 @@ package com.matheus.VehicleManager.enums;
 public enum VehicleStatus {
 
     AVAILABLE("Disponível"),
-    REFURBISHED("Reservado"),
+    RESERVED("Reservado"),
     SOLD("Vendido"),
-    MAINTENACE("Manutenção");
+    MAINTENANCE("Manutenção");
 
     private String vehicleStatus;
 
