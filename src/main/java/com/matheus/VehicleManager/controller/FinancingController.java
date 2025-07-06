@@ -3,6 +3,7 @@ package com.matheus.VehicleManager.controller;
 import com.matheus.VehicleManager.dto.FinancingRequestDTO;
 import com.matheus.VehicleManager.dto.FinancingResponseDTO;
 import com.matheus.VehicleManager.dto.VehicleMinimalDTO;
+import com.matheus.VehicleManager.enums.VehicleStatus;
 import com.matheus.VehicleManager.model.Client;
 import com.matheus.VehicleManager.model.Financing;
 import com.matheus.VehicleManager.model.Vehicle;
@@ -95,10 +96,11 @@ public class FinancingController {
         Optional<Client> clientOpt = clientRepository.findById(financingDto.getClient().getId());
         Optional<Vehicle> vehicleOpt = vehicleRepository.findById(financingDto.getVehicle().id());
 
-        if (clientOpt.isEmpty() || vehicleOpt.isEmpty()) {
+        if (clientOpt.isEmpty() || vehicleOpt.isEmpty() || vehicleOpt.get().getVehicleStatus() != VehicleStatus.AVAILABLE) {
             Map<String, String> errors = new HashMap<>();
             if (clientOpt.isEmpty()) errors.put("client", "Cliente não encontrado");
             if (vehicleOpt.isEmpty()) errors.put("vehicle", "Veículo não encontrado");
+            if (vehicleOpt.get().getVehicleStatus() != VehicleStatus.AVAILABLE) errors.put("vehicle", "Veículo não disponível");
             response.put("errors", errors);
             response.put("content", "");
             return ResponseEntity.badRequest().body(response);
@@ -116,8 +118,10 @@ public class FinancingController {
         financing.setFirstInstallmentDate(financingDto.getFirstInstallmentDate());
         financing.setStatus(financingDto.getFinancingStatus());
 
-        financingRepository.save(financing);
-
+        boolean inserted = financingService.insert(financing);
+        if (!inserted) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(financing));
     }
 
@@ -136,6 +140,8 @@ public class FinancingController {
             return ResponseEntity.badRequest().body(response);
         }
 
+        Financing financing = financingRepository.getReferenceById(financingId);
+
         Optional<Client> clientOpt = clientRepository.findById(financingDto.getClient().getId());
         Optional<Vehicle> vehicleOpt = vehicleRepository.findById(financingDto.getVehicle().id());
 
@@ -144,11 +150,21 @@ public class FinancingController {
             if (clientOpt.isEmpty()) errors.put("client", "Cliente não encontrado");
             if (vehicleOpt.isEmpty()) errors.put("vehicle", "Veículo não encontrado");
             response.put("errors", errors);
+            response.put("content", "");
             return ResponseEntity.badRequest().body(response);
         }
 
-        Financing financing = new Financing();
-        financing.setId(financingId);
+        if (financing.getVehicle().getId() != vehicleOpt.get().getId()) {
+            Vehicle vehicle = financing.getVehicle();
+            vehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
+            vehicleRepository.save(vehicle);
+            if (vehicleOpt.get().getVehicleStatus() != VehicleStatus.AVAILABLE) {
+                Map<String, String> errors = new HashMap<>();
+                errors.put("vehicle", "Veículo não disponível");
+                return ResponseEntity.badRequest().body(response);
+            }
+        }
+
         financing.setClient(clientOpt.get());
         financing.setVehicle(vehicleOpt.get());
         financing.setTotalAmount(financingDto.getTotalAmount());
@@ -160,7 +176,10 @@ public class FinancingController {
         financing.setFirstInstallmentDate(financingDto.getFirstInstallmentDate());
         financing.setStatus(financingDto.getFinancingStatus());
 
-        financingRepository.save(financing);
+        boolean updated = financingService.update(financing);
+        if (!updated) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        };
 
         return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(financing));
     }
