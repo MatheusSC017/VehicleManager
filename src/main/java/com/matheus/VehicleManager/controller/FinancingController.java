@@ -181,7 +181,7 @@ public class FinancingController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         };
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(financing));
+        return ResponseEntity.status(HttpStatus.OK).body(toDTO(financing));
     }
 
     @DeleteMapping("/{id}")

@@ -99,18 +99,13 @@ public class SalesController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        Sale sale = new Sale();
-        sale.setClient(clientOpt.get());
-        sale.setVehicle(vehicleOpt.get());
-        sale.setSalesDate(saleRequestDTO.getSalesDate());
-        sale.setReserveDate(saleRequestDTO.getReserveDate());
-        sale.setStatus(saleRequestDTO.getStatus());
-
-        boolean inserted = saleService.insert(sale);
-        if (!inserted) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        try {
+            Sale sale = saleService.insert(saleRequestDTO);
+            return ResponseEntity.status(HttpStatus.OK).body(toDTO(sale));
+        } catch (Exception e) {
+            response.put("errors", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(sale));
     }
 
     @PutMapping("/{id}")
@@ -120,15 +115,13 @@ public class SalesController {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error ->
-                    errors.put(error.getField(), error.getDefaultMessage())
+                errors.put(error.getField(), error.getDefaultMessage())
             );
             response.put("errors", errors);
             response.put("content", "");
 
             return ResponseEntity.badRequest().body(response);
         }
-
-        Sale sale = saleRepository.getReferenceById(saleId);
 
         Optional<Client> clientOpt = clientRepository.findById(saleRequestDTO.getClient().getId());
         Optional<Vehicle> vehicleOpt = vehicleRepository.findById(saleRequestDTO.getVehicle().id());
@@ -142,40 +135,12 @@ public class SalesController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        if (sale.getVehicle().getId() != vehicleOpt.get().getId()) {
-            Vehicle vehicle = sale.getVehicle();
-            vehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
-            vehicleRepository.save(vehicle);
-            if (vehicleOpt.get().getVehicleStatus() != VehicleStatus.AVAILABLE) {
-                Map<String, String> errors = new HashMap<>();
-                errors.put("vehicle", "Veículo não disponível");
-                return ResponseEntity.badRequest().body(response);
-            }
-        }
-
-        sale.setClient(clientOpt.get());
-        sale.setVehicle(vehicleOpt.get());
-        sale.setSalesDate(saleRequestDTO.getSalesDate());
-        sale.setReserveDate(saleRequestDTO.getReserveDate());
-        sale.setStatus(saleRequestDTO.getStatus());
-
-        boolean updated = saleService.update(sale);
-        if (!updated) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        };
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(sale));
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long saleId) {
         try {
-            saleRepository.deleteById(saleId);
-            return ResponseEntity.noContent().build();
+            Sale sale = saleService.update(saleId, saleRequestDTO);
+            return ResponseEntity.status(HttpStatus.OK).body(toDTO(sale));
         } catch (Exception e) {
-            System.err.println("Failed to delete Sale: ");
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            response.put("errors", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 

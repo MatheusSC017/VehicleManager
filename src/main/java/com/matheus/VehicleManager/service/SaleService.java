@@ -1,8 +1,11 @@
 package com.matheus.VehicleManager.service;
 
+import com.matheus.VehicleManager.dto.SaleRequestDTO;
 import com.matheus.VehicleManager.enums.SalesStatus;
 import com.matheus.VehicleManager.enums.VehicleStatus;
-import com.matheus.VehicleManager.model.Financing;
+import com.matheus.VehicleManager.exception.InvalidStatusTransitionException;
+import com.matheus.VehicleManager.exception.SaleNotFoundException;
+import com.matheus.VehicleManager.exception.VehicleUnavailableException;
 import com.matheus.VehicleManager.model.Sale;
 import com.matheus.VehicleManager.model.Vehicle;
 import com.matheus.VehicleManager.repository.SaleRepository;
@@ -19,30 +22,63 @@ public class SaleService {
     @Autowired
     private VehicleRepository vehicleRepository;
 
-    public boolean insert(Sale sale) {
-        return saveSale(sale);
+    public Sale insert(SaleRequestDTO saleRequestDTO) {
+        Vehicle newVehicle = vehicleRepository.findById(saleRequestDTO.getVehicle().id())
+                .orElseThrow(() -> new VehicleUnavailableException("Vehicle not found"));
+
+        Sale sale = new Sale();
+        sale.setClient(saleRequestDTO.getClient());
+        sale.setVehicle(newVehicle);
+        sale.setStatus(saleRequestDTO.getStatus());
+        saveSale(sale);
+        return sale;
     }
 
-    public boolean update(Sale sale) {
-        return saveSale(sale);
-    }
+    public Sale update(Long saleId, SaleRequestDTO saleRequestDTO) {
+        Sale sale = saleRepository.findById(saleId)
+                .orElseThrow(() -> new SaleNotFoundException("Sale with ID " + saleId + " not found"));
+        Vehicle newVehicle = vehicleRepository.findById(saleRequestDTO.getVehicle().id())
+                .orElseThrow(() -> new VehicleUnavailableException("Vehicle not found"));
 
-    private boolean saveSale(Sale sale) {
-        try {
-            if (sale.getStatus() == SalesStatus.CANCELED) return false;
-            saleRepository.save(sale);
-            Vehicle vehicle = sale.getVehicle();
-            if (sale.getStatus() == SalesStatus.SOLD) {
-                vehicle.setVehicleStatus(VehicleStatus.SOLD);
-            } else {
-                vehicle.setVehicleStatus(VehicleStatus.RESERVED);
+        if (!sale.getVehicle().getId().equals(newVehicle.getId())) {
+            if (newVehicle.getVehicleStatus() != VehicleStatus.AVAILABLE) {
+                throw new VehicleUnavailableException("Vehicle is not available");
             }
-            return true;
-        } catch (Exception e) {
-            System.err.println("Failed to insert financing");
-            e.printStackTrace();
-            return false;
+            Vehicle vehicle = sale.getVehicle();
+            vehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
+            vehicleRepository.save(vehicle);
         }
+
+        if (!isValidStatusTransition(sale.getStatus(), saleRequestDTO.getStatus())) {
+            throw new InvalidStatusTransitionException("Invalid status transition: " + sale.getStatus() + " -> " + saleRequestDTO.getStatus());
+        }
+
+        sale.setClient(saleRequestDTO.getClient());
+        sale.setVehicle(newVehicle);
+        sale.setStatus(saleRequestDTO.getStatus());
+
+        saveSale(sale);
+        return sale;
     }
+
+    private void saveSale(Sale sale) {
+        saleRepository.save(sale);
+        Vehicle vehicle = sale.getVehicle();
+        if (sale.getStatus() == SalesStatus.SOLD) {
+            vehicle.setVehicleStatus(VehicleStatus.SOLD);
+        } else if (sale.getStatus() == SalesStatus.RESERVED) {
+            vehicle.setVehicleStatus(VehicleStatus.RESERVED);
+        } else {
+            vehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
+        }
+        vehicleRepository.save(vehicle);
+    }
+
+    private boolean isValidStatusTransition(SalesStatus oldStatus, SalesStatus newStatus) {
+        if (oldStatus == newStatus) return true;
+        return (oldStatus == SalesStatus.RESERVED && (newStatus == SalesStatus.SOLD || newStatus == SalesStatus.CANCELED)) ||
+                (oldStatus == SalesStatus.SOLD && newStatus == SalesStatus.CANCELED);
+    }
+
 
 }

@@ -34,6 +34,25 @@ public class Sale {
     private LocalDate createdAt;
     private LocalDate updatedAt;
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDate.now();
+        this.updatedAt = LocalDate.now();
+        if (this.getStatus() == SalesStatus.SOLD) {
+            this.salesDate = LocalDate.now();
+        } else {
+            this.reserveDate = LocalDate.now();
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDate.now();
+        if (this.getStatus() == SalesStatus.SOLD) {
+            this.salesDate = LocalDate.now();
+        }
+    }
+
     public Long getId() {
         return id;
     }
@@ -58,22 +77,14 @@ public class Sale {
         this.vehicle = vehicle;
     }
 
-    public @NotNull(message = "Data da venda") LocalDate getSalesDate() {
+    public LocalDate getSalesDate() {
         return salesDate;
     }
 
-    public void setSalesDate(@NotNull(message = "Data da venda") LocalDate salesDate) {
-        this.salesDate = salesDate;
-    }
-
-    public @NotNull(message = "Data da reserva") LocalDate getReserveDate() {
+    public LocalDate getReserveDate() {
         return reserveDate;
     }
-
-    public void setReserveDate(@NotNull(message = "Data da reserva") LocalDate reserveDate) {
-        this.reserveDate = reserveDate;
-    }
-
+    
     public @NotNull SalesStatus getStatus() {
         return status;
     }
