@@ -20,6 +20,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -63,6 +64,13 @@ public class SalesController {
         Pageable paging = PageRequest.of(page, size);
         Page<Sale> sales = saleRepository.findAll(paging);
         Page<SaleResponseDTO> salesDtoPage = sales.map(this::toDTO);
+        return ResponseEntity.ok(salesDtoPage);
+    }
+
+    @GetMapping("/vehicle/{id}")
+    public ResponseEntity<List<SaleResponseDTO>> getAllByVehicle(@PathVariable("id") Long vehicleId) {
+        List<Sale> sales = saleRepository.findByVehicleId(vehicleId);
+        List<SaleResponseDTO> salesDtoPage = sales.stream().map(this::toDTO).toList();
         return ResponseEntity.ok(salesDtoPage);
     }
 
