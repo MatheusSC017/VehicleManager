@@ -24,7 +24,7 @@ public class SaleService {
 
     public Sale insert(SaleRequestDTO saleRequestDTO) {
         Vehicle newVehicle = vehicleRepository.findById(saleRequestDTO.getVehicle().id())
-                .orElseThrow(() -> new VehicleUnavailableException("Vehicle not found"));
+                .orElseThrow(() -> new VehicleUnavailableException("Veículo não encontrado"));
 
         Sale sale = new Sale();
         sale.setClient(saleRequestDTO.getClient());
@@ -36,13 +36,13 @@ public class SaleService {
 
     public Sale update(Long saleId, SaleRequestDTO saleRequestDTO) {
         Sale sale = saleRepository.findById(saleId)
-                .orElseThrow(() -> new SaleNotFoundException("Sale with ID " + saleId + " not found"));
+                .orElseThrow(() -> new SaleNotFoundException("Venda de ID " + saleId + " não encontrada"));
         Vehicle newVehicle = vehicleRepository.findById(saleRequestDTO.getVehicle().id())
-                .orElseThrow(() -> new VehicleUnavailableException("Vehicle not found"));
+                .orElseThrow(() -> new VehicleUnavailableException("Veículo não encontrado"));
 
         if (!sale.getVehicle().getId().equals(newVehicle.getId())) {
             if (newVehicle.getVehicleStatus() != VehicleStatus.AVAILABLE) {
-                throw new VehicleUnavailableException("Vehicle is not available");
+                throw new VehicleUnavailableException("Veículo não disponível");
             }
             Vehicle vehicle = sale.getVehicle();
             vehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
@@ -50,7 +50,7 @@ public class SaleService {
         }
 
         if (!isValidStatusTransition(sale.getStatus(), saleRequestDTO.getStatus())) {
-            throw new InvalidStatusTransitionException("Invalid status transition: " + sale.getStatus() + " -> " + saleRequestDTO.getStatus());
+            throw new InvalidStatusTransitionException("Transição de status inválida: " + sale.getStatus() + " -> " + saleRequestDTO.getStatus());
         }
 
         sale.setClient(saleRequestDTO.getClient());

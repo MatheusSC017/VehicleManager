@@ -69,7 +69,7 @@ public class SalesController {
 
     @GetMapping("/vehicle/{id}")
     public ResponseEntity<List<SaleResponseDTO>> getAllByVehicle(@PathVariable("id") Long vehicleId) {
-        List<Sale> sales = saleRepository.findByVehicleId(vehicleId);
+        List<Sale> sales = saleRepository.findByVehicleIdOrderByIdDesc(vehicleId);
         List<SaleResponseDTO> salesDtoPage = sales.stream().map(this::toDTO).toList();
         return ResponseEntity.ok(salesDtoPage);
     }
@@ -111,7 +111,10 @@ public class SalesController {
             Sale sale = saleService.insert(saleRequestDTO);
             return ResponseEntity.status(HttpStatus.OK).body(toDTO(sale));
         } catch (Exception e) {
-            response.put("errors", e);
+            Map<String, String> errors = new HashMap<>();
+            errors.put("sale", e.getMessage());
+            response.put("errors", errors);
+            response.put("content", "");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
@@ -147,7 +150,10 @@ public class SalesController {
             Sale sale = saleService.update(saleId, saleRequestDTO);
             return ResponseEntity.status(HttpStatus.OK).body(toDTO(sale));
         } catch (Exception e) {
-            response.put("errors", e);
+            Map<String, String> errors = new HashMap<>();
+            errors.put("sale", e.getMessage());
+            response.put("errors", errors);
+            response.put("content", "");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
