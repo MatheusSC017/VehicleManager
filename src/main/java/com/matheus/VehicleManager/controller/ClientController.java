@@ -57,7 +57,7 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<?> insert(@Valid Client client, BindingResult bindingResult) {
+    public ResponseEntity<?> insert(@Valid @RequestBody Client client, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, Object> response = new HashMap<>();
             response.put("content", toDTO(client));
@@ -78,7 +78,7 @@ public class ClientController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@Valid Client client, BindingResult bindingResult) {
+    public ResponseEntity<?> update(@PathVariable("id") Long clientId, @Valid @RequestBody Client client, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, Object> response = new HashMap<>();
             response.put("content", toDTO(client));
@@ -92,6 +92,7 @@ public class ClientController {
             return ResponseEntity.badRequest().body(response);
         }
 
+        client.setId(clientId);
         clientRepository.save(client);
 
         return ResponseEntity.ok(toDTO(client));
