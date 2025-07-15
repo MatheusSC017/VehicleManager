@@ -19,11 +19,11 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
     Vehicle findByChassi(String chassi);
 
-    List<Vehicle> findByVehicleStatusAndBrandContainingIgnoreCaseOrVehicleStatusAndModelContainingIgnoreCaseOrVehicleStatusAndPlateContainingIgnoreCase(
-            VehicleStatus status1, String brand,
-            VehicleStatus status2, String model,
-            VehicleStatus status3, String plate
-    );
+    @Query("SELECT v FROM Vehicle v WHERE v.vehicleStatus = 'AVAILABLE' AND " +
+            "(LOWER(v.brand) LIKE LOWER(CONCAT('%', :searchFor, '%')) OR " +
+            "LOWER(v.model) LIKE LOWER(CONCAT('%', :searchFor, '%')) OR " +
+            "LOWER(v.plate) LIKE LOWER(CONCAT('%', :searchFor, '%')))")
+    List<Vehicle> searchAvailableVehicles(@Param("searchFor") String searchFor);
 
     @Query("""
     SELECT new com.matheus.VehicleManager.dto.VehicleImageResponseDTO(
