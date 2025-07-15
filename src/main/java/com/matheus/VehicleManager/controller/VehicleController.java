@@ -107,6 +107,16 @@ public class VehicleController {
         return ResponseEntity.ok(vehiclesPage);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<VehicleResponseDTO>> search(@RequestParam("searchFor") String query) {
+        List<Vehicle> vehicles = vehicleRepository.findByVehicleStatusAndBrandContainingIgnoreCaseOrVehicleStatusAndModelContainingIgnoreCaseOrVehicleStatusAndPlateContainingIgnoreCase(
+                VehicleStatus.AVAILABLE, query, VehicleStatus.AVAILABLE, query, VehicleStatus.AVAILABLE, query);
+        List<VehicleResponseDTO> vehicleDTOs = vehicles.stream()
+                .map(this::toDTO)
+                .toList();
+        return ResponseEntity.ok(vehicleDTOs);
+    }
+
     @GetMapping("/chassi/{chassi}")
     public ResponseEntity<VehicleResponseDTO> getByChassi(@PathVariable(value="chassi") String chassi) {
         Vehicle vehicle = vehicleService.findByChassi(chassi);

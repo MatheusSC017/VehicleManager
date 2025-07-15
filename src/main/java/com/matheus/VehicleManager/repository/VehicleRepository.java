@@ -13,9 +13,17 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
     Vehicle findByChassi(String chassi);
+
+    List<Vehicle> findByVehicleStatusAndBrandContainingIgnoreCaseOrVehicleStatusAndModelContainingIgnoreCaseOrVehicleStatusAndPlateContainingIgnoreCase(
+            VehicleStatus status1, String brand,
+            VehicleStatus status2, String model,
+            VehicleStatus status3, String plate
+    );
 
     @Query("""
     SELECT new com.matheus.VehicleManager.dto.VehicleImageResponseDTO(

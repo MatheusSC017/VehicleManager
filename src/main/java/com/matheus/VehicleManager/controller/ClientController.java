@@ -45,7 +45,7 @@ public class ClientController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ClientResponseDTO>> searchClients(@RequestParam("searchFor") String query) {
+    public ResponseEntity<List<ClientResponseDTO>> search(@RequestParam("searchFor") String query) {
         List<Client> clients = clientRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrPhoneContaining(query, query, query);
         List<ClientResponseDTO> clientDTOs = clients.stream()
                 .map(this::toDTO)
