@@ -44,6 +44,15 @@ public class ClientController {
         return ResponseEntity.ok(clientsDtos);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<ClientResponseDTO>> searchClients(@RequestParam("searchFor") String query) {
+        List<Client> clients = clientRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrPhoneContaining(query, query, query);
+        List<ClientResponseDTO> clientDTOs = clients.stream()
+                .map(this::toDTO)
+                .toList();
+        return ResponseEntity.ok(clientDTOs);
+    }
+
     @GetMapping("/email/{email}")
     public ResponseEntity<ClientResponseDTO> getByEmail(@PathVariable("email") String email) {
         Client client = clientRepository.findByEmail(email);
