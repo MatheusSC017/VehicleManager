@@ -129,9 +129,7 @@ public class VehicleController {
     }
 
     @PostMapping
-    public ResponseEntity<?> insert(@Valid @ModelAttribute VehicleRequestDTO vehicleDto,
-                                           BindingResult bindingResult,
-                                           @RequestParam(value="imagesInput", required = false) MultipartFile[] images) {
+    public ResponseEntity<?> insert(@Valid @ModelAttribute VehicleRequestDTO vehicleDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, Object> response = new HashMap<>();
             response.put("content", vehicleDto);
@@ -162,26 +160,6 @@ public class VehicleController {
         vehicle.setPower(vehicleDto.getPower());
 
         vehicleRepository.save(vehicle);
-
-        if (images != null) {
-            for (MultipartFile image : images) {
-                if (image.isEmpty()) continue;
-
-                try {
-                    String path = fileStorageService.storeFile(image);
-
-                    FileStore imageEntity = new FileStore();
-                    imageEntity.setPath(path);
-                    imageEntity.setType(FileType.IMAGE);
-                    imageEntity.setVehicle(vehicle);
-
-                    fileRepository.save(imageEntity);
-                } catch (IOException e) {
-                    System.err.println("Failed to store image: " + image.getOriginalFilename());
-                    e.printStackTrace();
-                }
-            }
-        }
 
         return ResponseEntity.status(HttpStatus.CREATED).body(vehicle);
     }

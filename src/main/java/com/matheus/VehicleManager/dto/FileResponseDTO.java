@@ -5,4 +5,5 @@ import com.matheus.VehicleManager.enums.FileType;
 public record FileResponseDTO(
         Long id,
         String path,
-        FileType type) {}
+        FileType type,
+        Long vehicle) {}

@@ -78,7 +78,8 @@ public class VehicleService {
                 images.stream().map(image -> new FileResponseDTO(
                         image.getId(),
                         image.getPath(),
-                        image.getType()
+                        image.getType(),
+                        image.getVehicle().getId()
                 )).toList()
         );
     }
