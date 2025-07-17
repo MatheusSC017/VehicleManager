@@ -129,7 +129,7 @@ public class VehicleController {
     }
 
     @PostMapping
-    public ResponseEntity<?> insert(@Valid @ModelAttribute VehicleRequestDTO vehicleDto, BindingResult bindingResult) {
+    public ResponseEntity<?> insert(@Valid @RequestBody VehicleRequestDTO vehicleDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, Object> response = new HashMap<>();
             response.put("content", vehicleDto);
@@ -166,8 +166,8 @@ public class VehicleController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id,
-                                           @Valid @ModelAttribute VehicleRequestDTO vehicleDto,
-                                           BindingResult bindingResult) {
+                                   @Valid @RequestBody VehicleRequestDTO vehicleDto,
+                                   BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, Object> response = new HashMap<>();
             response.put("content", vehicleDto);
@@ -200,13 +200,6 @@ public class VehicleController {
         vehicleRepository.save(vehicle);
 
         return ResponseEntity.ok(toDTO(vehicle));
-    }
-
-    @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> updateStatus(@PathVariable Long id,
-                                             @RequestBody VehicleStatus newStatus) {
-        vehicleService.updateStatus(id, newStatus);
-        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
