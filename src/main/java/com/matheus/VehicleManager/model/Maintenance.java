@@ -26,10 +26,6 @@ public class Maintenance {
         this.startDate = LocalDate.now();
     }
 
-    public void softDelete() {
-        this.endDate = LocalDate.now();
-    }
-
     public Long getId() {
         return id;
     }
@@ -48,6 +44,10 @@ public class Maintenance {
 
     public LocalDate getStartDate() {
         return startDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 
     public LocalDate getEndDate() {

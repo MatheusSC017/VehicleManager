@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -33,14 +34,16 @@ public class MaintenanceService {
 
     @Transactional
     public boolean delete(Long maintenanceId) {
-        Optional<Maintenance> maintenance = maintenanceRepository.findById(maintenanceId);
-        if (maintenance.isEmpty()) return false;
+        Optional<Maintenance> maintenanceOpt = maintenanceRepository.findById(maintenanceId);
+        if (maintenanceOpt.isEmpty()) return false;
+        Maintenance maintenance = maintenanceOpt.get();
 
-        Vehicle vehicle = maintenance.get().getVehicle();
+        Vehicle vehicle = maintenance.getVehicle();
         vehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
         vehicleRepository.save(vehicle);
 
-        maintenanceRepository.delete(maintenance.get());
+        maintenance.setEndDate(LocalDate.now());
+        maintenanceRepository.save(maintenance);
         return true;
     }
 
