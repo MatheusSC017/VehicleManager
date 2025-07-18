@@ -10,6 +10,7 @@ import com.matheus.VehicleManager.model.Sale;
 import com.matheus.VehicleManager.model.Vehicle;
 import com.matheus.VehicleManager.repository.SaleRepository;
 import com.matheus.VehicleManager.repository.VehicleRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ public class SaleService {
     @Autowired
     private VehicleRepository vehicleRepository;
 
+    @Transactional
     public Sale insert(SaleRequestDTO saleRequestDTO) {
         Vehicle newVehicle = vehicleRepository.findById(saleRequestDTO.getVehicle().id())
                 .orElseThrow(() -> new VehicleUnavailableException("Veículo não encontrado"));
@@ -34,6 +36,7 @@ public class SaleService {
         return sale;
     }
 
+    @Transactional
     public Sale update(Long saleId, SaleRequestDTO saleRequestDTO) {
         Sale sale = saleRepository.findById(saleId)
                 .orElseThrow(() -> new SaleNotFoundException("Venda de ID " + saleId + " não encontrada"));
