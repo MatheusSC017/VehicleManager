@@ -22,12 +22,13 @@ public class MaintenanceService {
     private VehicleRepository vehicleRepository;
 
     @Transactional
-    public Maintenance insert(Vehicle vehicle) {
+    public Maintenance insert(Vehicle vehicle, String additionalInfo) {
         vehicle.setVehicleStatus(VehicleStatus.MAINTENANCE);
         vehicleRepository.save(vehicle);
 
         Maintenance maintenance = new Maintenance();
         maintenance.setVehicle(vehicle);
+        maintenance.setAdditionalInfo(additionalInfo);
         maintenanceRepository.save(maintenance);
         return maintenance;
     }

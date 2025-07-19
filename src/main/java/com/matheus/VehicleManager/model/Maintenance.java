@@ -17,6 +17,8 @@ public class Maintenance {
     @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 
+    private String additionalInfo;
+
     private LocalDate startDate;
 
     private LocalDate endDate;
@@ -40,6 +42,14 @@ public class Maintenance {
 
     public void setVehicle(@NotNull(message = "Veiculo é obrigatório") Vehicle vehicle) {
         this.vehicle = vehicle;
+    }
+
+    public String getAdditionalInfo() {
+        return additionalInfo;
+    }
+
+    public void setAdditionalInfo(String additionalInfo) {
+        this.additionalInfo = additionalInfo;
     }
 
     public LocalDate getStartDate() {

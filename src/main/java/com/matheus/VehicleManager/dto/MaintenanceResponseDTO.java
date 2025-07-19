@@ -7,6 +7,7 @@ import java.time.LocalDate;
 public record MaintenanceResponseDTO(
     Long id,
     VehicleMinimalDTO vehicle,
+    String additionalInfo,
     LocalDate startDate,
     LocalDate endDate
 ) { }

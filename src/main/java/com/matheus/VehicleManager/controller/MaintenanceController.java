@@ -46,6 +46,7 @@ public class MaintenanceController {
         return new MaintenanceResponseDTO(
             maintenance.getId(),
             vehicleDTO,
+            maintenance.getAdditionalInfo(),
             maintenance.getStartDate(),
             maintenance.getEndDate()
         );
@@ -88,7 +89,7 @@ public class MaintenanceController {
         }
 
         try {
-            Maintenance maintenance = maintenanceService.insert(vehicleOpt.get());
+            Maintenance maintenance = maintenanceService.insert(vehicleOpt.get(), maintenanceRequestDTO.getAdditionalInfo());
             return ResponseEntity.status(HttpStatus.OK).body(toDTO(maintenance));
         } catch (Exception e) {
             Map<String, String> errors = new HashMap<>();
