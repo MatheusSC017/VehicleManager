@@ -1,12 +1,8 @@
 package com.matheus.VehicleManager.controller;
 
 import com.matheus.VehicleManager.dto.FileResponseDTO;
-import com.matheus.VehicleManager.enums.FileType;
 import com.matheus.VehicleManager.model.FileStore;
-import com.matheus.VehicleManager.model.Vehicle;
-import com.matheus.VehicleManager.repository.FileRepository;
-import com.matheus.VehicleManager.repository.VehicleRepository;
-import com.matheus.VehicleManager.service.FileStorageService;
+import com.matheus.VehicleManager.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,20 +11,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/files")
 public class FileController {
 
     @Autowired
-    private FileStorageService fileStorageService;
-
-    @Autowired
-    private FileRepository fileRepository;
-
-    @Autowired
-    private VehicleRepository vehicleRepository;
+    private FileService fileService;
 
     private FileResponseDTO toDTO(FileStore file) {
         return new FileResponseDTO(
@@ -42,7 +31,7 @@ public class FileController {
 
     @GetMapping
     public ResponseEntity<List<FileResponseDTO>> getAll() {
-        List<FileStore> fileStores = fileRepository.findAll();
+        List<FileStore> fileStores = fileService.getAll();
         List<FileResponseDTO> fileStoresDtos = fileStores.stream()
                 .map(this::toDTO)
                 .toList();
@@ -51,7 +40,7 @@ public class FileController {
 
     @GetMapping("/{id}")
     public ResponseEntity<FileResponseDTO> get(@PathVariable("id") Long fileId) {
-        FileStore fileStore = fileRepository.getReferenceById(fileId);
+        FileStore fileStore = fileService.getById(fileId);
         return ResponseEntity.ok(toDTO(fileStore));
     }
 
@@ -60,28 +49,14 @@ public class FileController {
                                     @RequestParam(value="imagesInput") MultipartFile[] images) {
         if (images == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
-        Optional<Vehicle> vehicle = vehicleRepository.findById(vehicleId);
-        if (vehicle.isEmpty()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-
-        for (MultipartFile image : images) {
-            if (image.isEmpty()) continue;
-
-            try {
-                String path = fileStorageService.storeFile(image);
-
-                FileStore imageEntity = new FileStore();
-                imageEntity.setPath(path);
-                imageEntity.setType(FileType.IMAGE);
-                imageEntity.setVehicle(vehicle.get());
-
-                fileRepository.save(imageEntity);
-            } catch (IOException e) {
-                System.err.println("Failed to store image: " + image.getOriginalFilename());
-                e.printStackTrace();
-            }
+        try {
+            fileService.save(vehicleId, images);
+            return ResponseEntity.status(HttpStatus.CREATED).build();
+        } catch (IOException e) {
+            System.err.println("Failed to store images: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-
-        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 
@@ -89,42 +64,14 @@ public class FileController {
     public ResponseEntity<?> update(@RequestParam(value="vehicleId") Long vehicleId,
                                     @RequestParam(value = "imagesInput", required = false) MultipartFile[] images,
                                     @RequestParam(value = "selectedImages", required = false) List<Long> selectedImageIds) {
-        Optional<Vehicle> vehicle = vehicleRepository.findById(vehicleId);
-        if (vehicle.isEmpty()) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-
-        if (images != null) {
-            for (MultipartFile image : images) {
-                if (image.isEmpty()) continue;
-
-                try {
-                    String path = fileStorageService.storeFile(image);
-
-                    FileStore imageEntity = new FileStore();
-                    imageEntity.setPath(path);
-                    imageEntity.setType(FileType.IMAGE);
-                    imageEntity.setVehicle(vehicle.get());
-
-                    fileRepository.save(imageEntity);
-                } catch (IOException e) {
-                    System.err.println("Failed to store image: " + image.getOriginalFilename());
-                    e.printStackTrace();
-                }
-            }
+        try {
+            fileService.update(vehicleId, images, selectedImageIds);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (IOException e) {
+            System.err.println("Failed to update files: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
-
-        if (selectedImageIds != null) {
-            for (Long imageId : selectedImageIds) {
-                try {
-                    FileStore fileStore = fileRepository.getReferenceById(imageId);
-                    if (fileStore.getVehicle().getId().equals(vehicleId)) fileRepository.deleteById(imageId);
-                } catch (Exception e) {
-                    System.err.println("Failed to delete image with ID: " + imageId);
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

@@ -31,15 +31,6 @@ public class VehicleController {
     @Autowired
     private VehicleService vehicleService;
 
-    @Autowired
-    private FileStorageService fileStorageService;
-
-    @Autowired
-    private VehicleRepository vehicleRepository;
-
-    @Autowired
-    private FileRepository fileRepository;
-
     private VehicleResponseDTO toDTO(Vehicle vehicle) {
         return new VehicleResponseDTO(
                 vehicle.getId(),
@@ -109,7 +100,7 @@ public class VehicleController {
 
     @GetMapping("/search")
     public ResponseEntity<List<VehicleResponseDTO>> search(@RequestParam("searchFor") String searchFor) {
-        List<Vehicle> vehicles = vehicleRepository.searchAvailableVehicles(searchFor);
+        List<Vehicle> vehicles = vehicleService.searchAvailableVehicles(searchFor);
         List<VehicleResponseDTO> vehicleDTOs = vehicles.stream()
                 .map(this::toDTO)
                 .toList();
@@ -143,29 +134,13 @@ public class VehicleController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        Vehicle vehicle = new Vehicle();
-        vehicle.setVehicleType(vehicleDto.getVehicleType());
-        vehicle.setModel(vehicleDto.getModel());
-        vehicle.setBrand(vehicleDto.getBrand());
-        vehicle.setYear(vehicleDto.getYear());
-        vehicle.setColor(vehicleDto.getColor());
-        vehicle.setPlate(vehicleDto.getPlate());
-        vehicle.setChassi(vehicleDto.getChassi());
-        vehicle.setMileage(vehicleDto.getMileage());
-        vehicle.setPrice(vehicleDto.getPrice());
-        vehicle.setVehicleFuel(vehicleDto.getVehicleFuel());
-        vehicle.setVehicleChange(vehicleDto.getVehicleChange());
-        vehicle.setDoors(vehicleDto.getDoors());
-        vehicle.setMotor(vehicleDto.getMotor());
-        vehicle.setPower(vehicleDto.getPower());
-
-        vehicleRepository.save(vehicle);
+        Vehicle vehicle = vehicleService.create(vehicleDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(vehicle);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id,
+    public ResponseEntity<?> update(@PathVariable("id") Long vehicleId,
                                    @Valid @RequestBody VehicleRequestDTO vehicleDto,
                                    BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -181,23 +156,7 @@ public class VehicleController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        Vehicle vehicle = vehicleRepository.getReferenceById(id);
-        vehicle.setVehicleType(vehicleDto.getVehicleType());
-        vehicle.setModel(vehicleDto.getModel());
-        vehicle.setBrand(vehicleDto.getBrand());
-        vehicle.setYear(vehicleDto.getYear());
-        vehicle.setColor(vehicleDto.getColor());
-        vehicle.setPlate(vehicleDto.getPlate());
-        vehicle.setChassi(vehicleDto.getChassi());
-        vehicle.setMileage(vehicleDto.getMileage());
-        vehicle.setPrice(vehicleDto.getPrice());
-        vehicle.setVehicleFuel(vehicleDto.getVehicleFuel());
-        vehicle.setVehicleChange(vehicleDto.getVehicleChange());
-        vehicle.setDoors(vehicleDto.getDoors());
-        vehicle.setMotor(vehicleDto.getMotor());
-        vehicle.setPower(vehicleDto.getPower());
-
-        vehicleRepository.save(vehicle);
+        Vehicle vehicle = vehicleService.update(vehicleId, vehicleDto);
 
         return ResponseEntity.ok(toDTO(vehicle));
     }
@@ -205,12 +164,15 @@ public class VehicleController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long vehicleId) {
         try {
-            vehicleRepository.deleteById(vehicleId);
+            vehicleService.delete(vehicleId);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            System.err.println("Failed to delete vehicle: ");
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            Map<String, Object> response = new HashMap<>();
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", e.getMessage());
+            response.put("errors", errors);
+            response.put("content", "");
+            return ResponseEntity.badRequest().body(response);
         }
     }
 

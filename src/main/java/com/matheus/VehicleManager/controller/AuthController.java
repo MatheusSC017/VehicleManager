@@ -3,10 +3,10 @@ package com.matheus.VehicleManager.controller;
 import com.matheus.VehicleManager.dto.AuthRequestDTO;
 import com.matheus.VehicleManager.dto.AuthResponseDTO;
 import com.matheus.VehicleManager.dto.UsernameRequestDTO;
-import com.matheus.VehicleManager.repository.UserRepository;
 import com.matheus.VehicleManager.security.CustomUserDetailsService;
 import com.matheus.VehicleManager.security.JwtUtil;
 import com.matheus.VehicleManager.model.User;
+import com.matheus.VehicleManager.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,7 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,10 +23,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -38,7 +33,7 @@ public class AuthController {
     private CustomUserDetailsService userDetailsService;
 
     @Autowired
-    private UserRepository userRepository;
+    private AuthService authService;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody AuthRequestDTO request) {
@@ -71,8 +66,7 @@ public class AuthController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+        authService.createUser(user);
 
         return ResponseEntity.noContent().build();
     }

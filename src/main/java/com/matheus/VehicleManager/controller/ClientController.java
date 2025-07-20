@@ -2,7 +2,6 @@ package com.matheus.VehicleManager.controller;
 
 import com.matheus.VehicleManager.dto.ClientResponseDTO;
 import com.matheus.VehicleManager.model.Client;
-import com.matheus.VehicleManager.repository.ClientRepository;
 import com.matheus.VehicleManager.service.ClientService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +21,6 @@ public class ClientController {
     @Autowired
     private ClientService clientService;
 
-    @Autowired
-    private ClientRepository clientRepository;
-
     private ClientResponseDTO toDTO(Client client) {
         return new ClientResponseDTO(
                 client.getId(),
@@ -37,7 +33,7 @@ public class ClientController {
 
     @GetMapping
     public ResponseEntity<List<ClientResponseDTO>> getAll() {
-        List<Client> clients = clientRepository.findAll();
+        List<Client> clients = clientService.findAll();
         List<ClientResponseDTO> clientsDtos = clients.stream()
                 .map(this::toDTO)
                 .toList();
@@ -46,7 +42,7 @@ public class ClientController {
 
     @GetMapping("/search")
     public ResponseEntity<List<ClientResponseDTO>> search(@RequestParam("searchFor") String query) {
-        List<Client> clients = clientRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrPhoneContaining(query, query, query);
+        List<Client> clients = clientService.search(query);
         List<ClientResponseDTO> clientDTOs = clients.stream()
                 .map(this::toDTO)
                 .toList();
@@ -55,13 +51,13 @@ public class ClientController {
 
     @GetMapping("/email/{email}")
     public ResponseEntity<ClientResponseDTO> getByEmail(@PathVariable("email") String email) {
-        Client client = clientRepository.findByEmail(email);
+        Client client = clientService.findByEmail(email);
         return ResponseEntity.ok(toDTO(client));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ClientResponseDTO> get(@PathVariable("id") Long clientId) {
-        Client client = clientRepository.getReferenceById(clientId);
+        Client client = clientService.getById(clientId);
         return ResponseEntity.ok(toDTO(client));
     }
 
@@ -80,7 +76,7 @@ public class ClientController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        clientRepository.save(client);
+        clientService.create(client);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(client));
     }
@@ -101,8 +97,7 @@ public class ClientController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        client.setId(clientId);
-        clientRepository.save(client);
+        clientService.update(clientId, client);
 
         return ResponseEntity.ok(toDTO(client));
     }
@@ -110,12 +105,15 @@ public class ClientController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long clientId) {
         try {
-            clientRepository.deleteById(clientId);
+            clientService.delete(clientId);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            System.err.println("Failed to delete Client: ");
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            Map<String, Object> response = new HashMap<>();
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", e.getMessage());
+            response.put("errors", errors);
+            response.put("content", "");
+            return ResponseEntity.badRequest().body(response);
         }
     }
 

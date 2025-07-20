@@ -60,7 +60,7 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
       AND (:priceMin IS NULL OR v.price >= :priceMin)
       AND (:priceMax IS NULL OR v.price <= :priceMax)
     """)
-    Page<VehicleImageResponseDTO> searchVehiclesWithFilters(
+    Page<VehicleImageResponseDTO> searchVehiclesWithImages(
             @Param("search") String search,
             @Param("status") VehicleStatus status,
             @Param("type") VehicleType type,
