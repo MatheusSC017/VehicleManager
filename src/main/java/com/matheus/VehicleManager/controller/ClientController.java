@@ -5,6 +5,7 @@ import com.matheus.VehicleManager.model.Client;
 import com.matheus.VehicleManager.service.ClientService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -32,11 +33,10 @@ public class ClientController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ClientResponseDTO>> getAll() {
-        List<Client> clients = clientService.findAll();
-        List<ClientResponseDTO> clientsDtos = clients.stream()
-                .map(this::toDTO)
-                .toList();
+    public ResponseEntity<Page<ClientResponseDTO>> getAll(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                          @RequestParam(value = "size", defaultValue = "10") int size) {
+        Page<Client> clients = clientService.findAll(page, size);
+        Page<ClientResponseDTO> clientsDtos = clients.map(this::toDTO);
         return ResponseEntity.ok(clientsDtos);
     }
 
