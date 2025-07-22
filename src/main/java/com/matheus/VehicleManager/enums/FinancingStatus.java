@@ -1,8 +1,8 @@
 package com.matheus.VehicleManager.enums;
 
 public enum FinancingStatus {
+    DRAFT,
     ACTIVE,
-    PAID_OFF,
     DEFAULTED,
     CANCELED
 }

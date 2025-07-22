@@ -41,9 +41,6 @@ public class FinancingRequestDTO {
     @NotNull(message = "Data do primeiro pagamento é obrigatória")
     private LocalDate firstInstallmentDate;
 
-    @NotNull(message = "Status do financiamento é obrigatório")
-    private FinancingStatus financingStatus;
-
     public @NotNull(message = "Cliente é obrigatório") Client getClient() {
         return client;
     }
@@ -116,11 +113,4 @@ public class FinancingRequestDTO {
         this.firstInstallmentDate = firstInstallmentDate;
     }
 
-    public @NotNull(message = "Status do financiamento é obrigatório") FinancingStatus getFinancingStatus() {
-        return financingStatus;
-    }
-
-    public void setFinancingStatus(@NotNull(message = "Status do financiamento é obrigatório") FinancingStatus financingStatus) {
-        this.financingStatus = financingStatus;
-    }
 }

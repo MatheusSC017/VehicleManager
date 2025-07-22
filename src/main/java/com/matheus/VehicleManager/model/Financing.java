@@ -61,6 +61,7 @@ public class Financing {
     protected void onCreate() {
         this.createdAt = LocalDate.now();
         this.updatedAt = LocalDate.now();
+        this.status = FinancingStatus.DRAFT;
     }
 
     @PreUpdate

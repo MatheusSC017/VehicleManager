@@ -1,6 +1,7 @@
 package com.matheus.VehicleManager.service;
 
 import com.matheus.VehicleManager.dto.FinancingRequestDTO;
+import com.matheus.VehicleManager.enums.FinancingStatus;
 import com.matheus.VehicleManager.enums.VehicleStatus;
 import com.matheus.VehicleManager.exception.InvalidRequestException;
 import com.matheus.VehicleManager.model.Client;
@@ -67,7 +68,6 @@ public class FinancingService {
         financing.setAnnualInterestRate(financingRequestDTO.getAnnualInterestRate());
         financing.setContractDate(financingRequestDTO.getContractDate());
         financing.setFirstInstallmentDate(financingRequestDTO.getFirstInstallmentDate());
-        financing.setStatus(financingRequestDTO.getFinancingStatus());
 
         return financingRepository.save(financing);
     }
@@ -92,6 +92,7 @@ public class FinancingService {
                 vehicleRepository.save(currentVehicle);
             }
         }
+        if (!financing.getStatus().equals(FinancingStatus.DRAFT)) errors.put("financing", "Financiamento não pode ser alterado após fase de acolhimento");
 
         if (!errors.isEmpty()) throw new InvalidRequestException(errors);
 
@@ -104,7 +105,6 @@ public class FinancingService {
         financing.setAnnualInterestRate(financingRequestDTO.getAnnualInterestRate());
         financing.setContractDate(financingRequestDTO.getContractDate());
         financing.setFirstInstallmentDate(financingRequestDTO.getFirstInstallmentDate());
-        financing.setStatus(financingRequestDTO.getFinancingStatus());
 
         financingRepository.save(financing);
 

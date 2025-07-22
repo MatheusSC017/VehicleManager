@@ -20,7 +20,11 @@ public class UniqueEmailValidator implements ConstraintValidator<UniqueEmail, Cl
         Client existingClient = clientService.findByEmail(client.getEmail());
 
         if (existingClient == null) return true;
-
+        System.out.println("RESPONSE");
+        System.out.println(client.getId());
+        System.out.println("RESPONSE");
+        System.out.println(client.getId() != null && client.getId().equals(existingClient.getId()));
+        System.out.println("RESPONSE");
         if (client.getId() != null && client.getId().equals(existingClient.getId())) {
             return true;
         }
