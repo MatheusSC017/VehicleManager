@@ -2,6 +2,7 @@ package com.matheus.VehicleManager.controller;
 
 import com.matheus.VehicleManager.dto.FinancingRequestDTO;
 import com.matheus.VehicleManager.dto.FinancingResponseDTO;
+import com.matheus.VehicleManager.dto.FinancingStatusRequestDTO;
 import com.matheus.VehicleManager.dto.VehicleMinimalDTO;
 import com.matheus.VehicleManager.exception.InvalidRequestException;
 import com.matheus.VehicleManager.model.Financing;
@@ -109,6 +110,26 @@ public class FinancingController {
         try {
             Financing financing = financingService.update(financingId, financingDto);
             return ResponseEntity.ok(toDTO(financing));
+        } catch (InvalidRequestException e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("errors", e.getFieldErrors());
+            response.put("content", "");
+            return ResponseEntity.badRequest().body(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", e.getMessage());
+            response.put("errors", errors);
+            response.put("content", "");
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<?> updateStatus(@PathVariable("id") Long financingId, @RequestBody FinancingStatusRequestDTO financing) {
+        try {
+            financingService.updateStatus(financingId, financing.status());
+            return ResponseEntity.noContent().build();
         } catch (InvalidRequestException e) {
             Map<String, Object> response = new HashMap<>();
             response.put("errors", e.getFieldErrors());

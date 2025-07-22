@@ -72,7 +72,6 @@ public class FinancingService {
         return financingRepository.save(financing);
     }
 
-
     @Transactional
     public Financing update(Long financingId, FinancingRequestDTO financingRequestDTO) throws IOException {
         Client client = clientRepository.findById(financingRequestDTO.getClient().getId()).orElse(null);
@@ -115,6 +114,27 @@ public class FinancingService {
     }
 
     @Transactional
+    public void updateStatus(Long financingId, FinancingStatus status) {
+        Financing financing = financingRepository.findById(financingId).orElse(null);
+
+        Map<String, String> errors = new HashMap<>();
+        if (financing == null) errors.put("financing", "Financiamento não encontrado");
+        else if (!isValidStatusTransition(financing.getStatus(), status))
+            errors.put("status", "Transição de status inválida: " + financing.getStatus() + " -> " + status);
+
+        if (!errors.isEmpty()) throw new InvalidRequestException(errors);
+
+        financing.setStatus(status);
+        financingRepository.save(financing);
+
+        if (financing.getStatus().equals(FinancingStatus.CANCELED)) {
+            Vehicle vehicle = financing.getVehicle();
+            vehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
+            vehicleRepository.save(vehicle);
+        }
+    }
+
+    @Transactional
     public void delete(Long financingId) throws IOException {
         Financing financing = financingRepository.findById(financingId).orElse(null);
         if (financing != null) {
@@ -129,6 +149,12 @@ public class FinancingService {
             errors.put("financing", "Financiamento não encontrado");
             throw new InvalidRequestException(errors);
         }
+    }
+
+    private boolean isValidStatusTransition(FinancingStatus oldStatus, FinancingStatus newStatus) {
+        if (oldStatus == newStatus) return true;
+        return (oldStatus == FinancingStatus.DRAFT && newStatus != FinancingStatus.DEFAULTED) ||
+                (oldStatus == FinancingStatus.ACTIVE && newStatus != FinancingStatus.DRAFT);
     }
 
 }
