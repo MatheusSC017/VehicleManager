@@ -145,19 +145,4 @@ public class FinancingController {
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long financingId) {
-        try {
-            financingService.delete(financingId);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            errors.put("error", e.getMessage());
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        }
-    }
-
 }

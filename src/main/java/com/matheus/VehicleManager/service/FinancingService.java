@@ -134,23 +134,6 @@ public class FinancingService {
         }
     }
 
-    @Transactional
-    public void delete(Long financingId) throws IOException {
-        Financing financing = financingRepository.findById(financingId).orElse(null);
-        if (financing != null) {
-            Vehicle vehicle = financing.getVehicle();
-            vehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
-            vehicleRepository.save(vehicle);
-
-            financingRepository.delete(financing);
-        }
-        else {
-            Map<String, String> errors = new HashMap<>();
-            errors.put("financing", "Financiamento não encontrado");
-            throw new InvalidRequestException(errors);
-        }
-    }
-
     private boolean isValidStatusTransition(FinancingStatus oldStatus, FinancingStatus newStatus) {
         if (oldStatus == newStatus) return true;
         return (oldStatus == FinancingStatus.DRAFT && newStatus != FinancingStatus.DEFAULTED) ||
