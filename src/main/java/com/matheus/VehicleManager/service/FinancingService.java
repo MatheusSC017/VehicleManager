@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class FinancingService {
@@ -40,6 +41,10 @@ public class FinancingService {
 
     public Financing getById(Long financingId) {
         return financingRepository.getReferenceById(financingId);
+    }
+
+    public Optional<Financing> getByVehicleIdNotCanceled(Long vehicleId) {
+        return financingRepository.findActiveByVehicleId(vehicleId);
     }
 
     @Transactional

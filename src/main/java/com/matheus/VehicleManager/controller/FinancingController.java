@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/financings")
@@ -60,6 +61,12 @@ public class FinancingController {
     public ResponseEntity<FinancingResponseDTO> get(@PathVariable("id") Long financingId) {
         Financing financing = financingService.getById(financingId);
         return ResponseEntity.ok(toDTO(financing));
+    }
+
+    @GetMapping("/vehicle/{vehicleId}")
+    public ResponseEntity<FinancingResponseDTO> getByVehicleIdNotCanceled(@PathVariable("vehicleId") Long vehicleId) {
+        Optional<Financing> financing = financingService.getByVehicleIdNotCanceled(vehicleId);
+        return financing.map(value -> ResponseEntity.ok(toDTO(value))).orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @PostMapping
