@@ -1,14 +1,7 @@
 package com.matheus.VehicleManager.controller;
 
 import com.matheus.VehicleManager.dto.*;
-import com.matheus.VehicleManager.enums.FileType;
-import com.matheus.VehicleManager.enums.VehicleStatus;
-import com.matheus.VehicleManager.model.Client;
-import com.matheus.VehicleManager.model.FileStore;
 import com.matheus.VehicleManager.model.Vehicle;
-import com.matheus.VehicleManager.repository.FileRepository;
-import com.matheus.VehicleManager.repository.VehicleRepository;
-import com.matheus.VehicleManager.service.FileStorageService;
 import com.matheus.VehicleManager.service.VehicleService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.*;
 
 @RestController
