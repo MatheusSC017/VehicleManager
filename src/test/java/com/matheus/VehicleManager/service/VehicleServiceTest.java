@@ -98,8 +98,6 @@ class VehicleServiceTest {
             any(Pageable.class)
         )).thenReturn(vehiclePage);
 
-
-
         Page<Vehicle> foundVehicles = vehicleService.getFilteredVehicles("", null, null, null, 0, 0, paging);
 
         assertEquals(2, foundVehicles.getContent().size());
@@ -201,7 +199,7 @@ class VehicleServiceTest {
     }
 
     @Test
-    void testSearchVehicles() {
+    void testSearchAvailableVehicles() {
         Vehicle vehicle1 = new Vehicle();
         vehicle1.setModel("Ford");
         vehicle1.setBrand("Maverick");
@@ -231,7 +229,7 @@ class VehicleServiceTest {
     }
 
     @Test
-    void testCreateVehicle() {
+    void testCreate() {
         VehicleRequestDTO dto = new VehicleRequestDTO();
         dto.setVehicleType(VehicleType.CAR);
         dto.setModel("Test Model");
@@ -280,7 +278,7 @@ class VehicleServiceTest {
     }
 
     @Test
-    void testUpdateVehicle() {
+    void testUpdate() {
         Long vehicleId = 1L;
         VehicleRequestDTO dto = new VehicleRequestDTO();
         dto.setVehicleType(VehicleType.MOTORCYCLE);
@@ -333,7 +331,7 @@ class VehicleServiceTest {
     }
 
     @Test
-    void testDeleteVehicle() {
+    void testDelete() {
         Long vehicleId = 1L;
         doNothing().when(vehicleRepository).deleteById(vehicleId);
         vehicleService.delete(vehicleId);
