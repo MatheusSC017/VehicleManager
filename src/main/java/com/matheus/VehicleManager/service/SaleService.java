@@ -46,7 +46,6 @@ public class SaleService {
         return saleRepository.getReferenceById(vehicleId);
     }
 
-
     @Transactional
     public Sale create(SaleRequestDTO saleRequestDTO) {
         Client client = clientRepository.findById(saleRequestDTO.getClient().getId()).orElse(null);
@@ -64,8 +63,7 @@ public class SaleService {
         sale.setClient(client);
         sale.setVehicle(vehicle);
         sale.setStatus(saleRequestDTO.getStatus());
-        saveSale(sale);
-        return sale;
+        return saveSale(sale);
     }
 
     @Transactional
@@ -100,12 +98,10 @@ public class SaleService {
         sale.setVehicle(vehicle);
         sale.setStatus(saleRequestDTO.getStatus());
 
-        saveSale(sale);
-        return sale;
+        return saveSale(sale);
     }
 
-    private void saveSale(Sale sale) {
-        saleRepository.save(sale);
+    private Sale saveSale(Sale sale) {
         Vehicle vehicle = sale.getVehicle();
         if (sale.getStatus() == SalesStatus.SOLD) {
             vehicle.setVehicleStatus(VehicleStatus.SOLD);
@@ -115,6 +111,7 @@ public class SaleService {
             vehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
         }
         vehicleRepository.save(vehicle);
+        return saleRepository.save(sale);
     }
 
     private boolean isValidStatusTransition(SalesStatus oldStatus, SalesStatus newStatus) {
@@ -122,6 +119,5 @@ public class SaleService {
         return (oldStatus == SalesStatus.RESERVED && (newStatus == SalesStatus.SOLD || newStatus == SalesStatus.CANCELED)) ||
                 (oldStatus == SalesStatus.SOLD && newStatus == SalesStatus.CANCELED);
     }
-
 
 }

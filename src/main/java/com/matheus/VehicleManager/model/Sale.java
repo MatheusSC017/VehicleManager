@@ -77,6 +77,14 @@ public class Sale {
         this.vehicle = vehicle;
     }
 
+    public void setSalesDate(LocalDate salesDate) {
+        this.salesDate = salesDate;
+    }
+
+    public void setReserveDate(LocalDate reserveDate) {
+        this.reserveDate = reserveDate;
+    }
+
     public LocalDate getSalesDate() {
         return salesDate;
     }

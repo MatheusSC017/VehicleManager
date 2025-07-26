@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.internal.stubbing.answers.DoesNothing;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -63,11 +62,11 @@ public class MaintenanceServiceTest {
         Page<Maintenance> maintenancesPage = new PageImpl<>(maintenances, paging, maintenances.size());
         when(maintenanceRepository.findAll(any(Pageable.class))).thenReturn(maintenancesPage);
 
-        Page<Maintenance> foundedMaintenances = maintenanceService.findAll(0, 20);
+        Page<Maintenance> foundMaintenances = maintenanceService.findAll(0, 20);
 
-        assertEquals(2, foundedMaintenances.getContent().size());
-        assertEquals(maintenance1, foundedMaintenances.getContent().get(0));
-        assertEquals(maintenance2, foundedMaintenances.getContent().get(1));
+        assertEquals(2, foundMaintenances.getContent().size());
+        assertEquals(maintenance1, foundMaintenances.getContent().get(0));
+        assertEquals(maintenance2, foundMaintenances.getContent().get(1));
         verify(maintenanceRepository, times(1)).findAll(any(Pageable.class));
     }
 
@@ -96,13 +95,13 @@ public class MaintenanceServiceTest {
 
         when(maintenanceRepository.findByVehicleIdOrderByIdDesc(vehicleId)).thenReturn(maintenances);
 
-        List<Maintenance> foundedMaintenances = maintenanceService.findAllByVehicleId(vehicleId);
+        List<Maintenance> foundMaintenances = maintenanceService.findAllByVehicleId(vehicleId);
 
-        assertEquals(2, foundedMaintenances.size());
-        assertEquals(maintenance1, foundedMaintenances.get(0));
-        assertEquals(vehicleId, foundedMaintenances.get(0).getVehicle().getId());
-        assertEquals(maintenance2, foundedMaintenances.get(1));
-        assertEquals(vehicleId, foundedMaintenances.get(1).getVehicle().getId());
+        assertEquals(2, foundMaintenances.size());
+        assertEquals(maintenance1, foundMaintenances.get(0));
+        assertEquals(vehicleId, foundMaintenances.get(0).getVehicle().getId());
+        assertEquals(maintenance2, foundMaintenances.get(1));
+        assertEquals(vehicleId, foundMaintenances.get(1).getVehicle().getId());
         verify(maintenanceRepository, times(1)).findByVehicleIdOrderByIdDesc(vehicleId);
     }
 
