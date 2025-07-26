@@ -52,6 +52,10 @@ public class Maintenance {
         this.additionalInfo = additionalInfo;
     }
 
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
     public LocalDate getStartDate() {
         return startDate;
     }
