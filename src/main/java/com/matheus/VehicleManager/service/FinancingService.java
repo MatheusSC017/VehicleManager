@@ -17,7 +17,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -48,7 +47,7 @@ public class FinancingService {
     }
 
     @Transactional
-    public Financing create(FinancingRequestDTO financingRequestDTO) throws IOException {
+    public Financing create(FinancingRequestDTO financingRequestDTO) {
         Client client = clientRepository.findById(financingRequestDTO.getClient().getId()).orElse(null);
         Vehicle vehicle = vehicleRepository.findById(financingRequestDTO.getVehicle().id()).orElse(null);
 
@@ -78,7 +77,7 @@ public class FinancingService {
     }
 
     @Transactional
-    public Financing update(Long financingId, FinancingRequestDTO financingRequestDTO) throws IOException {
+    public Financing update(Long financingId, FinancingRequestDTO financingRequestDTO) {
         Client client = clientRepository.findById(financingRequestDTO.getClient().getId()).orElse(null);
         Vehicle vehicle = vehicleRepository.findById(financingRequestDTO.getVehicle().id()).orElse(null);
         Financing financing = financingRepository.getReferenceById(financingId);
