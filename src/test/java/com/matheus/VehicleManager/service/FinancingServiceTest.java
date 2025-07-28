@@ -13,7 +13,12 @@ import com.matheus.VehicleManager.repository.FinancingRepository;
 import com.matheus.VehicleManager.repository.VehicleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -84,6 +89,7 @@ public class FinancingServiceTest {
     }
 
     @Test
+    @DisplayName("Should return all financings with pagination")
     void testGetAll() {
         Financing financing1 = buildFinancing(1L, new Vehicle(), new Client(), FinancingStatus.DRAFT);
         Financing financing2 = buildFinancing(2L, new Vehicle(), new Client(), FinancingStatus.ACTIVE);
@@ -105,6 +111,7 @@ public class FinancingServiceTest {
     }
 
     @Test
+    @DisplayName("Should return a specific financing based on id")
     void testGetById() {
         Long financingId = 1L;
         Financing financing = buildFinancing(financingId, new Vehicle(), new Client(), FinancingStatus.DRAFT);
@@ -117,12 +124,14 @@ public class FinancingServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw an error if there is no financing with the specific id")
     void testGetByIdNotFound() {
         when(financingRepository.getReferenceById(99L)).thenThrow(EntityNotFoundException.class);
         assertThrows(EntityNotFoundException.class, () -> financingService.getById(99L));
     }
 
     @Test
+    @DisplayName("Must return a specific loan based on the id and the status must be different from Canceled")
     void testGetByVehicleIdNotCanceled() {
         Long vehicleId = 1L;
         Vehicle vehicle = buildVehicle(vehicleId, VehicleStatus.SOLD);
@@ -137,6 +146,7 @@ public class FinancingServiceTest {
     }
 
     @Test
+    @DisplayName("Should create a new financing and update the vehicle status")
     void testCreate() {
         Client client = buildClient(1L);
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
@@ -167,9 +177,11 @@ public class FinancingServiceTest {
 
         Financing createdFinancing = financingService.create(financingRequestDTO);
 
+        ArgumentCaptor<Vehicle> vehicleCaptor = ArgumentCaptor.forClass(Vehicle.class);
+        verify(vehicleRepository).save(vehicleCaptor.capture());
+        assertEquals(VehicleStatus.SOLD, vehicleCaptor.getValue().getVehicleStatus());
         assertEquals(financing, createdFinancing);
         assertEquals(vehicle, createdFinancing.getVehicle());
-        assertEquals(VehicleStatus.SOLD, createdFinancing.getVehicle().getVehicleStatus());
         verify(clientRepository, times(1)).findById(client.getId());
         verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
         verify(vehicleRepository, times(1)).save(any(Vehicle.class));
@@ -178,6 +190,7 @@ public class FinancingServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw an error if the client requested to the financing creation doesn't exist")
     void testCreateClientNotFound() {
         Client client = buildClient(1L);
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
@@ -210,6 +223,7 @@ public class FinancingServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw an error if the vehicle requested to the financing creation doesn't exist")
     void testCreateVehicleNotFound() {
         Client client = buildClient(1L);
 
@@ -241,6 +255,7 @@ public class FinancingServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw an error if the vehicle requested to the financing creation doesn't available")
     void testCreateVehicleNotAvailable() {
         Client client = buildClient(1L);
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.SOLD);
@@ -273,6 +288,7 @@ public class FinancingServiceTest {
     }
 
     @Test
+    @DisplayName("Should update the data of a specific financing and update the vehicle status if needed")
     void testUpdate() {
         Long financingId = 1L;
 
@@ -316,10 +332,10 @@ public class FinancingServiceTest {
         verify(vehicleRepository, times(2)).save(any(Vehicle.class));
         verify(financingRepository, times(1)).getReferenceById(financingId);
         verify(financingRepository, times(1)).save(any(Financing.class));
-
     }
 
     @Test
+    @DisplayName("Should throw an error if the client requested to the financing updating doesn't exist")
     void testUpdateClientNotFound() {
         Long financingId = 1L;
 
@@ -357,6 +373,7 @@ public class FinancingServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw an error if the vehicle requested to the financing updating doesn't exist")
     void testUpdateVehicleNotFound() {
         Long financingId = 1L;
 
@@ -394,6 +411,7 @@ public class FinancingServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw an error if the new vehicle requested to the financing updating doesn't available")
     void testUpdateVehicleNotAvailable() {
         Long financingId = 1L;
 
@@ -431,22 +449,56 @@ public class FinancingServiceTest {
         verify(financingRepository, times(1)).getReferenceById(financingId);
     }
 
-    @Test
-    void  testUpdateStatus() {
+    @ParameterizedTest
+    @CsvSource({
+        "DRAFT, DEFAULTED",
+        "ACTIVE, DRAFT",
+        "DEFAULTED, DRAFT",
+        "DEFAULTED, ACTIVE",
+        "DEFAULTED, CANCELED",
+        "CANCELED, DRAFT",
+        "CANCELED, DEFAULTED",
+        "CANCELED, ACTIVE"
+    })
+    @DisplayName("Should throw an error to all invalid transition of status")
+    void testUpdateStatusForInvalidTransitions(FinancingStatus oldStatus, FinancingStatus newStatus) {
         Long financingId = 1L;
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.SOLD);
-        Financing financing = buildFinancing(1L, vehicle, new Client(), FinancingStatus.ACTIVE);
+        Financing financing = buildFinancing(1L, vehicle, new Client(), oldStatus);
 
         when(financingRepository.findById(financingId)).thenReturn(Optional.of(financing));
-        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
-        when(financingRepository.save(any(Financing.class))).thenReturn(financing);
-        financingService.updateStatus(financingId, FinancingStatus.CANCELED);
 
-        assertEquals(FinancingStatus.CANCELED, financing.getStatus());
-        assertEquals(VehicleStatus.AVAILABLE, vehicle.getVehicleStatus());
+        assertThrows(InvalidRequestException.class, () -> financingService.updateStatus(financingId, newStatus));
+
         verify(financingRepository, times(1)).findById(financingId);
-        verify(vehicleRepository, times(1)).save(any(Vehicle.class));
-        verify(financingRepository, times(1)).save(any(Financing.class));
     }
 
+    @ParameterizedTest
+    @CsvSource({
+            "DRAFT, ACTIVE",
+            "DRAFT, CANCELED",
+            "ACTIVE, DEFAULTED",
+            "ACTIVE, CANCELED"
+    })
+    @DisplayName("Should update the financing status")
+    void testUpdateStatusForValidTransitions(FinancingStatus oldStatus, FinancingStatus newStatus) {
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.SOLD);
+        Financing financing = buildFinancing(1L, vehicle, buildClient(1L), oldStatus);
+        when(financingRepository.findById(1L)).thenReturn(Optional.of(financing));
+        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
+        when(financingRepository.save(any(Financing.class))).thenReturn(financing);
+
+        financingService.updateStatus(1L, newStatus);
+
+        assertEquals(newStatus, financing.getStatus());
+        verify(financingRepository, times(1)).findById(1L);
+        verify(financingRepository, times(1)).save(any(Financing.class));
+
+        if (newStatus == FinancingStatus.CANCELED) {
+            ArgumentCaptor<Vehicle> vehicleCaptor = ArgumentCaptor.forClass(Vehicle.class);
+            verify(vehicleRepository).save(vehicleCaptor.capture());
+            assertEquals(VehicleStatus.AVAILABLE, vehicleCaptor.getValue().getVehicleStatus());
+            verify(vehicleRepository, times(1)).save(any(Vehicle.class));
+        }
+    }
 }
