@@ -4,12 +4,14 @@ import com.matheus.VehicleManager.dto.FinancingRequestDTO;
 import com.matheus.VehicleManager.dto.VehicleMinimalDTO;
 import com.matheus.VehicleManager.enums.FinancingStatus;
 import com.matheus.VehicleManager.enums.VehicleStatus;
+import com.matheus.VehicleManager.exception.InvalidRequestException;
 import com.matheus.VehicleManager.model.Client;
 import com.matheus.VehicleManager.model.Financing;
 import com.matheus.VehicleManager.model.Vehicle;
 import com.matheus.VehicleManager.repository.ClientRepository;
 import com.matheus.VehicleManager.repository.FinancingRepository;
 import com.matheus.VehicleManager.repository.VehicleRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,7 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -49,33 +51,42 @@ public class FinancingServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
+    private Client buildClient(Long id) {
+        Client client = new Client();
+        client.setId(id);
+        return client;
+    }
+
+    private Vehicle buildVehicle(Long id, VehicleStatus status) {
+        Vehicle vehicle = new Vehicle();
+        vehicle.setId(id);
+        vehicle.setChassi("TestChassi");
+        vehicle.setBrand("TestBrand");
+        vehicle.setModel("TestModel");
+        vehicle.setVehicleStatus(status);
+        return vehicle;
+    }
+
+    private Financing buildFinancing(Long id, Vehicle vehicle, Client client, FinancingStatus status) {
+        Financing financing = new Financing();
+        financing.setId(id);
+        financing.setVehicle(vehicle);
+        financing.setClient(client);
+        financing.setTotalAmount(new BigDecimal(100000));
+        financing.setDownPayment(new BigDecimal(40000));
+        financing.setInstallmentCount(40);
+        financing.setInstallmentValue(new BigDecimal(1200));
+        financing.setAnnualInterestRate(new BigDecimal("1.2"));
+        financing.setContractDate(LocalDate.now());
+        financing.setFirstInstallmentDate(LocalDate.now().plusMonths(1));
+        financing.setStatus(status);
+        return financing;
+    }
+
     @Test
     void testGetAll() {
-        Financing financing1 = new Financing();
-        financing1.setId(1L);
-        financing1.setVehicle(new Vehicle());
-        financing1.setClient(new Client());
-        financing1.setTotalAmount(new BigDecimal(100000));
-        financing1.setDownPayment(new BigDecimal(40000));
-        financing1.setInstallmentCount(40);
-        financing1.setInstallmentValue(new BigDecimal(1200));
-        financing1.setAnnualInterestRate(new BigDecimal("1.2"));
-        financing1.setContractDate(LocalDate.now());
-        financing1.setFirstInstallmentDate(LocalDate.now().plusMonths(1));
-        financing1.setStatus(FinancingStatus.DRAFT);
-
-        Financing financing2 = new Financing();
-        financing2.setId(2L);
-        financing2.setVehicle(new Vehicle());
-        financing2.setClient(new Client());
-        financing2.setTotalAmount(new BigDecimal(90000));
-        financing2.setDownPayment(new BigDecimal(50000));
-        financing2.setInstallmentCount(24);
-        financing2.setInstallmentValue(new BigDecimal(1400));
-        financing2.setAnnualInterestRate(new BigDecimal("1.5"));
-        financing2.setContractDate(LocalDate.now().plusDays(15));
-        financing2.setFirstInstallmentDate(LocalDate.now().plusMonths(2));
-        financing2.setStatus(FinancingStatus.ACTIVE);
+        Financing financing1 = buildFinancing(1L, new Vehicle(), new Client(), FinancingStatus.DRAFT);
+        Financing financing2 = buildFinancing(2L, new Vehicle(), new Client(), FinancingStatus.ACTIVE);
 
         List<Financing> financings = new ArrayList<>();
         financings.add(financing1);
@@ -96,20 +107,7 @@ public class FinancingServiceTest {
     @Test
     void testGetById() {
         Long financingId = 1L;
-
-        Financing financing = new Financing();
-        financing.setId(1L);
-        financing.setVehicle(new Vehicle());
-        financing.setClient(new Client());
-        financing.setTotalAmount(new BigDecimal(100000));
-        financing.setDownPayment(new BigDecimal(40000));
-        financing.setInstallmentCount(40);
-        financing.setInstallmentValue(new BigDecimal(1200));
-        financing.setAnnualInterestRate(new BigDecimal("1.2"));
-        financing.setContractDate(LocalDate.now());
-        financing.setFirstInstallmentDate(LocalDate.now().plusMonths(1));
-        financing.setStatus(FinancingStatus.DRAFT);
-
+        Financing financing = buildFinancing(financingId, new Vehicle(), new Client(), FinancingStatus.DRAFT);
         when(financingRepository.getReferenceById(financingId)).thenReturn(financing);
 
         Financing foundFinancing = financingService.getById(financingId);
@@ -119,39 +117,30 @@ public class FinancingServiceTest {
     }
 
     @Test
+    void testGetByIdNotFound() {
+        when(financingRepository.getReferenceById(99L)).thenThrow(EntityNotFoundException.class);
+        assertThrows(EntityNotFoundException.class, () -> financingService.getById(99L));
+    }
+
+    @Test
     void testGetByVehicleIdNotCanceled() {
         Long vehicleId = 1L;
-
-        Vehicle vehicle = new Vehicle();
-        vehicle.setId(vehicleId);
-
-        Financing financing = new Financing();
-        financing.setId(1L);
-        financing.setVehicle(vehicle);
-        financing.setClient(new Client());
-        financing.setTotalAmount(new BigDecimal(100000));
-        financing.setDownPayment(new BigDecimal(40000));
-        financing.setInstallmentCount(40);
-        financing.setInstallmentValue(new BigDecimal(1200));
-        financing.setAnnualInterestRate(new BigDecimal("1.2"));
-        financing.setContractDate(LocalDate.now());
-        financing.setFirstInstallmentDate(LocalDate.now().plusMonths(1));
-        financing.setStatus(FinancingStatus.DRAFT);
+        Vehicle vehicle = buildVehicle(vehicleId, VehicleStatus.SOLD);
+        Financing financing = buildFinancing(1L, vehicle, new Client(), FinancingStatus.DRAFT);
 
         when(financingRepository.findActiveByVehicleId(vehicleId)).thenReturn(Optional.of(financing));
-
         Optional<Financing> foundFinancing = financingService.getByVehicleIdNotCanceled(vehicleId);
 
         assertEquals(financing, foundFinancing.get());
         assertEquals(vehicle, foundFinancing.get().getVehicle());
         verify(financingRepository, times(1)).findActiveByVehicleId(vehicleId);
-
     }
 
     @Test
     void testCreate() {
-        Client client = new Client();
-        client.setId(1L);
+        Client client = buildClient(1L);
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
+        Financing financing = buildFinancing(1L, vehicle, client, FinancingStatus.DRAFT);
 
         VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
                 1L,
@@ -171,26 +160,6 @@ public class FinancingServiceTest {
         financingRequestDTO.setContractDate(LocalDate.now());
         financingRequestDTO.setFirstInstallmentDate(LocalDate.now().plusMonths(1));
 
-        Vehicle vehicle = new Vehicle();
-        vehicle.setId(1L);
-        vehicle.setChassi("TestVehicleChassi");
-        vehicle.setBrand("TestVehicleBrand");
-        vehicle.setModel("TestVehicleModel");
-        vehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
-
-        Financing financing = new Financing();
-        financing.setId(1L);
-        financing.setVehicle(vehicle);
-        financing.setClient(client);
-        financing.setTotalAmount(new BigDecimal(100000));
-        financing.setDownPayment(new BigDecimal(40000));
-        financing.setInstallmentCount(40);
-        financing.setInstallmentValue(new BigDecimal(1200));
-        financing.setAnnualInterestRate(new BigDecimal("1.2"));
-        financing.setContractDate(LocalDate.now());
-        financing.setFirstInstallmentDate(LocalDate.now().plusMonths(1));
-        financing.setStatus(FinancingStatus.DRAFT);
-
         when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
         when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));
         when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
@@ -209,14 +178,111 @@ public class FinancingServiceTest {
     }
 
     @Test
-    void testUpdate() {
-        Long financingId = 1L;
-
-        Client client = new Client();
-        client.setId(1L);
+    void testCreateClientNotFound() {
+        Client client = buildClient(1L);
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
 
         VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
                 1L,
+                "TestVehicleChassi",
+                "TestVehicleBrand",
+                "TestVehicleModel"
+        );
+
+        FinancingRequestDTO financingRequestDTO = new FinancingRequestDTO();
+        financingRequestDTO.setVehicle(vehicleMinimalDTO);
+        financingRequestDTO.setClient(client);
+        financingRequestDTO.setTotalAmount(new BigDecimal(100000));
+        financingRequestDTO.setDownPayment(new BigDecimal(40000));
+        financingRequestDTO.setInstallmentCount(40);
+        financingRequestDTO.setInstallmentValue(new BigDecimal(1200));
+        financingRequestDTO.setAnnualInterestRate(new BigDecimal("1.2"));
+        financingRequestDTO.setContractDate(LocalDate.now());
+        financingRequestDTO.setFirstInstallmentDate(LocalDate.now().plusMonths(1));
+
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.empty());
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));
+
+        assertThrows(InvalidRequestException.class, () -> financingService.create(financingRequestDTO));
+
+        verify(clientRepository, times(1)).findById(client.getId());
+        verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
+    }
+
+    @Test
+    void testCreateVehicleNotFound() {
+        Client client = buildClient(1L);
+
+        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
+                1L,
+                "TestVehicleChassi",
+                "TestVehicleBrand",
+                "TestVehicleModel"
+        );
+
+        FinancingRequestDTO financingRequestDTO = new FinancingRequestDTO();
+        financingRequestDTO.setVehicle(vehicleMinimalDTO);
+        financingRequestDTO.setClient(client);
+        financingRequestDTO.setTotalAmount(new BigDecimal(100000));
+        financingRequestDTO.setDownPayment(new BigDecimal(40000));
+        financingRequestDTO.setInstallmentCount(40);
+        financingRequestDTO.setInstallmentValue(new BigDecimal(1200));
+        financingRequestDTO.setAnnualInterestRate(new BigDecimal("1.2"));
+        financingRequestDTO.setContractDate(LocalDate.now());
+        financingRequestDTO.setFirstInstallmentDate(LocalDate.now().plusMonths(1));
+
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.empty());
+
+        assertThrows(InvalidRequestException.class, () -> financingService.create(financingRequestDTO));
+
+        verify(clientRepository, times(1)).findById(client.getId());
+        verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
+    }
+
+    @Test
+    void testCreateVehicleNotAvailable() {
+        Client client = buildClient(1L);
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.SOLD);
+
+        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
+                1L,
+                "TestVehicleChassi",
+                "TestVehicleBrand",
+                "TestVehicleModel"
+        );
+
+        FinancingRequestDTO financingRequestDTO = new FinancingRequestDTO();
+        financingRequestDTO.setVehicle(vehicleMinimalDTO);
+        financingRequestDTO.setClient(client);
+        financingRequestDTO.setTotalAmount(new BigDecimal(100000));
+        financingRequestDTO.setDownPayment(new BigDecimal(40000));
+        financingRequestDTO.setInstallmentCount(40);
+        financingRequestDTO.setInstallmentValue(new BigDecimal(1200));
+        financingRequestDTO.setAnnualInterestRate(new BigDecimal("1.2"));
+        financingRequestDTO.setContractDate(LocalDate.now());
+        financingRequestDTO.setFirstInstallmentDate(LocalDate.now().plusMonths(1));
+
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));
+
+        assertThrows(InvalidRequestException.class, () -> financingService.create(financingRequestDTO));
+
+        verify(clientRepository, times(1)).findById(client.getId());
+        verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
+    }
+
+    @Test
+    void testUpdate() {
+        Long financingId = 1L;
+
+        Client client = buildClient(1L);
+        Vehicle oldVehicle = buildVehicle(1L, VehicleStatus.SOLD);
+        Vehicle newVehicle = buildVehicle(2L, VehicleStatus.AVAILABLE);
+        Financing financing = buildFinancing(1L, oldVehicle, client, FinancingStatus.DRAFT);
+
+        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
+                2L,
                 "TestVehicleChassi",
                 "TestVehicleBrand",
                 "TestVehicleModel"
@@ -233,82 +299,147 @@ public class FinancingServiceTest {
         financingRequestDTO.setContractDate(LocalDate.now().plusDays(15));
         financingRequestDTO.setFirstInstallmentDate(LocalDate.now().plusMonths(2));
 
-        Vehicle vehicle = new Vehicle();
-        vehicle.setId(1L);
-        vehicle.setChassi("TestVehicleChassi");
-        vehicle.setBrand("TestVehicleBrand");
-        vehicle.setModel("TestVehicleModel");
-        vehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
-
-        Financing financing = new Financing();
-        financing.setId(financingId);
-        financing.setVehicle(vehicle);
-        financing.setClient(client);
-        financing.setTotalAmount(new BigDecimal(100000));
-        financing.setDownPayment(new BigDecimal(40000));
-        financing.setInstallmentCount(40);
-        financing.setInstallmentValue(new BigDecimal(1200));
-        financing.setAnnualInterestRate(new BigDecimal("1.2"));
-        financing.setContractDate(LocalDate.now());
-        financing.setFirstInstallmentDate(LocalDate.now().plusMonths(1));
-        financing.setStatus(FinancingStatus.DRAFT);
-
         when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
-        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));
-        when(financingRepository.getReferenceById(vehicleMinimalDTO.id())).thenReturn(financing);
-        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(newVehicle));
+        when(financingRepository.getReferenceById(financingId)).thenReturn(financing);
+        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(newVehicle);
         when(financingRepository.save(any(Financing.class))).thenReturn(financing);
 
         Financing updatedFinancing = financingService.update(financingId, financingRequestDTO);
 
         assertEquals(financing, updatedFinancing);
-        assertEquals(financingId, updatedFinancing.getId());
-        assertEquals(vehicle, updatedFinancing.getVehicle());
-        assertEquals(client, updatedFinancing.getClient());
-        assertEquals(FinancingStatus.DRAFT, updatedFinancing.getStatus());
-        assertEquals(new BigDecimal(90000), updatedFinancing.getTotalAmount());
-        assertEquals(new BigDecimal(50000), updatedFinancing.getDownPayment());
-        assertEquals(24, updatedFinancing.getInstallmentCount());
-        assertEquals(new BigDecimal(1500), updatedFinancing.getInstallmentValue());
-        assertEquals(new BigDecimal("1.5"), updatedFinancing.getAnnualInterestRate());
-        assertEquals(LocalDate.now().plusDays(15), updatedFinancing.getContractDate());
-        assertEquals(LocalDate.now().plusMonths(2), updatedFinancing.getFirstInstallmentDate());
+        assertEquals(newVehicle, updatedFinancing.getVehicle());
+        assertEquals(VehicleStatus.AVAILABLE, oldVehicle.getVehicleStatus());
+        assertEquals(VehicleStatus.SOLD, newVehicle.getVehicleStatus());
         verify(clientRepository, times(1)).findById(client.getId());
         verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
-        verify(vehicleRepository, times(1)).save(any(Vehicle.class));
-        verify(financingRepository, times(1)).getReferenceById(vehicleMinimalDTO.id());
+        verify(vehicleRepository, times(2)).save(any(Vehicle.class));
+        verify(financingRepository, times(1)).getReferenceById(financingId);
         verify(financingRepository, times(1)).save(any(Financing.class));
 
     }
 
     @Test
-    void  testUpdateStatus() {
+    void testUpdateClientNotFound() {
         Long financingId = 1L;
 
-        Vehicle vehicle = new Vehicle();
-        vehicle.setId(1L);
-        vehicle.setChassi("TestVehicleChassi");
-        vehicle.setBrand("TestVehicleBrand");
-        vehicle.setModel("TestVehicleModel");
-        vehicle.setVehicleStatus(VehicleStatus.SOLD);
+        Client client = buildClient(1L);
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.SOLD);
+        Financing financing = buildFinancing(1L, vehicle, client, FinancingStatus.DRAFT);
 
-        Financing financing = new Financing();
-        financing.setId(1L);
-        financing.setVehicle(vehicle);
-        financing.setClient(new Client());
-        financing.setTotalAmount(new BigDecimal(100000));
-        financing.setDownPayment(new BigDecimal(40000));
-        financing.setInstallmentCount(40);
-        financing.setInstallmentValue(new BigDecimal(1200));
-        financing.setAnnualInterestRate(new BigDecimal("1.2"));
-        financing.setContractDate(LocalDate.now());
-        financing.setFirstInstallmentDate(LocalDate.now().plusMonths(1));
-        financing.setStatus(FinancingStatus.ACTIVE);
+        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
+                1L,
+                "TestVehicleChassi",
+                "TestVehicleBrand",
+                "TestVehicleModel"
+        );
+
+        FinancingRequestDTO financingRequestDTO = new FinancingRequestDTO();
+        financingRequestDTO.setVehicle(vehicleMinimalDTO);
+        financingRequestDTO.setClient(client);
+        financingRequestDTO.setTotalAmount(new BigDecimal(100000));
+        financingRequestDTO.setDownPayment(new BigDecimal(40000));
+        financingRequestDTO.setInstallmentCount(40);
+        financingRequestDTO.setInstallmentValue(new BigDecimal(1200));
+        financingRequestDTO.setAnnualInterestRate(new BigDecimal("1.2"));
+        financingRequestDTO.setContractDate(LocalDate.now());
+        financingRequestDTO.setFirstInstallmentDate(LocalDate.now().plusMonths(1));
+
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.empty());
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));
+        when(financingRepository.getReferenceById(financingId)).thenReturn(financing);
+
+        assertThrows(InvalidRequestException.class, () -> financingService.update(financingId, financingRequestDTO));
+
+        verify(clientRepository, times(1)).findById(client.getId());
+        verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
+        verify(financingRepository, times(1)).getReferenceById(financingId);
+    }
+
+    @Test
+    void testUpdateVehicleNotFound() {
+        Long financingId = 1L;
+
+        Client client = buildClient(1L);
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.SOLD);
+        Financing financing = buildFinancing(1L, vehicle, client, FinancingStatus.DRAFT);
+
+        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
+                1L,
+                "TestVehicleChassi",
+                "TestVehicleBrand",
+                "TestVehicleModel"
+        );
+
+        FinancingRequestDTO financingRequestDTO = new FinancingRequestDTO();
+        financingRequestDTO.setVehicle(vehicleMinimalDTO);
+        financingRequestDTO.setClient(client);
+        financingRequestDTO.setTotalAmount(new BigDecimal(100000));
+        financingRequestDTO.setDownPayment(new BigDecimal(40000));
+        financingRequestDTO.setInstallmentCount(40);
+        financingRequestDTO.setInstallmentValue(new BigDecimal(1200));
+        financingRequestDTO.setAnnualInterestRate(new BigDecimal("1.2"));
+        financingRequestDTO.setContractDate(LocalDate.now());
+        financingRequestDTO.setFirstInstallmentDate(LocalDate.now().plusMonths(1));
+
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.empty());
+        when(financingRepository.getReferenceById(financingId)).thenReturn(financing);
+
+        assertThrows(InvalidRequestException.class, () -> financingService.update(financingId, financingRequestDTO));
+
+        verify(clientRepository, times(1)).findById(client.getId());
+        verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
+        verify(financingRepository, times(1)).getReferenceById(financingId);
+    }
+
+    @Test
+    void testUpdateVehicleNotAvailable() {
+        Long financingId = 1L;
+
+        Client client = buildClient(1L);
+        Vehicle oldVehicle = buildVehicle(1L, VehicleStatus.SOLD);
+        Vehicle newVehicle = buildVehicle(2L, VehicleStatus.SOLD);
+        Financing financing = buildFinancing(1L, oldVehicle, client, FinancingStatus.DRAFT);
+
+        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
+                2L,
+                "TestVehicleChassi",
+                "TestVehicleBrand",
+                "TestVehicleModel"
+        );
+
+        FinancingRequestDTO financingRequestDTO = new FinancingRequestDTO();
+        financingRequestDTO.setVehicle(vehicleMinimalDTO);
+        financingRequestDTO.setClient(client);
+        financingRequestDTO.setTotalAmount(new BigDecimal(100000));
+        financingRequestDTO.setDownPayment(new BigDecimal(40000));
+        financingRequestDTO.setInstallmentCount(40);
+        financingRequestDTO.setInstallmentValue(new BigDecimal(1200));
+        financingRequestDTO.setAnnualInterestRate(new BigDecimal("1.2"));
+        financingRequestDTO.setContractDate(LocalDate.now());
+        financingRequestDTO.setFirstInstallmentDate(LocalDate.now().plusMonths(1));
+
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(newVehicle));
+        when(financingRepository.getReferenceById(financingId)).thenReturn(financing);
+
+        assertThrows(InvalidRequestException.class, () -> financingService.update(financingId, financingRequestDTO));
+
+        verify(clientRepository, times(1)).findById(client.getId());
+        verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
+        verify(financingRepository, times(1)).getReferenceById(financingId);
+    }
+
+    @Test
+    void  testUpdateStatus() {
+        Long financingId = 1L;
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.SOLD);
+        Financing financing = buildFinancing(1L, vehicle, new Client(), FinancingStatus.ACTIVE);
 
         when(financingRepository.findById(financingId)).thenReturn(Optional.of(financing));
         when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
         when(financingRepository.save(any(Financing.class))).thenReturn(financing);
-
         financingService.updateStatus(financingId, FinancingStatus.CANCELED);
 
         assertEquals(FinancingStatus.CANCELED, financing.getStatus());
@@ -316,8 +447,6 @@ public class FinancingServiceTest {
         verify(financingRepository, times(1)).findById(financingId);
         verify(vehicleRepository, times(1)).save(any(Vehicle.class));
         verify(financingRepository, times(1)).save(any(Financing.class));
-
-
     }
 
 }
