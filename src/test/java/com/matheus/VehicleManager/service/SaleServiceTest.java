@@ -4,6 +4,7 @@ import com.matheus.VehicleManager.dto.SaleRequestDTO;
 import com.matheus.VehicleManager.dto.VehicleMinimalDTO;
 import com.matheus.VehicleManager.enums.SalesStatus;
 import com.matheus.VehicleManager.enums.VehicleStatus;
+import com.matheus.VehicleManager.exception.InvalidRequestException;
 import com.matheus.VehicleManager.model.Client;
 import com.matheus.VehicleManager.model.Sale;
 import com.matheus.VehicleManager.model.Vehicle;
@@ -11,7 +12,11 @@ import com.matheus.VehicleManager.repository.ClientRepository;
 import com.matheus.VehicleManager.repository.SaleRepository;
 import com.matheus.VehicleManager.repository.VehicleRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -26,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -43,6 +49,34 @@ public class SaleServiceTest {
     @InjectMocks
     private SaleService saleService;
 
+    private Client buildClient(Long id) {
+        Client client = new Client();
+        client.setId(id);
+        return client;
+    }
+
+    private Vehicle buildVehicle(Long id, VehicleStatus status) {
+        Vehicle vehicle = new Vehicle();
+        vehicle.setId(id);
+        vehicle.setChassi("TestChassi");
+        vehicle.setBrand("TestBrand");
+        vehicle.setModel("TestModel");
+        vehicle.setVehicleStatus(status);
+        return vehicle;
+    }
+
+    private Sale buildSale(Long saleId, Vehicle vehicle, Client client, SalesStatus status) {
+        Sale sale = new Sale();
+        sale.setId(saleId);
+        sale.setVehicle(vehicle);
+        sale.setClient(client);
+        sale.setStatus(status);
+        if (status.equals(SalesStatus.RESERVED)) {
+            sale.setReserveDate(LocalDate.now());
+        }
+        sale.setSalesDate(LocalDate.now());
+        return sale;
+    }
 
     @BeforeEach
     void setUp() {
@@ -50,19 +84,10 @@ public class SaleServiceTest {
     }
 
     @Test
+    @DisplayName("Should return all sales registers with pagination")
     void testFindAll() {
-        Sale sale1 = new Sale();
-        sale1.setId(1L);
-        sale1.setVehicle(new Vehicle());
-        sale1.setClient(new Client());
-        sale1.setStatus(SalesStatus.RESERVED);
-
-        Sale sale2 = new Sale();
-        sale2.setId(2L);
-        sale2.setVehicle(new Vehicle());
-        sale2.setClient(new Client());
-        sale2.setStatus(SalesStatus.SOLD);
-
+        Sale sale1 = buildSale(1L, new Vehicle(), new Client(), SalesStatus.RESERVED);
+        Sale sale2 = buildSale(2L, new Vehicle(), new Client(), SalesStatus.SOLD);
         List<Sale> sales = new ArrayList<>();
         sales.add(sale1);
         sales.add(sale2);
@@ -80,84 +105,52 @@ public class SaleServiceTest {
     }
 
     @Test
+    @DisplayName("Should return all sales registers based on a vehicle id")
     void testFindAllByVehicleId() {
-        Long vehicleId = 1L;
-        Vehicle vehicle = new Vehicle();
-        vehicle.setId(vehicleId);
-
-        Sale sale1 = new Sale();
-        sale1.setId(1L);
-        sale1.setVehicle(vehicle);
-        sale1.setClient(new Client());
-        sale1.setStatus(SalesStatus.CANCELED);
-
-        Sale sale2 = new Sale();
-        sale2.setId(2L);
-        sale2.setVehicle(vehicle);
-        sale2.setClient(new Client());
-        sale2.setStatus(SalesStatus.SOLD);
-
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.SOLD);
+        Sale sale1 = buildSale(1L, vehicle, new Client(), SalesStatus.CANCELED);
+        Sale sale2 = buildSale(2L, vehicle, new Client(), SalesStatus.SOLD);
         List<Sale> sales = new ArrayList<>();
         sales.add(sale1);
         sales.add(sale2);
 
-        when(saleRepository.findByVehicleIdOrderByIdDesc(vehicleId)).thenReturn(sales);
-
-        List<Sale> foundSales = saleService.findAllByVehicleId(vehicleId);
+        when(saleRepository.findByVehicleIdOrderByIdDesc(1L)).thenReturn(sales);
+        List<Sale> foundSales = saleService.findAllByVehicleId(1L);
 
         assertEquals(2, foundSales.size());
         assertEquals(sale1, foundSales.get(0));
-        assertEquals(vehicleId, foundSales.get(0).getVehicle().getId());
+        assertEquals(1L, foundSales.get(0).getVehicle().getId());
         assertEquals(sale2, foundSales.get(1));
-        assertEquals(vehicleId, foundSales.get(1).getVehicle().getId());
-        verify(saleRepository, times(1)).findByVehicleIdOrderByIdDesc(vehicleId);
+        assertEquals(1L, foundSales.get(1).getVehicle().getId());
+        verify(saleRepository, times(1)).findByVehicleIdOrderByIdDesc(1L);
     }
 
     @Test
+    @DisplayName("Should return a specific sale based on id")
     void testFindById() {
-        Long saleId = 1L;
+        Sale sale = buildSale(1L, new Vehicle(), new Client(), SalesStatus.SOLD);
 
-        Sale sale = new Sale();
-        sale.setId(saleId);
-        sale.setVehicle(new Vehicle());
-        sale.setClient(new Client());
-        sale.setStatus(SalesStatus.SOLD);
-
-        when(saleRepository.getReferenceById(saleId)).thenReturn(sale);
-
-        Sale foundSale = saleService.findById(saleId);
+        when(saleRepository.getReferenceById(1L)).thenReturn(sale);
+        Sale foundSale = saleService.findById(1L);
 
         assertEquals(sale, foundSale);
-        verify(saleRepository, times(1)).getReferenceById(saleId);
+        verify(saleRepository, times(1)).getReferenceById(1L);
     }
 
     @Test
+    @DisplayName("Should create a new sale and update the vehicle status")
     void testCreate() {
+        Client client = buildClient(1L);
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
+        Sale sale = buildSale(1L, vehicle, client, SalesStatus.SOLD);
+
         VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
-            1L, "TestVehicleChassi", "TestBrand", "TestModel"
+                1L, "TestVehicleChassi", "TestBrand", "TestModel"
         );
-
-        Client client = new Client();
-        client.setId(1L);
-
         SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
         saleRequestDTO.setClient(client);
         saleRequestDTO.setVehicle(vehicleMinimalDTO);
         saleRequestDTO.setStatus(SalesStatus.SOLD);
-
-        Vehicle vehicle = new Vehicle();
-        vehicle.setId(1L);
-        vehicle.setChassi("TestVehicleChassi");
-        vehicle.setBrand("TestBrand");
-        vehicle.setModel("TestModel");
-        vehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
-
-        Sale sale = new Sale();
-        sale.setId(1L);
-        sale.setVehicle(vehicle);
-        sale.setClient(client);
-        sale.setStatus(SalesStatus.SOLD);
-        sale.setSalesDate(LocalDate.now());
 
         when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
         when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));
@@ -166,11 +159,13 @@ public class SaleServiceTest {
 
         Sale createdSale = saleService.create(saleRequestDTO);
 
+        ArgumentCaptor<Vehicle> vehicleCaptor = ArgumentCaptor.forClass(Vehicle.class);
+        verify(vehicleRepository).save(vehicleCaptor.capture());
+        assertEquals(VehicleStatus.SOLD, vehicleCaptor.getValue().getVehicleStatus());
         assertEquals(vehicle, createdSale.getVehicle());
         assertEquals(client, createdSale.getClient());
         assertEquals(SalesStatus.SOLD, createdSale.getStatus());
         assertEquals(LocalDate.now(), createdSale.getSalesDate());
-        assertEquals(VehicleStatus.SOLD, createdSale.getVehicle().getVehicleStatus());
         verify(clientRepository, times(1)).findById(client.getId());
         verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
         verify(vehicleRepository, times(1)).save(any(Vehicle.class));
@@ -178,56 +173,259 @@ public class SaleServiceTest {
     }
 
     @Test
-    void testUpdate() {
-        Long saleId = 1L;
+    @DisplayName("Should throw an error if the client requested to the sale creation doesn't exist")
+    void testCreateClientNotFound() {
+        Client client = buildClient(1L);
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
 
         VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
                 1L, "TestVehicleChassi", "TestBrand", "TestModel"
         );
-
-        Client client = new Client();
-        client.setId(1L);
-
         SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
         saleRequestDTO.setClient(client);
         saleRequestDTO.setVehicle(vehicleMinimalDTO);
         saleRequestDTO.setStatus(SalesStatus.SOLD);
 
-        Vehicle vehicle = new Vehicle();
-        vehicle.setId(1L);
-        vehicle.setChassi("TestVehicleChassi");
-        vehicle.setBrand("TestBrand");
-        vehicle.setModel("TestModel");
-        vehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.empty());
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));;
 
-        Sale sale = new Sale();
-        sale.setId(saleId);
-        sale.setVehicle(vehicle);
-        sale.setClient(client);
-        sale.setStatus(SalesStatus.RESERVED);
-        sale.setReserveDate(LocalDate.now());
-        sale.setSalesDate(LocalDate.now());
+        assertThrows(InvalidRequestException.class, () -> saleService.create(saleRequestDTO));
+    }
+
+    @Test
+    @DisplayName("Should throw an error if the vehicle requested to the sale creation doesn't exist")
+    void testCreateVehicleNotFound() {
+        Client client = buildClient(1L);
+
+        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
+                1L, "TestVehicleChassi", "TestBrand", "TestModel"
+        );
+        SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
+        saleRequestDTO.setClient(client);
+        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setStatus(SalesStatus.SOLD);
 
         when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
-        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));
-        when(saleRepository.findById(saleId)).thenReturn(Optional.of(sale));
-        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.empty());;
+
+        assertThrows(InvalidRequestException.class, () -> saleService.create(saleRequestDTO));
+    }
+
+    @Test
+    @DisplayName("Should throw an error if the vehicle requested to the sale creation it doesn't available")
+    void testCreateVehicleNotAvailable() {
+        Client client = buildClient(1L);
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.SOLD);
+
+        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
+                1L, "TestVehicleChassi", "TestBrand", "TestModel"
+        );
+        SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
+        saleRequestDTO.setClient(client);
+        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setStatus(SalesStatus.SOLD);
+
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));;
+
+        assertThrows(InvalidRequestException.class, () -> saleService.create(saleRequestDTO));
+    }
+
+    @Test
+    void testUpdateVehicleChange() {
+        Client client = buildClient(1L);
+        Vehicle oldVehicle = buildVehicle(1L, VehicleStatus.SOLD);
+        Vehicle newVehicle = buildVehicle(2L, VehicleStatus.AVAILABLE);
+        Sale sale = buildSale(1L, oldVehicle, client, SalesStatus.SOLD);
+
+        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
+                2L, "TestVehicleChassi", "TestBrand", "TestModel"
+        );
+        SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
+        saleRequestDTO.setClient(client);
+        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setStatus(SalesStatus.SOLD);
+
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(newVehicle));
+        when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
+        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(newVehicle);
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
 
-        Sale updatedSale = saleService.update(saleId, saleRequestDTO);
+        Sale updatedSale = saleService.update(1L, saleRequestDTO);
 
-        assertEquals(vehicle, updatedSale.getVehicle());
+        assertEquals(newVehicle, updatedSale.getVehicle());
         assertEquals(client, updatedSale.getClient());
         assertEquals(SalesStatus.SOLD, updatedSale.getStatus());
         assertEquals(sale, updatedSale);
-        assertEquals(LocalDate.now(), updatedSale.getReserveDate());
-        assertEquals(LocalDate.now(), updatedSale.getSalesDate());
-        assertEquals(VehicleStatus.SOLD, updatedSale.getVehicle().getVehicleStatus());
+        assertEquals(VehicleStatus.AVAILABLE, oldVehicle.getVehicleStatus());
+        assertEquals(VehicleStatus.SOLD, newVehicle.getVehicleStatus());
         verify(clientRepository, times(1)).findById(client.getId());
         verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
-        verify(saleRepository, times(1)).findById(saleId);
+        verify(saleRepository, times(1)).findById(1L);
+        verify(vehicleRepository, times(2)).save(any(Vehicle.class));
+        verify(saleRepository, times(1)).save(any(Sale.class));
+    }
+
+    @ParameterizedTest
+    @DisplayName("Should update a specific sale and update the vehicle status")
+    @CsvSource({
+            "RESERVED, SOLD",
+            "RESERVED, CANCELED",
+            "SOLD, CANCELED",
+    })
+    void testUpdate(SalesStatus oldStatus, SalesStatus newStatus) {
+        Client client = buildClient(1L);
+        Vehicle vehicle = buildVehicle(1L, oldStatus.equals(SalesStatus.SOLD) ? VehicleStatus.SOLD : VehicleStatus.RESERVED);
+        Sale sale = buildSale(1L, vehicle, client, oldStatus);
+
+        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
+                1L, "TestVehicleChassi", "TestBrand", "TestModel"
+        );
+        SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
+        saleRequestDTO.setClient(client);
+        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setStatus(newStatus);
+
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));
+        when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
+        when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
+        when(saleRepository.save(any(Sale.class))).thenReturn(sale);
+
+        Sale updatedSale = saleService.update(1L, saleRequestDTO);
+
+        ArgumentCaptor<Vehicle> vehicleCaptor = ArgumentCaptor.forClass(Vehicle.class);
+        verify(vehicleRepository).save(vehicleCaptor.capture());
+        assertEquals(newStatus.equals(SalesStatus.SOLD) ? VehicleStatus.SOLD : VehicleStatus.AVAILABLE, vehicleCaptor.getValue().getVehicleStatus());
+        assertEquals(vehicle, updatedSale.getVehicle());
+        assertEquals(client, updatedSale.getClient());
+        assertEquals(newStatus, updatedSale.getStatus());
+        assertEquals(sale, updatedSale);
+        verify(clientRepository, times(1)).findById(client.getId());
+        verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
+        verify(saleRepository, times(1)).findById(1L);
         verify(vehicleRepository, times(1)).save(any(Vehicle.class));
         verify(saleRepository, times(1)).save(any(Sale.class));
+    }
+
+    @ParameterizedTest
+    @DisplayName("Should throw an error if the transition of status is invalid")
+    @CsvSource({
+            "SOLD, RESERVED",
+            "CANCELED, RESERVED",
+            "CANCELED, SOLD",
+    })
+    void testUpdateInvalidStatusTransition(SalesStatus oldStatus, SalesStatus newStatus) {
+        Client client = buildClient(1L);
+        Vehicle vehicle = buildVehicle(1L, oldStatus.equals(SalesStatus.SOLD) ? VehicleStatus.SOLD : VehicleStatus.RESERVED);
+        Sale sale = buildSale(1L, vehicle, client, oldStatus);
+
+        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
+                1L, "TestVehicleChassi", "TestBrand", "TestModel"
+        );
+        SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
+        saleRequestDTO.setClient(client);
+        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setStatus(newStatus);
+
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));
+        when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
+
+        assertThrows(InvalidRequestException.class, () -> saleService.update(1L, saleRequestDTO));
+
+        verify(clientRepository, times(1)).findById(client.getId());
+        verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
+        verify(saleRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    @DisplayName("Should throw an error if the client requested to the sale update doesn't exist")
+    void testUpdateClientNotFound() {
+        Client client = buildClient(1L);
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
+        Sale sale = buildSale(1L, vehicle, client, SalesStatus.RESERVED);
+
+        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
+                1L, "TestVehicleChassi", "TestBrand", "TestModel"
+        );
+        SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
+        saleRequestDTO.setClient(client);
+        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setStatus(SalesStatus.SOLD);
+
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.empty());
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));;
+        when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
+
+        assertThrows(InvalidRequestException.class, () -> saleService.update(1L, saleRequestDTO));
+    }
+
+    @Test
+    @DisplayName("Should throw an error if the vehicle requested to the sale update doesn't exist")
+    void testUpdateVehicleNotFound() {
+        Client client = buildClient(1L);
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
+        Sale sale = buildSale(1L, vehicle, client, SalesStatus.RESERVED);
+
+        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
+                1L, "TestVehicleChassi", "TestBrand", "TestModel"
+        );
+        SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
+        saleRequestDTO.setClient(client);
+        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setStatus(SalesStatus.SOLD);
+
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.empty());;
+        when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
+
+        assertThrows(InvalidRequestException.class, () -> saleService.update(1L, saleRequestDTO));
+    }
+
+    @Test
+    @DisplayName("Should throw an error if the sale requested to be updated doesn't exist")
+    void testUpdateSaleNotFound() {
+        Client client = buildClient(1L);
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
+
+        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
+                1L, "TestVehicleChassi", "TestBrand", "TestModel"
+        );
+        SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
+        saleRequestDTO.setClient(client);
+        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setStatus(SalesStatus.SOLD);
+
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));
+        when(saleRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(InvalidRequestException.class, () -> saleService.update(1L, saleRequestDTO));
+    }
+
+    @Test
+    @DisplayName("Should throw an error if the vehicle requested to the sale update it doesn't available")
+    void testUpdateVehicleNotAvailable() {
+        Client client = buildClient(1L);
+        Vehicle oldVehicle = buildVehicle(1L, VehicleStatus.SOLD);
+        Vehicle newVehicle = buildVehicle(2L, VehicleStatus.SOLD);
+        Sale sale = buildSale(1L, oldVehicle, client, SalesStatus.RESERVED);
+
+        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
+                2L, "TestVehicleChassi", "TestBrand", "TestModel"
+        );
+        SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
+        saleRequestDTO.setClient(client);
+        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setStatus(SalesStatus.SOLD);
+
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(newVehicle));;
+        when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
+
+        assertThrows(InvalidRequestException.class, () -> saleService.update(1L, saleRequestDTO));
     }
 
 }

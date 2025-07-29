@@ -85,7 +85,7 @@ public class MaintenanceServiceTest {
     }
 
     @Test
-    @DisplayName("Should return all maintenances registers based on a vehicleId")
+    @DisplayName("Should return all maintenances registers based on a vehicle id")
     void testFindAllByVehicleId() {
         Long vehicleId = 1L;
         Vehicle vehicle = new Vehicle();
@@ -148,6 +148,8 @@ public class MaintenanceServiceTest {
     void testCreateVehicleNotFound() {
         when(vehicleRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(InvalidRequestException.class, () -> maintenanceService.create(1L, "TestAdditionalInfo"));
+
+        verify(vehicleRepository, times(1)).findById(1L);
     }
 
     @Test
@@ -157,6 +159,8 @@ public class MaintenanceServiceTest {
 
         when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
         assertThrows(InvalidRequestException.class, () -> maintenanceService.create(1L, "TestAdditionalInfo"));
+
+        verify(vehicleRepository, times(1)).findById(1L);
     }
 
     @Test

@@ -77,6 +77,9 @@ public class SaleService {
         if (client == null) errors.put("client", "Cliente não encontrado");
         if (vehicle == null) errors.put("vehicle", "Veículo não encontrado");
         if (sale == null) errors.put("sale", "Venda não encontrada");
+        else if (!isValidStatusTransition(sale.getStatus(), saleRequestDTO.getStatus())) {
+            errors.put("saleStatus", "Transição de status inválida: " + sale.getStatus() + " -> " + saleRequestDTO.getStatus());
+        }
 
         if (vehicle != null && sale != null && !sale.getVehicle().getId().equals(vehicle.getId())) {
             if (vehicle.getVehicleStatus() != VehicleStatus.AVAILABLE) {
@@ -86,10 +89,6 @@ public class SaleService {
                 currentVehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
                 vehicleRepository.save(currentVehicle);
             }
-        }
-
-        if (!isValidStatusTransition(sale.getStatus(), saleRequestDTO.getStatus())) {
-            errors.put("saleStatus", "Transição de status inválida: " + sale.getStatus() + " -> " + saleRequestDTO.getStatus());
         }
 
         if (!errors.isEmpty()) throw new InvalidRequestException(errors);
