@@ -4,6 +4,7 @@ import com.matheus.VehicleManager.enums.UserRole;
 import com.matheus.VehicleManager.model.User;
 import com.matheus.VehicleManager.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -30,6 +31,7 @@ public class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("Should create a new user")
     void TestCreateUser() {
         String password = "TestPassword";
         String encodedPassword = "EncodedPassword";

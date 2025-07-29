@@ -11,6 +11,7 @@ import com.matheus.VehicleManager.enums.VehicleType;
 import com.matheus.VehicleManager.model.Vehicle;
 import com.matheus.VehicleManager.repository.VehicleRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -40,48 +41,54 @@ class VehicleServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void testFindByChassi() {
-        String chassi = "TestChassi123";
+    private Vehicle buildVehicle(Long id, VehicleStatus status) {
         Vehicle vehicle = new Vehicle();
-        vehicle.setChassi(chassi);
-
-        when(vehicleRepository.findByChassi(chassi)).thenReturn(vehicle);
-
-        Vehicle foundVehicle = vehicleService.findByChassi(chassi);
-
-        assertEquals(chassi, foundVehicle.getChassi());
-        verify(vehicleRepository, times(1)).findByChassi(chassi);
+        vehicle.setId(id);
+        vehicle.setChassi("TestChassi123");
+        vehicle.setBrand("TestBrand");
+        vehicle.setModel("TestModel");
+        vehicle.setVehicleStatus(status);
+        vehicle.setVehicleType(VehicleType.CAR);
+        vehicle.setYear(1999);
+        vehicle.setColor("Test Color");
+        vehicle.setMileage(new BigDecimal("9999.99"));
+        vehicle.setPrice(new BigDecimal("99999.99"));
+        vehicle.setVehicleFuel(VehicleFuel.HYBRID);
+        vehicle.setDoors(2);
+        return vehicle;
     }
 
     @Test
+    @DisplayName("Should return a specific vehicle based on the chassi value")
+    void testFindByChassi() {
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
+
+        when(vehicleRepository.findByChassi(anyString())).thenReturn(vehicle);
+        Vehicle foundVehicle = vehicleService.findByChassi("TestChassi123");
+
+        assertEquals("TestChassi123", foundVehicle.getChassi());
+        verify(vehicleRepository, times(1)).findByChassi(anyString());
+    }
+
+    @Test
+    @DisplayName("Should return a specific vehicle with the images")
     void testGetVehicleWithImagesById() {
-        Long vehicleId = 1L;
-        Vehicle vehicle = new Vehicle();
-        vehicle.setId(vehicleId);
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
         vehicle.setImages(new ArrayList<>());
 
-        when(vehicleRepository.getReferenceById(vehicleId)).thenReturn(vehicle);
+        when(vehicleRepository.getReferenceById(1L)).thenReturn(vehicle);
+        VehicleImagesResponseDTO foundVehicle = vehicleService.getVehicleWithImagesById(1L);
 
-        VehicleImagesResponseDTO foundVehicle = vehicleService.getVehicleWithImagesById(vehicleId);
-
-        assertEquals(vehicleId, foundVehicle.id());
+        assertEquals(1L, foundVehicle.id());
         assertEquals(new ArrayList<>(), foundVehicle.images());
-        verify(vehicleRepository, times(1)).getReferenceById(vehicleId);
+        verify(vehicleRepository, times(1)).getReferenceById(1L);
     }
 
     @Test
+    @DisplayName("Should return all vehicles with pagination")
     void testGetFilteredVehicles() {
-        Vehicle vehicle1 = new Vehicle();
-        vehicle1.setModel("Ford");
-        vehicle1.setBrand("Maverick");
-        vehicle1.setChassi("TestChassi456");
-
-        Vehicle vehicle2 = new Vehicle();
-        vehicle2.setModel("Ford");
-        vehicle2.setBrand("Mustang");
-        vehicle2.setChassi("TestChassi123");
-
+        Vehicle vehicle1 = buildVehicle(1L, VehicleStatus.AVAILABLE);
+        Vehicle vehicle2 = buildVehicle(2L, VehicleStatus.AVAILABLE);
         List<Vehicle> searchedVehicles = new ArrayList<>();
         searchedVehicles.add(vehicle1);
         searchedVehicles.add(vehicle2);
@@ -101,12 +108,8 @@ class VehicleServiceTest {
         Page<Vehicle> foundVehicles = vehicleService.getFilteredVehicles("", null, null, null, 0, 0, paging);
 
         assertEquals(2, foundVehicles.getContent().size());
-        assertEquals("Ford", foundVehicles.getContent().get(0).getModel());
-        assertEquals("Maverick", foundVehicles.getContent().get(0).getBrand());
-        assertEquals("TestChassi456", foundVehicles.getContent().get(0).getChassi());
-        assertEquals("Ford", foundVehicles.getContent().get(1).getModel());
-        assertEquals("Mustang", foundVehicles.getContent().get(1).getBrand());
-        assertEquals("TestChassi123", foundVehicles.getContent().get(1).getChassi());
+        assertEquals(vehicle1, foundVehicles.getContent().get(0));
+        assertEquals(vehicle2, foundVehicles.getContent().get(1));
         verify(vehicleRepository, times(1)).searchVehicles(
             anyString(),
             any(),
@@ -119,6 +122,7 @@ class VehicleServiceTest {
     }
 
     @Test
+    @DisplayName("Should return all vehicles with pagination and one image by register")
     void tetFilteredVehiclesWithOneImage() {
         VehicleImageResponseDTO vehicle1 = new VehicleImageResponseDTO(
             1L, VehicleType.CAR, VehicleStatus.AVAILABLE, "Ford", "Maverick", 2000, "Red",
@@ -199,36 +203,25 @@ class VehicleServiceTest {
     }
 
     @Test
+    @DisplayName("Should return all available vehicles")
     void testSearchAvailableVehicles() {
-        Vehicle vehicle1 = new Vehicle();
-        vehicle1.setModel("Ford");
-        vehicle1.setBrand("Maverick");
-        vehicle1.setChassi("TestChassi456");
-
-        Vehicle vehicle2 = new Vehicle();
-        vehicle2.setModel("Ford");
-        vehicle2.setBrand("Mustang");
-        vehicle2.setChassi("TestChassi123");
-
+        Vehicle vehicle1 = buildVehicle(1L, VehicleStatus.AVAILABLE);
+        Vehicle vehicle2 = buildVehicle(2L, VehicleStatus.AVAILABLE);
         List<Vehicle> searchedVehicles = new ArrayList<>();
         searchedVehicles.add(vehicle1);
         searchedVehicles.add(vehicle2);
         when(vehicleRepository.searchAvailableVehicles("Ford")).thenReturn(searchedVehicles);
 
-
         List<Vehicle> foundVehicles = vehicleService.searchAvailableVehicles("Ford");
 
         assertEquals(2, foundVehicles.size());
-        assertEquals("Ford", foundVehicles.get(0).getModel());
-        assertEquals("Maverick", foundVehicles.get(0).getBrand());
-        assertEquals("TestChassi456", foundVehicles.get(0).getChassi());
-        assertEquals("Ford", foundVehicles.get(1).getModel());
-        assertEquals("Mustang", foundVehicles.get(1).getBrand());
-        assertEquals("TestChassi123", foundVehicles.get(1).getChassi());
+        assertEquals(vehicle1, foundVehicles.get(0));
+        assertEquals(vehicle2, foundVehicles.get(1));
         verify(vehicleRepository, times(1)).searchAvailableVehicles("Ford");
     }
 
     @Test
+    @DisplayName("Should create a new vehicle")
     void testCreate() {
         VehicleRequestDTO dto = new VehicleRequestDTO();
         dto.setVehicleType(VehicleType.CAR);
@@ -242,44 +235,18 @@ class VehicleServiceTest {
         dto.setVehicleFuel(VehicleFuel.HYBRID);
         dto.setDoors(2);
 
-        Vehicle vehicle = new Vehicle();
-        vehicle.setVehicleType(VehicleType.CAR);
-        vehicle.setModel("Test Model");
-        vehicle.setBrand("Test Brand");
-        vehicle.setYear(1999);
-        vehicle.setColor("Test Color");
-        vehicle.setMileage(new BigDecimal("9999.99"));
-        vehicle.setChassi("TestChassi123");
-        vehicle.setPrice(new BigDecimal("99999.99"));
-        vehicle.setVehicleFuel(VehicleFuel.HYBRID);
-        vehicle.setDoors(2);
-        vehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
 
         when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
-
         Vehicle createdVehicle = vehicleService.create(dto);
 
-        assertEquals(VehicleType.CAR, createdVehicle.getVehicleType());
-        assertEquals("Test Model", createdVehicle.getModel());
-        assertEquals("Test Brand", createdVehicle.getBrand());
-        assertEquals(1999, createdVehicle.getYear());
-        assertEquals("Test Color", createdVehicle.getColor());
-        assertEquals(null, createdVehicle.getPlate());
-        assertEquals(new BigDecimal("9999.99"), createdVehicle.getMileage());
-        assertEquals("TestChassi123", createdVehicle.getChassi());
-        assertEquals(new BigDecimal("99999.99"), createdVehicle.getPrice());
-        assertEquals(VehicleFuel.HYBRID, createdVehicle.getVehicleFuel());
-        assertEquals(null, createdVehicle.getVehicleChange());
-        assertEquals(2, createdVehicle.getDoors());
-        assertEquals(null, createdVehicle.getMotor());
-        assertEquals(null, createdVehicle.getPower());
-        assertEquals(VehicleStatus.AVAILABLE, createdVehicle.getVehicleStatus());
+        assertEquals(vehicle, createdVehicle);
         verify(vehicleRepository, times(1)).save(any(Vehicle.class));
     }
 
     @Test
+    @DisplayName("Should update a specific vehicle")
     void testUpdate() {
-        Long vehicleId = 1L;
         VehicleRequestDTO dto = new VehicleRequestDTO();
         dto.setVehicleType(VehicleType.MOTORCYCLE);
         dto.setModel("Updated Model");
@@ -292,50 +259,23 @@ class VehicleServiceTest {
         dto.setVehicleFuel(VehicleFuel.GASOLINE);
         dto.setDoors(0);
 
-        Vehicle existingVehicle = new Vehicle();
-        existingVehicle.setId(vehicleId);
-        existingVehicle.setVehicleType(VehicleType.CAR);
-        existingVehicle.setModel("Original Model");
-        existingVehicle.setBrand("Original Brand");
-        existingVehicle.setYear(1999);
-        existingVehicle.setColor("Original Color");
-        existingVehicle.setMileage(new BigDecimal("9999.99"));
-        existingVehicle.setChassi("OriginalChassi123");
-        existingVehicle.setPrice(new BigDecimal("99999.99"));
-        existingVehicle.setVehicleFuel(VehicleFuel.HYBRID);
-        existingVehicle.setDoors(2);
-        existingVehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
 
-        when(vehicleRepository.getReferenceById(vehicleId)).thenReturn(existingVehicle);
+        when(vehicleRepository.getReferenceById(1L)).thenReturn(vehicle);
         when(vehicleRepository.save(any(Vehicle.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        Vehicle updatedVehicle = vehicleService.update(1L, dto);
 
-        Vehicle updatedVehicle = vehicleService.update(vehicleId, dto);
-
-        assertEquals(VehicleType.MOTORCYCLE, updatedVehicle.getVehicleType());
-        assertEquals("Updated Model", updatedVehicle.getModel());
-        assertEquals("Updated Brand", updatedVehicle.getBrand());
-        assertEquals(2000, updatedVehicle.getYear());
-        assertEquals("Updated Color", updatedVehicle.getColor());
-        assertEquals(null, updatedVehicle.getPlate());
-        assertEquals(new BigDecimal("10000.00"), updatedVehicle.getMileage());
-        assertEquals("UpdatedChassi123", updatedVehicle.getChassi());
-        assertEquals(new BigDecimal("100000.00"), updatedVehicle.getPrice());
-        assertEquals(VehicleFuel.GASOLINE, updatedVehicle.getVehicleFuel());
-        assertEquals(null, updatedVehicle.getVehicleChange());
-        assertEquals(0, updatedVehicle.getDoors());
-        assertEquals(null, updatedVehicle.getMotor());
-        assertEquals(null, updatedVehicle.getPower());
-        assertEquals(VehicleStatus.AVAILABLE, updatedVehicle.getVehicleStatus());
-        verify(vehicleRepository, times(1)).getReferenceById(vehicleId);
+        assertEquals(vehicle, updatedVehicle);
+        verify(vehicleRepository, times(1)).getReferenceById(1L);
         verify(vehicleRepository, times(1)).save(any(Vehicle.class));
     }
 
     @Test
+    @DisplayName("Should delete a specific vehicle")
     void testDelete() {
-        Long vehicleId = 1L;
-        doNothing().when(vehicleRepository).deleteById(vehicleId);
-        vehicleService.delete(vehicleId);
-        verify(vehicleRepository, times(1)).deleteById(vehicleId);
+        doNothing().when(vehicleRepository).deleteById(1L);
+        vehicleService.delete(1L);
+        verify(vehicleRepository, times(1)).deleteById(1L);
     }
 
 }
