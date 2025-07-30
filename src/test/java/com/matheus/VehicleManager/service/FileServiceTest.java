@@ -5,6 +5,7 @@ import com.matheus.VehicleManager.model.Vehicle;
 import com.matheus.VehicleManager.repository.FileRepository;
 import com.matheus.VehicleManager.repository.VehicleRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -39,6 +40,7 @@ class FileServiceTest {
     }
 
     @Test
+    @DisplayName("Should return all files")
     void testGetAll() {
         List<FileStore> fileStores = new ArrayList<>();
         fileStores.add(new FileStore());
@@ -51,6 +53,7 @@ class FileServiceTest {
     }
 
     @Test
+    @DisplayName("Should return a specific file")
     void testGetById() {
         FileStore fileStore = new FileStore();
         fileStore.setId(1L);
@@ -63,6 +66,7 @@ class FileServiceTest {
     }
 
     @Test
+    @DisplayName("Should save all files")
     void testSave() throws IOException {
         Vehicle vehicle = new Vehicle();
         vehicle.setId(1L);
@@ -79,6 +83,7 @@ class FileServiceTest {
     }
 
     @Test
+    @DisplayName("Should throw an erro if vehicle not found")
     void testSaveVehicleNotFound() {
         when(vehicleRepository.findById(1L)).thenReturn(Optional.empty());
         MultipartFile file = mock(MultipartFile.class);
@@ -89,6 +94,7 @@ class FileServiceTest {
     }
 
     @Test
+    @DisplayName("Should save all files send and delete if ordered")
     void testUpdate() throws IOException {
         Vehicle vehicle = new Vehicle();
         vehicle.setId(1L);

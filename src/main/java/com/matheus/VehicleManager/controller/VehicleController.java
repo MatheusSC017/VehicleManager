@@ -105,9 +105,18 @@ public class VehicleController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<VehicleImagesResponseDTO> get(@PathVariable(value="id") Long vehicleId) {
-        VehicleImagesResponseDTO vehicle = vehicleService.getVehicleWithImagesById(vehicleId);
-        return ResponseEntity.ok(vehicle);
+    public ResponseEntity<?> get(@PathVariable(value="id") Long vehicleId) {
+        try {
+            VehicleImagesResponseDTO vehicle = vehicleService.getVehicleWithImagesById(vehicleId);
+            return ResponseEntity.ok(vehicle);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", e.getMessage());
+            response.put("errors", errors);
+            response.put("content", "");
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @PostMapping
