@@ -81,7 +81,6 @@ public class ClientController {
         return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(client));
     }
 
-
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable("id") Long clientId, @Valid @RequestBody Client client, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
