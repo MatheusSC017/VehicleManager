@@ -13,7 +13,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,9 +47,7 @@ public class ClientServiceTest {
     void testFindAll() {
         Client client1 = buildClient(1L);
         Client client2 = buildClient(2L);
-        List<Client> searchedClients = new ArrayList<>();
-        searchedClients.add(client1);
-        searchedClients.add(client2);
+        List<Client> searchedClients = List.of(client1, client2);
 
         Pageable paging = PageRequest.of(0, 20);
         Page<Client> clientPage = new PageImpl<>(searchedClients, paging, searchedClients.size());
@@ -69,9 +66,7 @@ public class ClientServiceTest {
     void testSearch() {
         Client client1 = buildClient(1L);
         Client client2 = buildClient(2L);
-        List<Client> searchedClients = new ArrayList<>();
-        searchedClients.add(client1);
-        searchedClients.add(client2);
+        List<Client> searchedClients = List.of(client1, client2);
 
         when(clientRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrPhoneContaining("Test", "Test", "Test"))
                 .thenReturn(searchedClients);

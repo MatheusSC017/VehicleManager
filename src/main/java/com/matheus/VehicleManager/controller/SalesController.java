@@ -109,7 +109,7 @@ public class SalesController {
 
         try {
             Sale sale = saleService.update(saleId, saleRequestDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(sale));
+            return ResponseEntity.status(HttpStatus.OK).body(toDTO(sale));
         } catch (InvalidRequestException e) {
             Map<String, Object> response = new HashMap<>();
             response.put("errors", e.getFieldErrors());

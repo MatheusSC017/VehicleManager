@@ -88,9 +88,7 @@ public class SaleServiceTest {
     void testFindAll() {
         Sale sale1 = buildSale(1L, new Vehicle(), new Client(), SalesStatus.RESERVED);
         Sale sale2 = buildSale(2L, new Vehicle(), new Client(), SalesStatus.SOLD);
-        List<Sale> sales = new ArrayList<>();
-        sales.add(sale1);
-        sales.add(sale2);
+        List<Sale> sales = List.of(sale1, sale2);
 
         Pageable paging = PageRequest.of(0, 20);
         Page<Sale> salesPage = new PageImpl<>(sales, paging, sales.size());
@@ -110,9 +108,7 @@ public class SaleServiceTest {
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.SOLD);
         Sale sale1 = buildSale(1L, vehicle, new Client(), SalesStatus.CANCELED);
         Sale sale2 = buildSale(2L, vehicle, new Client(), SalesStatus.SOLD);
-        List<Sale> sales = new ArrayList<>();
-        sales.add(sale1);
-        sales.add(sale2);
+        List<Sale> sales = List.of(sale1, sale2);
 
         when(saleRepository.findByVehicleIdOrderByIdDesc(1L)).thenReturn(sales);
         List<Sale> foundSales = saleService.findAllByVehicleId(1L);

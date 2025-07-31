@@ -28,7 +28,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -92,10 +91,7 @@ public class FinancingServiceTest {
     void testGetAll() {
         Financing financing1 = buildFinancing(1L, new Vehicle(), new Client(), FinancingStatus.DRAFT);
         Financing financing2 = buildFinancing(2L, new Vehicle(), new Client(), FinancingStatus.ACTIVE);
-
-        List<Financing> financings = new ArrayList<>();
-        financings.add(financing1);
-        financings.add(financing2);
+        List<Financing> financings = List.of(financing1, financing2);
 
         Pageable paging = PageRequest.of(0, 20);
         Page<Financing> financingsPage = new PageImpl<>(financings, paging, financings.size());

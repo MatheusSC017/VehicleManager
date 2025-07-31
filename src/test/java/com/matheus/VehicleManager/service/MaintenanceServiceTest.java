@@ -67,10 +67,7 @@ public class MaintenanceServiceTest {
     void testFindAll() {
         Maintenance maintenance1 = buildMaintenance(1L, new Vehicle());
         Maintenance maintenance2 = buildMaintenance(2L, new Vehicle());
-
-        List<Maintenance> maintenances = new ArrayList<>();
-        maintenances.add(maintenance1);
-        maintenances.add(maintenance2);
+        List<Maintenance> maintenances = List.of(maintenance1, maintenance2);
 
         Pageable paging = PageRequest.of(0, 20);
         Page<Maintenance> maintenancesPage = new PageImpl<>(maintenances, paging, maintenances.size());
@@ -93,10 +90,7 @@ public class MaintenanceServiceTest {
 
         Maintenance maintenance1 = buildMaintenance(1L, vehicle);
         Maintenance maintenance2 = buildMaintenance(2L, vehicle);
-
-        List<Maintenance> maintenances = new ArrayList<>();
-        maintenances.add(maintenance1);
-        maintenances.add(maintenance2);
+        List<Maintenance> maintenances = List.of(maintenance1, maintenance2);
 
         when(maintenanceRepository.findByVehicleIdOrderByIdDesc(vehicleId)).thenReturn(maintenances);
 

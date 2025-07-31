@@ -62,7 +62,7 @@ class ClientControllerTest {
 
     @Test
     @DisplayName("Should return all clients with pagination")
-    void testGetAllClients() throws Exception {
+    void testGetAll() throws Exception {
         Client client = buildClient(1L);
         when(clientService.findAll(0, 10))
                 .thenReturn(new PageImpl<>(List.of(client), PageRequest.of(0, 10), 1));
@@ -78,7 +78,7 @@ class ClientControllerTest {
 
     @Test
     @DisplayName("Should return all clients based on a search")
-    void testSearchClients() throws Exception {
+    void testSearch() throws Exception {
         Client client = buildClient(1L);
         when(clientService.search("TestFirstName")).thenReturn(List.of(client));
 

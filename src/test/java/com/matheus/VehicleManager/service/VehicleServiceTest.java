@@ -99,9 +99,7 @@ class VehicleServiceTest {
     void testGetFilteredVehicles() {
         Vehicle vehicle1 = buildVehicle(1L, VehicleStatus.AVAILABLE);
         Vehicle vehicle2 = buildVehicle(2L, VehicleStatus.AVAILABLE);
-        List<Vehicle> searchedVehicles = new ArrayList<>();
-        searchedVehicles.add(vehicle1);
-        searchedVehicles.add(vehicle2);
+        List<Vehicle> searchedVehicles = List.of(vehicle1, vehicle2);
 
         Pageable paging = PageRequest.of(0, 20);
         Page<Vehicle> vehiclePage = new PageImpl<>(searchedVehicles, paging, searchedVehicles.size());
@@ -135,8 +133,8 @@ class VehicleServiceTest {
     @DisplayName("Should return filtered vehicles by status")
     void testGetFilteredVehiclesByStatus() {
         Vehicle vehicle1 = buildVehicle(1L, VehicleStatus.AVAILABLE);
-        List<Vehicle> searchedVehicles = new ArrayList<>();
-        searchedVehicles.add(vehicle1);
+        Vehicle vehicle2 = buildVehicle(2L, VehicleStatus.SOLD);
+        List<Vehicle> searchedVehicles = List.of(vehicle1, vehicle2);
 
         Pageable paging = PageRequest.of(0, 20);
         Page<Vehicle> vehiclePage = new PageImpl<>(searchedVehicles, paging, searchedVehicles.size());
@@ -153,7 +151,7 @@ class VehicleServiceTest {
 
         Page<Vehicle> foundVehicles = vehicleService.getFilteredVehicles("", "AVAILABLE", null, null, 0, 0, paging);
 
-        assertEquals(1, foundVehicles.getContent().size());
+        assertEquals(2, foundVehicles.getContent().size());
         assertEquals(VehicleStatus.AVAILABLE, foundVehicles.getContent().get(0).getVehicleStatus());
     }
 
@@ -172,9 +170,7 @@ class VehicleServiceTest {
             VehicleChange.AUTOMATED, 3, "1.5", "150cv", "TestMustangUrlImage"
         );
 
-        List<VehicleImageResponseDTO> searchedVehicles = new ArrayList<>();
-        searchedVehicles.add(vehicle1);
-        searchedVehicles.add(vehicle2);
+        List<VehicleImageResponseDTO> searchedVehicles = List.of(vehicle1, vehicle2);
 
         Pageable paging = PageRequest.of(0, 20);
         Page<VehicleImageResponseDTO> vehiclePage = new PageImpl<>(searchedVehicles, paging, searchedVehicles.size());
@@ -243,9 +239,7 @@ class VehicleServiceTest {
     void testSearchAvailableVehicles() {
         Vehicle vehicle1 = buildVehicle(1L, VehicleStatus.AVAILABLE);
         Vehicle vehicle2 = buildVehicle(2L, VehicleStatus.AVAILABLE);
-        List<Vehicle> searchedVehicles = new ArrayList<>();
-        searchedVehicles.add(vehicle1);
-        searchedVehicles.add(vehicle2);
+        List<Vehicle> searchedVehicles = List.of(vehicle1, vehicle2);
         when(vehicleRepository.searchAvailableVehicles("Ford")).thenReturn(searchedVehicles);
 
         List<Vehicle> foundVehicles = vehicleService.searchAvailableVehicles("Ford");
