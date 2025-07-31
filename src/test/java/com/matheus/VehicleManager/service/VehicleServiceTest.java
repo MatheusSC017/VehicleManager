@@ -66,7 +66,7 @@ class VehicleServiceTest {
     void testFindByChassi() {
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
 
-        when(vehicleRepository.findByChassi(anyString())).thenReturn(vehicle);
+        when(vehicleRepository.findByChassi("TestChassi123")).thenReturn(vehicle);
         Vehicle foundVehicle = vehicleService.findByChassi("TestChassi123");
 
         assertEquals("TestChassi123", foundVehicle.getChassi());
@@ -159,7 +159,7 @@ class VehicleServiceTest {
 
     @Test
     @DisplayName("Should return all vehicles with pagination and one image by register")
-    void tetFilteredVehiclesWithOneImage() {
+    void testGetFilteredVehiclesWithOneImage() {
         VehicleImageResponseDTO vehicle1 = new VehicleImageResponseDTO(
             1L, VehicleType.CAR, VehicleStatus.AVAILABLE, "Ford", "Maverick", 2000, "Red",
             "ABC1234", "TestChassi456", new BigDecimal(0), new BigDecimal(15000), VehicleFuel.GASOLINE,
@@ -259,22 +259,22 @@ class VehicleServiceTest {
     @Test
     @DisplayName("Should create a new vehicle")
     void testCreate() {
-        VehicleRequestDTO dto = new VehicleRequestDTO();
-        dto.setVehicleType(VehicleType.CAR);
-        dto.setModel("Test Model");
-        dto.setBrand("Test Brand");
-        dto.setYear(1999);
-        dto.setColor("Test Color");
-        dto.setMileage(new BigDecimal("9999.99"));
-        dto.setChassi("TestChassi123");
-        dto.setPrice(new BigDecimal("99999.99"));
-        dto.setVehicleFuel(VehicleFuel.HYBRID);
-        dto.setDoors(2);
+        VehicleRequestDTO vehicleRequestDTO = new VehicleRequestDTO();
+        vehicleRequestDTO.setVehicleType(VehicleType.CAR);
+        vehicleRequestDTO.setModel("Test Model");
+        vehicleRequestDTO.setBrand("Test Brand");
+        vehicleRequestDTO.setYear(1999);
+        vehicleRequestDTO.setColor("Test Color");
+        vehicleRequestDTO.setMileage(new BigDecimal("9999.99"));
+        vehicleRequestDTO.setChassi("TestChassi123");
+        vehicleRequestDTO.setPrice(new BigDecimal("99999.99"));
+        vehicleRequestDTO.setVehicleFuel(VehicleFuel.HYBRID);
+        vehicleRequestDTO.setDoors(2);
 
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
 
         when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
-        Vehicle createdVehicle = vehicleService.create(dto);
+        Vehicle createdVehicle = vehicleService.create(vehicleRequestDTO);
 
         assertEquals(vehicle, createdVehicle);
         verify(vehicleRepository, times(1)).save(any(Vehicle.class));
@@ -283,28 +283,28 @@ class VehicleServiceTest {
     @Test
     @DisplayName("Should update a specific vehicle")
     void testUpdate() {
-        VehicleRequestDTO dto = new VehicleRequestDTO();
-        dto.setModel("Updated Model");
-        dto.setBrand("Updated Brand");
-        dto.setYear(2024);
-        dto.setColor("Blue");
-        dto.setPlate("NEW123");
-        dto.setChassi("NEWCHASSI");
-        dto.setMileage(new BigDecimal("100.0"));
-        dto.setPrice(new BigDecimal("50000.0"));
-        dto.setVehicleType(VehicleType.CAR);
-        dto.setVehicleFuel(VehicleFuel.ELECTRIC);
-        dto.setVehicleChange(VehicleChange.AUTOMATIC);
-        dto.setDoors(4);
-        dto.setMotor("Electric Motor");
-        dto.setPower("300hp");
+        VehicleRequestDTO vehicleRequestDTO = new VehicleRequestDTO();
+        vehicleRequestDTO.setModel("Updated Model");
+        vehicleRequestDTO.setBrand("Updated Brand");
+        vehicleRequestDTO.setYear(2024);
+        vehicleRequestDTO.setColor("Blue");
+        vehicleRequestDTO.setPlate("NEW123");
+        vehicleRequestDTO.setChassi("NEWCHASSI");
+        vehicleRequestDTO.setMileage(new BigDecimal("100.0"));
+        vehicleRequestDTO.setPrice(new BigDecimal("50000.0"));
+        vehicleRequestDTO.setVehicleType(VehicleType.CAR);
+        vehicleRequestDTO.setVehicleFuel(VehicleFuel.ELECTRIC);
+        vehicleRequestDTO.setVehicleChange(VehicleChange.AUTOMATIC);
+        vehicleRequestDTO.setDoors(4);
+        vehicleRequestDTO.setMotor("Electric Motor");
+        vehicleRequestDTO.setPower("300hp");
 
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
 
         when(vehicleRepository.getReferenceById(1L)).thenReturn(vehicle);
         when(vehicleRepository.save(any(Vehicle.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Vehicle updatedVehicle = vehicleService.update(1L, dto);
+        Vehicle updatedVehicle = vehicleService.update(1L, vehicleRequestDTO);
 
         assertEquals("Updated Model", updatedVehicle.getModel());
         assertEquals("Updated Brand", updatedVehicle.getBrand());
