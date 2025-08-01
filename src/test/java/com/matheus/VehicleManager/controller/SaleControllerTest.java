@@ -3,7 +3,6 @@ package com.matheus.VehicleManager.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.matheus.VehicleManager.dto.SaleRequestDTO;
 import com.matheus.VehicleManager.dto.VehicleMinimalDTO;
-import com.matheus.VehicleManager.dto.VehicleRequestDTO;
 import com.matheus.VehicleManager.enums.SalesStatus;
 import com.matheus.VehicleManager.enums.VehicleFuel;
 import com.matheus.VehicleManager.enums.VehicleStatus;

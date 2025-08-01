@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/maintenance")
+@RequestMapping("/api/maintenances")
 public class MaintenanceController {
 
     @Autowired
@@ -65,7 +65,7 @@ public class MaintenanceController {
     public ResponseEntity<?> insert(@RequestBody MaintenanceRequestDTO maintenanceRequestDTO) {
         try {
             Maintenance maintenance = maintenanceService.create(maintenanceRequestDTO.getVehicleId(), maintenanceRequestDTO.getAdditionalInfo());
-            return ResponseEntity.status(HttpStatus.OK).body(toDTO(maintenance));
+            return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(maintenance));
         } catch (InvalidRequestException e) {
             Map<String, Object> response = new HashMap<>();
             response.put("errors", e.getFieldErrors());
