@@ -25,12 +25,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -98,9 +96,9 @@ public class MaintenanceControllerTest {
                         .param("size", "10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].id").value(1L))
                 .andExpect(jsonPath("$.content[0].additionalInfo").value("TestAdditionalInfo"))
-                .andExpect(jsonPath("$.content[1].id").value(2))
+                .andExpect(jsonPath("$.content[1].id").value(2L))
                 .andExpect(jsonPath("$.content[1].additionalInfo").value("TestAdditionalInfo"));
     }
 
@@ -116,11 +114,11 @@ public class MaintenanceControllerTest {
         mockMvc.perform(get("/api/maintenances/vehicle/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1))
-                .andExpect(jsonPath("$[0].vehicle.id").value(1))
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].vehicle.id").value(1L))
                 .andExpect(jsonPath("$[0].additionalInfo").value("TestAdditionalInfo"))
-                .andExpect(jsonPath("$[1].id").value(2))
-                .andExpect(jsonPath("$[1].vehicle.id").value(1))
+                .andExpect(jsonPath("$[1].id").value(2L))
+                .andExpect(jsonPath("$[1].vehicle.id").value(1L))
                 .andExpect(jsonPath("$[1].additionalInfo").value("TestAdditionalInfo"));
     }
 
@@ -132,7 +130,7 @@ public class MaintenanceControllerTest {
 
         mockMvc.perform(get("/api/maintenances/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.additionalInfo").value("TestAdditionalInfo"));
     }
 
@@ -173,7 +171,7 @@ public class MaintenanceControllerTest {
     }
 
     @Test
-    @DisplayName("Should update a specific maintenance adding end date")
+    @DisplayName("Should update a specific maintenance")
     void testDeleteSuccess() throws Exception {
         doNothing().when(maintenanceService).delete(1L);
 
