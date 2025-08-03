@@ -45,13 +45,12 @@ public class AuthController {
             final String token = jwtUtil.generateToken(request.getUsername());
             return ResponseEntity.ok(new AuthResponseDTO(token));
         } else {
-            throw new RuntimeException("Invalid credentials");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid credentials");
         }
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult bindingResult) {
-
         if (bindingResult.hasErrors()) {
             Map<String, Object> response = new HashMap<>();
             user.setPassword("");
@@ -68,7 +67,7 @@ public class AuthController {
 
         authService.createUser(user);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/refresh")
