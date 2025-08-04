@@ -2,12 +2,15 @@ package com.matheus.VehicleManager.controller;
 
 import com.matheus.VehicleManager.dto.FileResponseDTO;
 import com.matheus.VehicleManager.model.FileStore;
+import com.matheus.VehicleManager.security.JwtAuthenticationFilter;
+import com.matheus.VehicleManager.security.JwtUtil;
 import com.matheus.VehicleManager.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import java.io.IOException;
 import java.util.List;
