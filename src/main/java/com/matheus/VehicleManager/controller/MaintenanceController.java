@@ -5,6 +5,7 @@ import com.matheus.VehicleManager.dto.MaintenanceResponseDTO;
 import com.matheus.VehicleManager.dto.VehicleMinimalDTO;
 import com.matheus.VehicleManager.exception.InvalidRequestException;
 import com.matheus.VehicleManager.model.Maintenance;
+import com.matheus.VehicleManager.model.Sale;
 import com.matheus.VehicleManager.service.MaintenanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -56,9 +57,18 @@ public class MaintenanceController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MaintenanceResponseDTO> get(@PathVariable("id") Long saleId) {
-        Maintenance maintenance = maintenanceService.findById(saleId);
-        return ResponseEntity.ok(toDTO(maintenance));
+    public ResponseEntity<?> get(@PathVariable("id") Long saleId) {
+        try {
+            Maintenance maintenance = maintenanceService.findById(saleId);
+            return ResponseEntity.ok(toDTO(maintenance));
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", e.getMessage());
+            response.put("errors", errors);
+            response.put("content", "");
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @PostMapping

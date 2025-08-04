@@ -6,6 +6,7 @@ import com.matheus.VehicleManager.dto.FinancingStatusRequestDTO;
 import com.matheus.VehicleManager.dto.VehicleMinimalDTO;
 import com.matheus.VehicleManager.exception.InvalidRequestException;
 import com.matheus.VehicleManager.model.Financing;
+import com.matheus.VehicleManager.model.Maintenance;
 import com.matheus.VehicleManager.service.FinancingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,15 +59,33 @@ public class FinancingController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FinancingResponseDTO> get(@PathVariable("id") Long financingId) {
-        Financing financing = financingService.getById(financingId);
-        return ResponseEntity.ok(toDTO(financing));
+    public ResponseEntity<?> get(@PathVariable("id") Long financingId) {
+        try {
+            Financing financing = financingService.getById(financingId);
+            return ResponseEntity.ok(toDTO(financing));
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", e.getMessage());
+            response.put("errors", errors);
+            response.put("content", "");
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @GetMapping("/vehicle/{vehicleId}")
-    public ResponseEntity<FinancingResponseDTO> getByVehicleIdNotCanceled(@PathVariable("vehicleId") Long vehicleId) {
-        Optional<Financing> financing = financingService.getByVehicleIdNotCanceled(vehicleId);
-        return financing.map(value -> ResponseEntity.ok(toDTO(value))).orElseGet(() -> ResponseEntity.noContent().build());
+    public ResponseEntity<?> getByVehicleIdNotCanceled(@PathVariable("vehicleId") Long vehicleId) {
+        try {
+            Optional<Financing> financing = financingService.getByVehicleIdNotCanceled(vehicleId);
+            return financing.map(value -> ResponseEntity.ok(toDTO(value))).orElseGet(() -> ResponseEntity.noContent().build());
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", e.getMessage());
+            response.put("errors", errors);
+            response.put("content", "");
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @PostMapping

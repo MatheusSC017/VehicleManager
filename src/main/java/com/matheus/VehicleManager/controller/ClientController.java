@@ -2,6 +2,7 @@ package com.matheus.VehicleManager.controller;
 
 import com.matheus.VehicleManager.dto.ClientResponseDTO;
 import com.matheus.VehicleManager.model.Client;
+import com.matheus.VehicleManager.model.Financing;
 import com.matheus.VehicleManager.service.ClientService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/clients")
@@ -50,15 +52,33 @@ public class ClientController {
     }
 
     @GetMapping("/email/{email}")
-    public ResponseEntity<ClientResponseDTO> getByEmail(@PathVariable("email") String email) {
-        Client client = clientService.findByEmail(email);
-        return ResponseEntity.ok(toDTO(client));
+    public ResponseEntity<?> getByEmail(@PathVariable("email") String email) {
+        try {
+            Client client = clientService.findByEmail(email);
+            return ResponseEntity.ok(toDTO(client));
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", e.getMessage());
+            response.put("errors", errors);
+            response.put("content", "");
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ClientResponseDTO> get(@PathVariable("id") Long clientId) {
-        Client client = clientService.getById(clientId);
-        return ResponseEntity.ok(toDTO(client));
+    public ResponseEntity<?> get(@PathVariable("id") Long clientId) {
+        try {
+            Client client = clientService.getById(clientId);
+            return ResponseEntity.ok(toDTO(client));
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", e.getMessage());
+            response.put("errors", errors);
+            response.put("content", "");
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @PostMapping

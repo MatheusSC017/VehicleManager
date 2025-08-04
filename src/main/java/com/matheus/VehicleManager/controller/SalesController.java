@@ -3,6 +3,7 @@ package com.matheus.VehicleManager.controller;
 import com.matheus.VehicleManager.dto.*;
 import com.matheus.VehicleManager.exception.InvalidRequestException;
 import com.matheus.VehicleManager.model.Sale;
+import com.matheus.VehicleManager.model.Vehicle;
 import com.matheus.VehicleManager.service.SaleService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,9 +58,18 @@ public class SalesController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SaleResponseDTO> get(@PathVariable("id") Long saleId) {
-        Sale sale = saleService.findById(saleId);
-        return ResponseEntity.ok(toDTO(sale));
+    public ResponseEntity<?> get(@PathVariable("id") Long saleId) {
+        try {
+            Sale sale = saleService.findById(saleId);
+            return ResponseEntity.ok(toDTO(sale));
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", e.getMessage());
+            response.put("errors", errors);
+            response.put("content", "");
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @PostMapping

@@ -13,7 +13,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/files")
@@ -42,9 +44,18 @@ public class FileController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FileResponseDTO> get(@PathVariable("id") Long fileId) {
-        FileStore fileStore = fileService.getById(fileId);
-        return ResponseEntity.ok(toDTO(fileStore));
+    public ResponseEntity<?> get(@PathVariable("id") Long fileId) {
+        try {
+            FileStore fileStore = fileService.getById(fileId);
+            return ResponseEntity.ok(toDTO(fileStore));
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            Map<String, String> errors = new HashMap<>();
+            errors.put("error", e.getMessage());
+            response.put("errors", errors);
+            response.put("content", "");
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @PostMapping
