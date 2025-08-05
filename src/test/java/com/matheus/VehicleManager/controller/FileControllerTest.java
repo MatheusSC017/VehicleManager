@@ -6,18 +6,14 @@ import com.matheus.VehicleManager.model.Vehicle;
 import com.matheus.VehicleManager.security.JwtAuthenticationFilter;
 import com.matheus.VehicleManager.security.JwtUtil;
 import com.matheus.VehicleManager.service.FileService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -31,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(FileController.class)
 @AutoConfigureMockMvc(addFilters = false)
+@ActiveProfiles("test")
 class FileControllerTest {
 
     @Autowired
