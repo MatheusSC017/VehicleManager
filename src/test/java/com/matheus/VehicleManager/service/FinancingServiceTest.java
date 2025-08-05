@@ -17,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -435,6 +436,48 @@ public class FinancingServiceTest {
 
         when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
         when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(newVehicle));
+        when(financingRepository.getReferenceById(financingId)).thenReturn(financing);
+
+        assertThrows(InvalidRequestException.class, () -> financingService.update(financingId, financingRequestDTO));
+
+        verify(clientRepository, times(1)).findById(client.getId());
+        verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
+        verify(financingRepository, times(1)).getReferenceById(financingId);
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+            value = FinancingStatus.class,
+            names = { "ACTIVE", "DEFAULTED", "CANCELED" }
+    )
+    @DisplayName("Should throw an error if the financing status differnt of draft")
+    void testUpdateNotDraftStatus(FinancingStatus financingStatus) {
+        Long financingId = 1L;
+
+        Client client = buildClient(1L);
+        Vehicle vehicle = buildVehicle(1L, VehicleStatus.SOLD);
+        Financing financing = buildFinancing(1L, vehicle, client, financingStatus);
+
+        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
+                1L,
+                "TestVehicleChassi",
+                "TestVehicleBrand",
+                "TestVehicleModel"
+        );
+
+        FinancingRequestDTO financingRequestDTO = new FinancingRequestDTO();
+        financingRequestDTO.setVehicle(vehicleMinimalDTO);
+        financingRequestDTO.setClient(client);
+        financingRequestDTO.setTotalAmount(new BigDecimal(100000));
+        financingRequestDTO.setDownPayment(new BigDecimal(40000));
+        financingRequestDTO.setInstallmentCount(40);
+        financingRequestDTO.setInstallmentValue(new BigDecimal(1200));
+        financingRequestDTO.setAnnualInterestRate(new BigDecimal("1.2"));
+        financingRequestDTO.setContractDate(LocalDate.now());
+        financingRequestDTO.setFirstInstallmentDate(LocalDate.now().plusMonths(1));
+
+        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));
         when(financingRepository.getReferenceById(financingId)).thenReturn(financing);
 
         assertThrows(InvalidRequestException.class, () -> financingService.update(financingId, financingRequestDTO));
