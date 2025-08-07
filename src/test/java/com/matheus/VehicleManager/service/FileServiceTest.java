@@ -57,12 +57,12 @@ class FileServiceTest {
     void testGetById() {
         FileStore fileStore = new FileStore();
         fileStore.setId(1L);
-        when(fileRepository.getReferenceById(1L)).thenReturn(fileStore);
+        when(fileRepository.findById(1L)).thenReturn(Optional.of(fileStore));
 
         FileStore result = fileService.getById(1L);
 
         assertEquals(1L, result.getId());
-        verify(fileRepository, times(1)).getReferenceById(1L);
+        verify(fileRepository, times(1)).findById(1L);
     }
 
     @Test

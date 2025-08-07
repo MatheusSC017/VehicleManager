@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -66,7 +67,7 @@ class VehicleServiceTest {
     void testFindByChassi() {
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
 
-        when(vehicleRepository.findByChassi("TestChassi123")).thenReturn(vehicle);
+        when(vehicleRepository.findByChassi("TestChassi123")).thenReturn(Optional.of(vehicle));
         Vehicle foundVehicle = vehicleService.findByChassi("TestChassi123");
 
         assertEquals("TestChassi123", foundVehicle.getChassi());
@@ -79,12 +80,12 @@ class VehicleServiceTest {
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
         vehicle.setImages(new ArrayList<>());
 
-        when(vehicleRepository.getReferenceById(1L)).thenReturn(vehicle);
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
         VehicleImagesResponseDTO foundVehicle = vehicleService.getVehicleWithImagesById(1L);
 
         assertEquals(1L, foundVehicle.id());
         assertEquals(new ArrayList<>(), foundVehicle.images());
-        verify(vehicleRepository, times(1)).getReferenceById(1L);
+        verify(vehicleRepository, times(1)).findById(1L);
     }
 
     @Test

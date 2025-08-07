@@ -10,6 +10,7 @@ import com.matheus.VehicleManager.model.Vehicle;
 import com.matheus.VehicleManager.repository.ClientRepository;
 import com.matheus.VehicleManager.repository.FinancingRepository;
 import com.matheus.VehicleManager.repository.VehicleRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -39,11 +40,13 @@ public class FinancingService {
     }
 
     public Financing getById(Long financingId) {
-        return financingRepository.getReferenceById(financingId);
+        return financingRepository.findById(financingId)
+                .orElseThrow(() -> new EntityNotFoundException("Financing with id " + financingId + " not found"));
     }
 
-    public Optional<Financing> getByVehicleIdNotCanceled(Long vehicleId) {
-        return financingRepository.findActiveByVehicleId(vehicleId);
+    public Financing getByVehicleIdNotCanceled(Long vehicleId) {
+        return financingRepository.findActiveByVehicleId(vehicleId)
+                .orElseThrow(() -> new EntityNotFoundException("Financing with vehicle id " + vehicleId + " not found"));
     }
 
     @Transactional

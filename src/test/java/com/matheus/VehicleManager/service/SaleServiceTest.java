@@ -125,11 +125,11 @@ public class SaleServiceTest {
     void testFindById() {
         Sale sale = buildSale(1L, new Vehicle(), new Client(), SalesStatus.SOLD);
 
-        when(saleRepository.getReferenceById(1L)).thenReturn(sale);
+        when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
         Sale foundSale = saleService.findById(1L);
 
         assertEquals(sale, foundSale);
-        verify(saleRepository, times(1)).getReferenceById(1L);
+        verify(saleRepository, times(1)).findById(1L);
     }
 
     @Test

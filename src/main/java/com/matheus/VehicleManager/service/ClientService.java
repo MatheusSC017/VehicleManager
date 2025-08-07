@@ -3,6 +3,7 @@ package com.matheus.VehicleManager.service;
 import com.matheus.VehicleManager.exception.InvalidRequestException;
 import com.matheus.VehicleManager.model.Client;
 import com.matheus.VehicleManager.repository.ClientRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,11 +30,13 @@ public class ClientService {
     }
 
     public Client findByEmail(String email) {
-        return clientRepository.findByEmail(email);
+        return clientRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Client with email " + email + " not found"));
     }
 
     public Client getById(Long clientId) {
-        return clientRepository.getReferenceById(clientId);
+        return clientRepository.findById(clientId)
+                .orElseThrow(() -> new EntityNotFoundException("Client with id " + clientId + " not found"));
     }
 
     public Client create(Client client) {

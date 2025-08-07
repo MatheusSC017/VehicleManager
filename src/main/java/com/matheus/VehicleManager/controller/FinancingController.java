@@ -60,32 +60,14 @@ public class FinancingController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable("id") Long financingId) {
-        try {
-            Financing financing = financingService.getById(financingId);
-            return ResponseEntity.ok(toDTO(financing));
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            errors.put("error", e.getMessage());
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        }
+        Financing financing = financingService.getById(financingId);
+        return ResponseEntity.ok(toDTO(financing));
     }
 
     @GetMapping("/vehicle/{vehicleId}")
     public ResponseEntity<?> getByVehicleIdNotCanceled(@PathVariable("vehicleId") Long vehicleId) {
-        try {
-            Optional<Financing> financing = financingService.getByVehicleIdNotCanceled(vehicleId);
-            return financing.map(value -> ResponseEntity.ok(toDTO(value))).orElseGet(() -> ResponseEntity.noContent().build());
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            errors.put("error", e.getMessage());
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        }
+        Financing financing = financingService.getByVehicleIdNotCanceled(vehicleId);
+        return ResponseEntity.ok(toDTO(financing));
     }
 
     @PostMapping

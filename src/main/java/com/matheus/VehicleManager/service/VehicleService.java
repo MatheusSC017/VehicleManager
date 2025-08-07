@@ -10,6 +10,7 @@ import com.matheus.VehicleManager.enums.VehicleType;
 import com.matheus.VehicleManager.model.FileStore;
 import com.matheus.VehicleManager.model.Vehicle;
 import com.matheus.VehicleManager.repository.FileRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,11 +29,14 @@ public class VehicleService {
     private FileRepository fileRepository;
 
     public Vehicle findByChassi(String chassi) {
-        return vehicleRepository.findByChassi(chassi);
+        Vehicle vehicle = vehicleRepository.findByChassi(chassi)
+                .orElseThrow(() -> new EntityNotFoundException("Vehicle with chassi " + chassi + " not found"));
+        return vehicle;
     }
 
     public VehicleImagesResponseDTO getVehicleWithImagesById(Long id) {
-        Vehicle vehicle = this.vehicleRepository.getReferenceById(id);
+        Vehicle vehicle = vehicleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Vehicle with id " + id + " not found"));
         List<FileStore> images = vehicle.getImages();
         return new VehicleImagesResponseDTO(
                 vehicle.getId(),

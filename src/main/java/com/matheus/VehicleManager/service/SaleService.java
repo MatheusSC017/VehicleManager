@@ -10,6 +10,7 @@ import com.matheus.VehicleManager.model.Vehicle;
 import com.matheus.VehicleManager.repository.ClientRepository;
 import com.matheus.VehicleManager.repository.SaleRepository;
 import com.matheus.VehicleManager.repository.VehicleRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -42,8 +43,9 @@ public class SaleService {
         return saleRepository.findByVehicleIdOrderByIdDesc(vehicleId);
     }
 
-    public Sale findById(Long vehicleId) {
-        return saleRepository.getReferenceById(vehicleId);
+    public Sale findById(Long saleId) {
+        return saleRepository.findById(saleId)
+                .orElseThrow(() -> new EntityNotFoundException("Sale with id " + saleId + " not found"));
     }
 
     @Transactional

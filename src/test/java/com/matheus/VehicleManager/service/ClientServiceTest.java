@@ -84,7 +84,7 @@ public class ClientServiceTest {
     void testFindByEmail() {
         Client client = buildClient(1L);
 
-        when(clientRepository.findByEmail(anyString())).thenReturn(client);
+        when(clientRepository.findByEmail(anyString())).thenReturn(Optional.of(client));
         Client foundClient = clientService.findByEmail("Test@test.com");
 
         assertEquals("Test@test.com", foundClient.getEmail());
@@ -97,11 +97,11 @@ public class ClientServiceTest {
     void testGetById() {
         Client client = buildClient(1L);
 
-        when(clientRepository.getReferenceById(1L)).thenReturn(client);
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
         Client foundClient = clientService.getById(1L);
 
         assertEquals(client, foundClient);
-        verify(clientRepository, times(1)).getReferenceById(1L);
+        verify(clientRepository, times(1)).findById(1L);
     }
 
     @Test

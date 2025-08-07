@@ -14,10 +14,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
 
-    Vehicle findByChassi(String chassi);
+    Optional<Vehicle> findByChassi(String chassi);
 
     @Query("SELECT v FROM Vehicle v WHERE v.vehicleStatus = 'AVAILABLE' AND " +
             "(LOWER(v.brand) LIKE LOWER(CONCAT('%', :searchFor, '%')) OR " +

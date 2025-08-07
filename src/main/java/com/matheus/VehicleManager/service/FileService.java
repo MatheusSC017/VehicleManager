@@ -5,6 +5,7 @@ import com.matheus.VehicleManager.model.FileStore;
 import com.matheus.VehicleManager.model.Vehicle;
 import com.matheus.VehicleManager.repository.FileRepository;
 import com.matheus.VehicleManager.repository.VehicleRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,9 @@ public class FileService {
     }
 
     public FileStore getById(Long id) {
-        return fileRepository.getReferenceById(id);
+        FileStore fileStore = fileRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("File with id " + id + " not found"));
+        return fileStore;
     }
 
     public void save(Long vehicleId, MultipartFile[] images) throws IOException {

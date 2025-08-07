@@ -140,7 +140,7 @@ public class FinancingControllerTest {
     void testGetByVehicleIdNotCanceled() throws Exception {
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.SOLD);
         Financing financing = buildFinancing(1L, vehicle, new Client(), FinancingStatus.DRAFT);
-        when(financingService.getByVehicleIdNotCanceled(1L)).thenReturn(Optional.of(financing));
+        when(financingService.getByVehicleIdNotCanceled(1L)).thenReturn(financing);
 
         mockMvc.perform(get("/api/financings/vehicle/1").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

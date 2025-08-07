@@ -58,17 +58,8 @@ public class MaintenanceController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable("id") Long saleId) {
-        try {
-            Maintenance maintenance = maintenanceService.findById(saleId);
-            return ResponseEntity.ok(toDTO(maintenance));
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            errors.put("error", e.getMessage());
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        }
+        Maintenance maintenance = maintenanceService.findById(saleId);
+        return ResponseEntity.ok(toDTO(maintenance));
     }
 
     @PostMapping

@@ -59,17 +59,8 @@ public class SalesController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable("id") Long saleId) {
-        try {
-            Sale sale = saleService.findById(saleId);
-            return ResponseEntity.ok(toDTO(sale));
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            errors.put("error", e.getMessage());
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        }
+        Sale sale = saleService.findById(saleId);
+        return ResponseEntity.ok(toDTO(sale));
     }
 
     @PostMapping

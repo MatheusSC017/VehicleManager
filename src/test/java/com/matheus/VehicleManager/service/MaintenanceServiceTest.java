@@ -108,11 +108,11 @@ public class MaintenanceServiceTest {
     void testFindById() {
         Maintenance maintenance = buildMaintenance(1L, new Vehicle());
 
-        when(maintenanceRepository.getReferenceById(1L)).thenReturn(maintenance);
+        when(maintenanceRepository.findById(1L)).thenReturn(Optional.of(maintenance));
         Maintenance foundMaintenance = maintenanceService.findById(1L);
 
         assertEquals(maintenance, foundMaintenance);
-        verify(maintenanceRepository, times(1)).getReferenceById(1L);
+        verify(maintenanceRepository, times(1)).findById(1L);
     }
 
     @Test

@@ -111,12 +111,12 @@ public class FinancingServiceTest {
     void testGetById() {
         Long financingId = 1L;
         Financing financing = buildFinancing(financingId, new Vehicle(), new Client(), FinancingStatus.DRAFT);
-        when(financingRepository.getReferenceById(financingId)).thenReturn(financing);
+        when(financingRepository.findById(financingId)).thenReturn(Optional.of(financing));
 
         Financing foundFinancing = financingService.getById(financingId);
 
         assertEquals(financing, foundFinancing);
-        verify(financingRepository, times(1)).getReferenceById(financingId);
+        verify(financingRepository, times(1)).findById(financingId);
     }
 
     @Test
@@ -134,10 +134,10 @@ public class FinancingServiceTest {
         Financing financing = buildFinancing(1L, vehicle, new Client(), FinancingStatus.DRAFT);
 
         when(financingRepository.findActiveByVehicleId(vehicleId)).thenReturn(Optional.of(financing));
-        Optional<Financing> foundFinancing = financingService.getByVehicleIdNotCanceled(vehicleId);
+        Financing foundFinancing = financingService.getByVehicleIdNotCanceled(vehicleId);
 
-        assertEquals(financing, foundFinancing.get());
-        assertEquals(vehicle, foundFinancing.get().getVehicle());
+        assertEquals(financing, foundFinancing);
+        assertEquals(vehicle, foundFinancing.getVehicle());
         verify(financingRepository, times(1)).findActiveByVehicleId(vehicleId);
     }
 

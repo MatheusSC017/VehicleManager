@@ -52,32 +52,14 @@ public class ClientController {
 
     @GetMapping("/email/{email}")
     public ResponseEntity<?> getByEmail(@PathVariable("email") String email) {
-        try {
-            Client client = clientService.findByEmail(email);
-            return ResponseEntity.ok(toDTO(client));
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            errors.put("error", e.getMessage());
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        }
+        Client client = clientService.findByEmail(email);
+        return ResponseEntity.ok(toDTO(client));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable("id") Long clientId) {
-        try {
-            Client client = clientService.getById(clientId);
-            return ResponseEntity.ok(toDTO(client));
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            errors.put("error", e.getMessage());
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        }
+        Client client = clientService.getById(clientId);
+        return ResponseEntity.ok(toDTO(client));
     }
 
     @PostMapping

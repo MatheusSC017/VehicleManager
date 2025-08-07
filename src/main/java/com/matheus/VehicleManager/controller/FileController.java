@@ -45,17 +45,8 @@ public class FileController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable("id") Long fileId) {
-        try {
-            FileStore fileStore = fileService.getById(fileId);
-            return ResponseEntity.ok(toDTO(fileStore));
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            errors.put("error", e.getMessage());
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        }
+        FileStore fileStore = fileService.getById(fileId);
+        return ResponseEntity.ok(toDTO(fileStore));
     }
 
     @PostMapping

@@ -6,6 +6,7 @@ import com.matheus.VehicleManager.model.Maintenance;
 import com.matheus.VehicleManager.model.Vehicle;
 import com.matheus.VehicleManager.repository.MaintenanceRepository;
 import com.matheus.VehicleManager.repository.VehicleRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -36,8 +37,9 @@ public class MaintenanceService {
         return maintenanceRepository.findByVehicleIdOrderByIdDesc(vehicleId);
     }
 
-    public Maintenance findById(Long vehicleId) {
-        return maintenanceRepository.getReferenceById(vehicleId);
+    public Maintenance findById(Long maintenanceId) {
+        return maintenanceRepository.findById(maintenanceId)
+                .orElseThrow(() -> new EntityNotFoundException("Maintenance with id " + maintenanceId + " not found"));
     }
 
     @Transactional
