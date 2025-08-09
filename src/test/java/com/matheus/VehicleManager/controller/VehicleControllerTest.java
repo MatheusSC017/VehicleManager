@@ -264,8 +264,7 @@ public class VehicleControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(vehicleRequestDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors").exists())
-                .andExpect(jsonPath("$.content").exists());
+                .andExpect(jsonPath("$.errors").exists());
     }
 
     @Test
@@ -308,8 +307,7 @@ public class VehicleControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(vehicleRequestDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors").exists())
-                .andExpect(jsonPath("$.content").exists());
+                .andExpect(jsonPath("$.errors").exists());
     }
 
     @Test

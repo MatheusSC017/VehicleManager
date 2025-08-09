@@ -162,7 +162,7 @@ public class MaintenanceServiceTest {
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.MAINTENANCE);
         Maintenance maintenance = buildMaintenance(1L, vehicle);
 
-        when(maintenanceRepository.getReferenceById(1L)).thenReturn(maintenance);
+        when(maintenanceRepository.findById(1L)).thenReturn(Optional.of(maintenance));
         when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
         when(maintenanceRepository.save(any(Maintenance.class))).thenReturn(maintenance);
 
@@ -172,7 +172,7 @@ public class MaintenanceServiceTest {
         verify(vehicleRepository).save(vehicleCaptor.capture());
         assertEquals(VehicleStatus.AVAILABLE, vehicleCaptor.getValue().getVehicleStatus());
         assertEquals(LocalDate.now(), maintenance.getEndDate());
-        verify(maintenanceRepository, times(1)).getReferenceById(1L);
+        verify(maintenanceRepository, times(1)).findById(1L);
         verify(vehicleRepository, times(1)).save(any(Vehicle.class));
         verify(maintenanceRepository, times(1)).save(any(Maintenance.class));
     }

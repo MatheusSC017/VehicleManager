@@ -13,23 +13,26 @@ public class UniqueChassiValidator implements ConstraintValidator<UniqueChassi, 
 
     @Override
     public boolean isValid(Vehicle vehicle, ConstraintValidatorContext context) {
-        if (vehicleService == null || vehicle == null || vehicle.getChassi() == null) {
+        if (vehicle == null || vehicle.getChassi() == null || vehicle.getChassi().isBlank()) {
             return true;
         }
 
-        Vehicle existingVehicle = vehicleService.findByChassi(vehicle.getChassi());
+        try {
+            Vehicle existingVehicle = vehicleService.findByChassi(vehicle.getChassi());
 
-        if (existingVehicle == null) return true;
+            if (existingVehicle == null) return true;
 
-        if (vehicle.getId() != null && vehicle.getId().equals(existingVehicle.getId())) {
+            if (vehicle.getId() != null && vehicle.getId().equals(existingVehicle.getId())) {
+                return true;
+            }
+
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate("O chassi já está em uso")
+                    .addPropertyNode("chassi")
+                    .addConstraintViolation();
+            return false;
+        } catch (Exception e) {
             return true;
         }
-
-        context.disableDefaultConstraintViolation();
-        context.buildConstraintViolationWithTemplate("O chassi já está em uso")
-                .addPropertyNode("chassi")
-                .addConstraintViolation();
-
-        return false;
     }
 }

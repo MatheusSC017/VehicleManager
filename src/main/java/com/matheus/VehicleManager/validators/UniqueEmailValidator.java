@@ -5,7 +5,9 @@ import com.matheus.VehicleManager.service.ClientService;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UniqueEmailValidator implements ConstraintValidator<UniqueEmail, Client> {
 
     @Autowired
@@ -13,27 +15,27 @@ public class UniqueEmailValidator implements ConstraintValidator<UniqueEmail, Cl
 
     @Override
     public boolean isValid(Client client, ConstraintValidatorContext context) {
-        if (clientService == null || client == null || client.getEmail() == null) {
+        if (client == null || client.getEmail() == null || client.getEmail().isBlank()) {
             return true;
         }
 
-        Client existingClient = clientService.findByEmail(client.getEmail());
+        try {
+            Client existingClient = clientService.findByEmail(client.getEmail());
 
-        if (existingClient == null) return true;
-        System.out.println("RESPONSE");
-        System.out.println(client.getId());
-        System.out.println("RESPONSE");
-        System.out.println(client.getId() != null && client.getId().equals(existingClient.getId()));
-        System.out.println("RESPONSE");
-        if (client.getId() != null && client.getId().equals(existingClient.getId())) {
+            if (existingClient == null) return true;
+
+            if (client.getId() != null && client.getId().equals(existingClient.getId())) {
+                return true;
+            }
+
+            context.disableDefaultConstraintViolation();
+            context.buildConstraintViolationWithTemplate("O email já está em uso")
+                    .addPropertyNode("email")
+                    .addConstraintViolation();
+            return false;
+
+        } catch (Exception e) {
             return true;
         }
-
-        context.disableDefaultConstraintViolation();
-        context.buildConstraintViolationWithTemplate("O email já está em uso")
-                .addPropertyNode("email")
-                .addConstraintViolation();
-
-        return false;
     }
 }

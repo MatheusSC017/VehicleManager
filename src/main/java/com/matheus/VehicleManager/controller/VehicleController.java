@@ -111,44 +111,15 @@ public class VehicleController {
     }
 
     @PostMapping
-    public ResponseEntity<?> insert(@Valid @RequestBody VehicleRequestDTO vehicleDto, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("content", vehicleDto);
-
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
-            );
-            response.put("errors", errors);
-
-            return ResponseEntity.badRequest().body(response);
-        }
-
+    public ResponseEntity<?> insert(@Valid @RequestBody VehicleRequestDTO vehicleDto) {
         Vehicle vehicle = vehicleService.create(vehicleDto);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(vehicle);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable("id") Long vehicleId,
-                                   @Valid @RequestBody VehicleRequestDTO vehicleDto,
-                                   BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("content", vehicleDto);
-
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                    errors.put(error.getField(), error.getDefaultMessage())
-            );
-            response.put("errors", errors);
-
-            return ResponseEntity.badRequest().body(response);
-        }
-
+                                   @Valid @RequestBody VehicleRequestDTO vehicleDto) {
         Vehicle vehicle = vehicleService.update(vehicleId, vehicleDto);
-
         return ResponseEntity.ok(toDTO(vehicle));
     }
 

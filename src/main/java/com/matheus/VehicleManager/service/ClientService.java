@@ -49,15 +49,9 @@ public class ClientService {
     }
 
     public void delete(Long clientId) {
-        Client client = clientRepository.findById(clientId).orElse(null);
-        if (client != null) {
-            clientRepository.delete(client);
-        }
-        else {
-            Map<String, String> errors = new HashMap<>();
-            errors.put("client", "Cliente não encontrado");
-            throw new InvalidRequestException(errors);
-        }
+        Client client = clientRepository.findById(clientId)
+                .orElseThrow(() -> new EntityNotFoundException("Client with id " + clientId + " not found"));
+        clientRepository.delete(client);
     }
 
 }

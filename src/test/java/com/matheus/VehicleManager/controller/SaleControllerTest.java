@@ -187,8 +187,7 @@ public class SaleControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(saleRequestDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors").exists())
-                .andExpect(jsonPath("$.content").exists());
+                .andExpect(jsonPath("$.errors").exists());
     }
 
     @Test
@@ -227,8 +226,7 @@ public class SaleControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(saleRequestDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors").exists())
-                .andExpect(jsonPath("$.content").exists());
+                .andExpect(jsonPath("$.errors").exists());
     }
 
 }

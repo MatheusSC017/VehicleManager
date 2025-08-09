@@ -64,18 +64,7 @@ public class SalesController {
     }
 
     @PostMapping
-    public  ResponseEntity<?> insert(@Valid @RequestBody SaleRequestDTO saleRequestDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                    errors.put(error.getField(), error.getDefaultMessage())
-            );
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        }
-
+    public  ResponseEntity<?> insert(@Valid @RequestBody SaleRequestDTO saleRequestDTO) {
         try {
             Sale sale = saleService.create(saleRequestDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(sale));
@@ -95,19 +84,7 @@ public class SalesController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable("id") Long saleId, @Valid @RequestBody SaleRequestDTO saleRequestDTO, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
-            );
-            response.put("errors", errors);
-            response.put("content", "");
-
-            return ResponseEntity.badRequest().body(response);
-        }
-
+    public ResponseEntity<?> update(@PathVariable("id") Long saleId, @Valid @RequestBody SaleRequestDTO saleRequestDTO) {
         try {
             Sale sale = saleService.update(saleId, saleRequestDTO);
             return ResponseEntity.status(HttpStatus.OK).body(toDTO(sale));

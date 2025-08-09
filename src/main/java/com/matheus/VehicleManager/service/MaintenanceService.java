@@ -63,7 +63,8 @@ public class MaintenanceService {
 
     @Transactional
     public void delete(Long maintenanceId) {
-        Maintenance maintenance = maintenanceRepository.getReferenceById(maintenanceId);
+        Maintenance maintenance = maintenanceRepository.findById(maintenanceId)
+                .orElseThrow(() -> new EntityNotFoundException("Maintenance with id " + maintenanceId + " not found"));
         Vehicle vehicle = maintenance.getVehicle();
         vehicle.setVehicleStatus(VehicleStatus.AVAILABLE);
         vehicleRepository.save(vehicle);

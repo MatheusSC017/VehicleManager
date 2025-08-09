@@ -87,11 +87,6 @@ public class MaintenanceController {
         try {
             maintenanceService.delete(maintenanceId);
             return ResponseEntity.noContent().build();
-        } catch (InvalidRequestException e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("errors", e.getFieldErrors());
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();
             Map<String, String> errors = new HashMap<>();

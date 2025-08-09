@@ -14,7 +14,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleNotFound(Exception e) {
         Map<String, Object> response = new HashMap<>();
         response.put("errors", Map.of("error", e.getMessage()));
-        response.put("content", "");
         return ResponseEntity.badRequest().body(response);
     }
 }

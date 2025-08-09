@@ -33,9 +33,8 @@ public class FileService {
     }
 
     public FileStore getById(Long id) {
-        FileStore fileStore = fileRepository.findById(id)
+        return fileRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("File with id " + id + " not found"));
-        return fileStore;
     }
 
     public void save(Long vehicleId, MultipartFile[] images) throws IOException {

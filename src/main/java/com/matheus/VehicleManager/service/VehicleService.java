@@ -29,9 +29,8 @@ public class VehicleService {
     private FileRepository fileRepository;
 
     public Vehicle findByChassi(String chassi) {
-        Vehicle vehicle = vehicleRepository.findByChassi(chassi)
+        return vehicleRepository.findByChassi(chassi)
                 .orElseThrow(() -> new EntityNotFoundException("Vehicle with chassi " + chassi + " not found"));
-        return vehicle;
     }
 
     public VehicleImagesResponseDTO getVehicleWithImagesById(Long id) {

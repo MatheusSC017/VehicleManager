@@ -71,18 +71,7 @@ public class FinancingController {
     }
 
     @PostMapping
-    public  ResponseEntity<?> insert(@Valid @RequestBody FinancingRequestDTO financingDto, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
-            );
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        }
-
+    public  ResponseEntity<?> insert(@Valid @RequestBody FinancingRequestDTO financingDto) {
         try {
             Financing financing = financingService.create(financingDto);
             return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(financing));
@@ -102,19 +91,7 @@ public class FinancingController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable("id") Long financingId, @Valid @RequestBody FinancingRequestDTO financingDto, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
-            );
-            response.put("errors", errors);
-            response.put("content", "");
-
-            return ResponseEntity.badRequest().body(response);
-        }
-
+    public ResponseEntity<?> update(@PathVariable("id") Long financingId, @Valid @RequestBody FinancingRequestDTO financingDto) {
         try {
             Financing financing = financingService.update(financingId, financingDto);
             return ResponseEntity.ok(toDTO(financing));

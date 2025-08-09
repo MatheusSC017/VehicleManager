@@ -196,8 +196,7 @@ public class FinancingControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(financingRequestDTO)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors").exists())
-                .andExpect(jsonPath("$.content").exists());
+                .andExpect(jsonPath("$.errors").exists());
     }
 
     @Test

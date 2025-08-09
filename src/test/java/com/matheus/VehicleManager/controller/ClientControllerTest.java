@@ -5,6 +5,7 @@ import com.matheus.VehicleManager.model.Client;
 import com.matheus.VehicleManager.security.JwtAuthenticationFilter;
 import com.matheus.VehicleManager.security.JwtUtil;
 import com.matheus.VehicleManager.service.ClientService;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,8 +136,7 @@ class ClientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(client)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors").exists())
-                .andExpect(jsonPath("$.content").exists());
+                .andExpect(jsonPath("$.errors").exists());
     }
 
     @Test
@@ -163,8 +163,7 @@ class ClientControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(client)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors").exists())
-                .andExpect(jsonPath("$.content").exists());
+                .andExpect(jsonPath("$.errors").exists());
     }
 
     @Test
@@ -180,7 +179,7 @@ class ClientControllerTest {
     @Test
     @DisplayName("Should throw an error during delete call if client doesn't exists")
     void testDeleteFailure() throws Exception {
-        doThrow(new RuntimeException("Client not found")).when(clientService).delete(1L);
+        doThrow(new EntityNotFoundException("Client not found")).when(clientService).delete(1L);
 
         mockMvc.perform(delete("/api/clients/1")
                         .contentType(MediaType.APPLICATION_JSON))

@@ -2,19 +2,16 @@ package com.matheus.VehicleManager.controller;
 
 import com.matheus.VehicleManager.dto.ClientResponseDTO;
 import com.matheus.VehicleManager.model.Client;
-import com.matheus.VehicleManager.model.Financing;
 import com.matheus.VehicleManager.service.ClientService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/clients")
@@ -63,58 +60,21 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<?> insert(@Valid @RequestBody Client client, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("content", toDTO(client));
-
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
-            );
-            response.put("errors", errors);
-
-            return ResponseEntity.badRequest().body(response);
-        }
-
+    public ResponseEntity<?> insert(@Valid @RequestBody Client client) {
         clientService.create(client);
-
         return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(client));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable("id") Long clientId, @Valid @RequestBody Client client, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("content", toDTO(client));
-
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
-            );
-            response.put("errors", errors);
-
-            return ResponseEntity.badRequest().body(response);
-        }
-
+    public ResponseEntity<?> update(@PathVariable("id") Long clientId, @Valid @RequestBody Client client) {
         clientService.update(clientId, client);
-
         return ResponseEntity.ok(toDTO(client));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long clientId) {
-        try {
-            clientService.delete(clientId);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            errors.put("error", e.getMessage());
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        }
+        clientService.delete(clientId);
+        return ResponseEntity.noContent().build();
     }
 
 }
