@@ -78,17 +78,13 @@ public class AuthController {
 
         String token = authHeader.substring(7);
 
-        try {
-            String tokenUsername = jwtUtil.extractUsername(token);
-            if (jwtUtil.validateToken(token) && tokenUsername.equals(request.getUsername())) {
-                String newToken = jwtUtil.generateToken(tokenUsername);
-                return ResponseEntity.ok(new AuthResponseDTO(newToken));
-            } else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Token validation failed");
-            }
-
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token is invalid or expired");
+        String tokenUsername = jwtUtil.extractUsername(token);
+        if (jwtUtil.validateToken(token) && tokenUsername.equals(request.getUsername())) {
+            String newToken = jwtUtil.generateToken(tokenUsername);
+            return ResponseEntity.ok(new AuthResponseDTO(newToken));
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Token validation failed");
         }
+
     }
 }

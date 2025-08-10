@@ -65,42 +65,14 @@ public class SalesController {
 
     @PostMapping
     public  ResponseEntity<?> insert(@Valid @RequestBody SaleRequestDTO saleRequestDTO) {
-        try {
-            Sale sale = saleService.create(saleRequestDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(sale));
-        } catch (InvalidRequestException e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("errors", e.getFieldErrors());
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            errors.put("server", "Erro interno: " + e.getMessage());
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+        Sale sale = saleService.create(saleRequestDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(sale));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable("id") Long saleId, @Valid @RequestBody SaleRequestDTO saleRequestDTO) {
-        try {
-            Sale sale = saleService.update(saleId, saleRequestDTO);
-            return ResponseEntity.status(HttpStatus.OK).body(toDTO(sale));
-        } catch (InvalidRequestException e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("errors", e.getFieldErrors());
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            errors.put("server", "Erro interno: " + e.getMessage());
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+        Sale sale = saleService.update(saleId, saleRequestDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(toDTO(sale));
     }
 
 }

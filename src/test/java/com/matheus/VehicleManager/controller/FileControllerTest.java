@@ -109,7 +109,8 @@ class FileControllerTest {
                         .file(image)
                         .param("vehicleId", "10"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Failed to save"));
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.error").value("Failed to save"));
     }
 
     @Test
@@ -142,6 +143,7 @@ class FileControllerTest {
                         .param("selectedImages", "1", "2")
                         .with(request -> { request.setMethod("PUT"); return request; }))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().string("Failed to update"));
+                .andExpect(jsonPath("$.errors").exists())
+                .andExpect(jsonPath("$.errors.error").value("Failed to update"));
     }
 }

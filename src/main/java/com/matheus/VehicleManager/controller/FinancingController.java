@@ -6,19 +6,16 @@ import com.matheus.VehicleManager.dto.FinancingStatusRequestDTO;
 import com.matheus.VehicleManager.dto.VehicleMinimalDTO;
 import com.matheus.VehicleManager.exception.InvalidRequestException;
 import com.matheus.VehicleManager.model.Financing;
-import com.matheus.VehicleManager.model.Maintenance;
 import com.matheus.VehicleManager.service.FinancingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/financings")
@@ -72,62 +69,20 @@ public class FinancingController {
 
     @PostMapping
     public  ResponseEntity<?> insert(@Valid @RequestBody FinancingRequestDTO financingDto) {
-        try {
-            Financing financing = financingService.create(financingDto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(financing));
-        } catch (InvalidRequestException e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("errors", e.getFieldErrors());
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            errors.put("server", "Erro interno: " + e.getMessage());
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
-        }
+        Financing financing = financingService.create(financingDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(financing));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable("id") Long financingId, @Valid @RequestBody FinancingRequestDTO financingDto) {
-        try {
-            Financing financing = financingService.update(financingId, financingDto);
-            return ResponseEntity.ok(toDTO(financing));
-        } catch (InvalidRequestException e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("errors", e.getFieldErrors());
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            errors.put("error", e.getMessage());
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        }
+        Financing financing = financingService.update(financingId, financingDto);
+        return ResponseEntity.ok(toDTO(financing));
     }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<?> updateStatus(@PathVariable("id") Long financingId, @RequestBody FinancingStatusRequestDTO financing) {
-        try {
-            financingService.updateStatus(financingId, financing.status());
-            return ResponseEntity.noContent().build();
-        } catch (InvalidRequestException e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("errors", e.getFieldErrors());
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            errors.put("error", e.getMessage());
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        }
+        financingService.updateStatus(financingId, financing.status());
+        return ResponseEntity.noContent().build();
     }
 
 }

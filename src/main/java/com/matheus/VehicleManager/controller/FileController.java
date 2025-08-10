@@ -51,32 +51,20 @@ public class FileController {
 
     @PostMapping
     public ResponseEntity<?> insert(@RequestParam(value="vehicleId") Long vehicleId,
-                                    @RequestParam(value="imagesInput") MultipartFile[] images) {
+                                    @RequestParam(value="imagesInput") MultipartFile[] images) throws IOException {
         if (images == null) return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
-        try {
-            fileService.save(vehicleId, images);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        } catch (IOException e) {
-            System.err.println("Failed to store images: " + e.getMessage());
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+        fileService.save(vehicleId, images);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@RequestParam(value="vehicleId") Long vehicleId,
                                     @RequestParam(value = "imagesInput", required = false) MultipartFile[] images,
-                                    @RequestParam(value = "selectedImages", required = false) List<Long> selectedImageIds) {
-        try {
-            fileService.update(vehicleId, images, selectedImageIds);
-            return ResponseEntity.status(HttpStatus.OK).build();
-        } catch (IOException e) {
-            System.err.println("Failed to update files: " + e.getMessage());
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+                                    @RequestParam(value = "selectedImages", required = false) List<Long> selectedImageIds) throws IOException {
+        fileService.update(vehicleId, images, selectedImageIds);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

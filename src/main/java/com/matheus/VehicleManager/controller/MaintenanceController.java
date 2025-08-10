@@ -64,37 +64,14 @@ public class MaintenanceController {
 
     @PostMapping
     public ResponseEntity<?> insert(@RequestBody MaintenanceRequestDTO maintenanceRequestDTO) {
-        try {
-            Maintenance maintenance = maintenanceService.create(maintenanceRequestDTO.getVehicleId(), maintenanceRequestDTO.getAdditionalInfo());
-            return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(maintenance));
-        } catch (InvalidRequestException e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("errors", e.getFieldErrors());
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            errors.put("error", e.getMessage());
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        }
+        Maintenance maintenance = maintenanceService.create(maintenanceRequestDTO.getVehicleId(), maintenanceRequestDTO.getAdditionalInfo());
+        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(maintenance));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable("id") Long maintenanceId) {
-        try {
-            maintenanceService.delete(maintenanceId);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            Map<String, String> errors = new HashMap<>();
-            errors.put("error", e.getMessage());
-            response.put("errors", errors);
-            response.put("content", "");
-            return ResponseEntity.badRequest().body(response);
-        }
+        maintenanceService.delete(maintenanceId);
+        return ResponseEntity.noContent().build();
     }
 
 }

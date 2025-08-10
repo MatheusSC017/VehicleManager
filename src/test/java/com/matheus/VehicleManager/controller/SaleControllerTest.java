@@ -1,5 +1,6 @@
 package com.matheus.VehicleManager.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.matheus.VehicleManager.dto.SaleRequestDTO;
 import com.matheus.VehicleManager.dto.VehicleMinimalDTO;
@@ -92,12 +93,8 @@ public class SaleControllerTest {
         return sale;
     }
 
-    private static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    private static String asJsonString(final Object obj) throws JsonProcessingException {
+        return new ObjectMapper().writeValueAsString(obj);
     }
 
     @Test
