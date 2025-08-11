@@ -1,21 +1,16 @@
 package com.matheus.VehicleManager.controller;
 
 import com.matheus.VehicleManager.dto.*;
-import com.matheus.VehicleManager.exception.InvalidRequestException;
 import com.matheus.VehicleManager.model.Sale;
-import com.matheus.VehicleManager.model.Vehicle;
 import com.matheus.VehicleManager.service.SaleService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/sales")
@@ -24,7 +19,7 @@ public class SalesController {
     @Autowired
     private SaleService saleService;
 
-    private SaleResponseDTO toDTO(Sale sales) {
+    private static SaleResponseDTO toDTO(Sale sales) {
         VehicleMinimalDTO vehicleDTO = new VehicleMinimalDTO(
                 sales.getVehicle().getId(),
                 sales.getVehicle().getChassi(),
@@ -46,14 +41,14 @@ public class SalesController {
     public ResponseEntity<Page<SaleResponseDTO>> getAll(@RequestParam(value = "page", defaultValue = "0") int page,
                                                         @RequestParam(value = "size", defaultValue = "10") int size) {
         Page<Sale> sales = saleService.findAll(page, size);
-        Page<SaleResponseDTO> salesDtoPage = sales.map(this::toDTO);
+        Page<SaleResponseDTO> salesDtoPage = sales.map(SalesController::toDTO);
         return ResponseEntity.ok(salesDtoPage);
     }
 
     @GetMapping("/vehicle/{id}")
     public ResponseEntity<List<SaleResponseDTO>> getAllByVehicle(@PathVariable("id") Long vehicleId) {
         List<Sale> sales = saleService.findAllByVehicleId(vehicleId);
-        List<SaleResponseDTO> salesDtoPage = sales.stream().map(this::toDTO).toList();
+        List<SaleResponseDTO> salesDtoPage = sales.stream().map(SalesController::toDTO).toList();
         return ResponseEntity.ok(salesDtoPage);
     }
 

@@ -10,7 +10,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -22,7 +21,7 @@ public class VehicleController {
     @Autowired
     private VehicleService vehicleService;
 
-    private VehicleResponseDTO toDTO(Vehicle vehicle) {
+    private static VehicleResponseDTO toDTO(Vehicle vehicle) {
         return new VehicleResponseDTO(
                 vehicle.getId(),
                 vehicle.getVehicleType(),
@@ -44,21 +43,21 @@ public class VehicleController {
     }
 
     @GetMapping("/images")
-    public ResponseEntity<Page<VehicleImageResponseDTO>> getAllWithImages(@RequestParam(value="searchInput") Optional<String> search,
-                                                                            @RequestParam("status") Optional<String> status,
-                                                                            @RequestParam("type") Optional<String> type,
-                                                                            @RequestParam("fuel") Optional<String> fuel,
-                                                                            @RequestParam(value="priceMin", defaultValue="0") int priceMin,
-                                                                            @RequestParam(value="priceMax", defaultValue="0") int priceMax,
-                                                                            @RequestParam(value = "page", defaultValue = "0") int page,
-                                                                            @RequestParam(value = "size", defaultValue = "10") int size) {
+    public ResponseEntity<Page<VehicleImageResponseDTO>> getAllWithImages(@RequestParam(value="searchInput", defaultValue="") String search,
+                                                                          @RequestParam(value="status", defaultValue="") String status,
+                                                                          @RequestParam(value="type", defaultValue="") String type,
+                                                                          @RequestParam(value="fuel", defaultValue="") String fuel,
+                                                                          @RequestParam(value="priceMin", defaultValue="0") int priceMin,
+                                                                          @RequestParam(value="priceMax", defaultValue="0") int priceMax,
+                                                                          @RequestParam(value = "page", defaultValue="0") int page,
+                                                                          @RequestParam(value = "size", defaultValue="10") int size) {
         Pageable paging = PageRequest.of(page, size);
         Page<VehicleImageResponseDTO> vehiclesPage;
         vehiclesPage = vehicleService.getFilteredVehiclesWithOneImage(
-                search.orElse(""),
-                status.orElse(""),
-                type.orElse(""),
-                fuel.orElse(""),
+                search,
+                status,
+                type,
+                fuel,
                 priceMin,
                 priceMax,
                 paging
@@ -67,25 +66,25 @@ public class VehicleController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<VehicleResponseDTO>> getAll(@RequestParam(value="searchInput") Optional<String> search,
-                                                           @RequestParam("status") Optional<String> status,
-                                                           @RequestParam("type") Optional<String> type,
-                                                           @RequestParam("fuel") Optional<String> fuel,
+    public ResponseEntity<Page<VehicleResponseDTO>> getAll(@RequestParam(value="searchInput", defaultValue="") String search,
+                                                           @RequestParam(value="status", defaultValue="") String status,
+                                                           @RequestParam(value="type", defaultValue="") String type,
+                                                           @RequestParam(value="fuel", defaultValue="") String fuel,
                                                            @RequestParam(value="priceMin", defaultValue="0") int priceMin,
                                                            @RequestParam(value="priceMax", defaultValue="0") int priceMax,
-                                                           @RequestParam(value = "page", defaultValue = "0") int page,
-                                                           @RequestParam(value = "size", defaultValue = "10") int size) {
+                                                           @RequestParam(value = "page", defaultValue="0") int page,
+                                                           @RequestParam(value = "size", defaultValue="10") int size) {
         Pageable paging = PageRequest.of(page, size);
         Page<Vehicle> vehicles = vehicleService.getFilteredVehicles(
-                search.orElse(""),
-                status.orElse(""),
-                type.orElse(""),
-                fuel.orElse(""),
+                search,
+                status,
+                type,
+                fuel,
                 priceMin,
                 priceMax,
                 paging
         );
-        Page<VehicleResponseDTO> vehiclesPage = vehicles.map(this::toDTO);
+        Page<VehicleResponseDTO> vehiclesPage = vehicles.map(VehicleController::toDTO);
         return ResponseEntity.ok(vehiclesPage);
     }
 
@@ -93,7 +92,7 @@ public class VehicleController {
     public ResponseEntity<List<VehicleResponseDTO>> search(@RequestParam("searchFor") String searchFor) {
         List<Vehicle> vehicles = vehicleService.searchAvailableVehicles(searchFor);
         List<VehicleResponseDTO> vehicleDTOs = vehicles.stream()
-                .map(this::toDTO)
+                .map(VehicleController::toDTO)
                 .toList();
         return ResponseEntity.ok(vehicleDTOs);
     }

@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,7 +19,7 @@ public class ClientController {
     @Autowired
     private ClientService clientService;
 
-    private ClientResponseDTO toDTO(Client client) {
+    private static ClientResponseDTO toDTO(Client client) {
         return new ClientResponseDTO(
                 client.getId(),
                 client.getFirstName(),
@@ -34,7 +33,7 @@ public class ClientController {
     public ResponseEntity<Page<ClientResponseDTO>> getAll(@RequestParam(value = "page", defaultValue = "0") int page,
                                                           @RequestParam(value = "size", defaultValue = "10") int size) {
         Page<Client> clients = clientService.findAll(page, size);
-        Page<ClientResponseDTO> clientsDtos = clients.map(this::toDTO);
+        Page<ClientResponseDTO> clientsDtos = clients.map(ClientController::toDTO);
         return ResponseEntity.ok(clientsDtos);
     }
 
@@ -42,7 +41,7 @@ public class ClientController {
     public ResponseEntity<List<ClientResponseDTO>> search(@RequestParam("searchFor") String query) {
         List<Client> clients = clientService.search(query);
         List<ClientResponseDTO> clientDTOs = clients.stream()
-                .map(this::toDTO)
+                .map(ClientController::toDTO)
                 .toList();
         return ResponseEntity.ok(clientDTOs);
     }

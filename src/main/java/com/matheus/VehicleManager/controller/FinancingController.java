@@ -4,7 +4,6 @@ import com.matheus.VehicleManager.dto.FinancingRequestDTO;
 import com.matheus.VehicleManager.dto.FinancingResponseDTO;
 import com.matheus.VehicleManager.dto.FinancingStatusRequestDTO;
 import com.matheus.VehicleManager.dto.VehicleMinimalDTO;
-import com.matheus.VehicleManager.exception.InvalidRequestException;
 import com.matheus.VehicleManager.model.Financing;
 import com.matheus.VehicleManager.service.FinancingService;
 import jakarta.validation.Valid;
@@ -14,9 +13,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @RestController
 @RequestMapping("/api/financings")
 public class FinancingController {
@@ -24,7 +20,7 @@ public class FinancingController {
     @Autowired
     private FinancingService financingService;
 
-    private FinancingResponseDTO toDTO(Financing financing) {
+    private static FinancingResponseDTO toDTO(Financing financing) {
         VehicleMinimalDTO vehicleDTO = new VehicleMinimalDTO(
             financing.getVehicle().getId(),
             financing.getVehicle().getChassi(),
@@ -51,7 +47,7 @@ public class FinancingController {
     public ResponseEntity<Page<FinancingResponseDTO>> getAll(@RequestParam(value = "page", defaultValue = "0") int page,
                                                              @RequestParam(value = "size", defaultValue = "10") int size) {
         Page<Financing> financings = financingService.getAll(page, size);
-        Page<FinancingResponseDTO> financingsDtoPage = financings.map(this::toDTO);
+        Page<FinancingResponseDTO> financingsDtoPage = financings.map(FinancingController::toDTO);
         return ResponseEntity.ok(financingsDtoPage);
     }
 

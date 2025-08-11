@@ -2,8 +2,6 @@ package com.matheus.VehicleManager.controller;
 
 import com.matheus.VehicleManager.dto.FileResponseDTO;
 import com.matheus.VehicleManager.model.FileStore;
-import com.matheus.VehicleManager.security.JwtAuthenticationFilter;
-import com.matheus.VehicleManager.security.JwtUtil;
 import com.matheus.VehicleManager.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,9 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/files")
@@ -24,7 +20,7 @@ public class FileController {
     @Autowired
     private FileService fileService;
 
-    private FileResponseDTO toDTO(FileStore file) {
+    private static FileResponseDTO toDTO(FileStore file) {
         return new FileResponseDTO(
             file.getId(),
             file.getPath(),
@@ -38,7 +34,7 @@ public class FileController {
     public ResponseEntity<List<FileResponseDTO>> getAll() {
         List<FileStore> fileStores = fileService.getAll();
         List<FileResponseDTO> fileStoresDtos = fileStores.stream()
-                .map(this::toDTO)
+                .map(FileController::toDTO)
                 .toList();
         return ResponseEntity.ok(fileStoresDtos);
     }
