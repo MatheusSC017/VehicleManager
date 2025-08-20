@@ -19,6 +19,12 @@ spec:
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: prod
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://postgres:5432/vehicle-manager
+            - name: SPRING_DATASOURCE_USERNAME
+              value: vehicle-manager-user
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: vehicle-manager-password
           ports:
             - containerPort: 8080
 ---
@@ -27,7 +33,7 @@ kind: Service
 metadata:
   name: backend
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: backend
   ports:
