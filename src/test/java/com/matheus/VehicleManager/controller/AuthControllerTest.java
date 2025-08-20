@@ -71,7 +71,7 @@ public class AuthControllerTest {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authMock);
         when(jwtUtil.generateToken("UsernameTest")).thenReturn("TestToken");
 
-        mockMvc.perform(post("/auth/login")
+        mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(authRequestDTO)))
                 .andExpect(status().isOk())
@@ -90,7 +90,7 @@ public class AuthControllerTest {
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authMock);
 
-        mockMvc.perform(post("/auth/login")
+        mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(authRequestDTO)))
                 .andExpect(status().isBadRequest())
@@ -107,7 +107,7 @@ public class AuthControllerTest {
         when(jwtUtil.validateToken("TestToken")).thenReturn(true);
         when(jwtUtil.generateToken("UsernameTest")).thenReturn("TestNewToken");
 
-        mockMvc.perform(post("/auth/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .header("Authorization", "Bearer TestToken")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(usernameRequestDTO)))
@@ -122,7 +122,7 @@ public class AuthControllerTest {
         UsernameRequestDTO usernameRequestDTO = new UsernameRequestDTO();
         usernameRequestDTO.setUsername("UsernameTest");
 
-        mockMvc.perform(post("/auth/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .header("Authorization", authorization)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(usernameRequestDTO)))
@@ -139,7 +139,7 @@ public class AuthControllerTest {
         when(jwtUtil.extractUsername("TestToken")).thenReturn("UsernameTest");
         when(jwtUtil.validateToken("TestToken")).thenReturn(false);
 
-        mockMvc.perform(post("/auth/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .header("Authorization", "Bearer TestToken")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(usernameRequestDTO)))
@@ -156,7 +156,7 @@ public class AuthControllerTest {
         when(jwtUtil.extractUsername("TestToken")).thenReturn("DifferentUsernameTest");
         when(jwtUtil.validateToken("TestToken")).thenReturn(true);
 
-        mockMvc.perform(post("/auth/refresh")
+        mockMvc.perform(post("/api/auth/refresh")
                         .header("Authorization", "Bearer TestToken")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(usernameRequestDTO)))
@@ -174,7 +174,7 @@ public class AuthControllerTest {
 
         when(authService.createUser(any(User.class))).thenReturn(user);
 
-        mockMvc.perform(post("/auth/register")
+        mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(user)))
                 .andExpect(status().isCreated());
@@ -185,7 +185,7 @@ public class AuthControllerTest {
     void testCreateValidationError() throws Exception {
         User user = new User();
 
-        mockMvc.perform(post("/auth/register")
+        mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(asJsonString(user)))
                 .andExpect(status().isBadRequest())
