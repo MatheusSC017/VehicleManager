@@ -2,6 +2,8 @@
 
 The Vehicle Manager API is a RESTful Spring Boot application designed to manage vehicle-related operations for businesses or dealerships. It provides a robust backend with secure token-based authentication and supports full CRUD operations across multiple entities.
 
+This project can be used separately or in conjunction with the frontend, for this read the description of the [Vehicle Manager Frontend](https://github.com/MatheusSC017/VehicleManagerFrontend) repository
+
 ## Features
 
 - **Vehicle Management**: Register and manage details about vehicles in inventory.
@@ -39,24 +41,44 @@ git clone https://github.com/MatheusSC017/VehicleManager.git
 cd VehicleManager
 ```
 
-### 2. Database Configuration
+### 2. Profile Configuration
 
-The application uses PostgreSQL as its database. You need to have a PostgreSQL server running.
+The application needs a configuration file to connect to the database and handle security settings.
 
-1.  Create a database, for example `vehicle_manager_db`.
-2.  The application requires configuration properties to connect to the database. Create a file named `application-dev.properties` inside the `src/main/resources` directory.
-3.  Add the following properties to the file, replacing the placeholder values with your actual database credentials:
+#### Step 1: Create the configuration file
 
-```properties
+Create a file named application-dev.properties inside the directory:
+
+```
+src/main/resources
+```
+
+#### Step 2: Set up the database
+
+This project uses PostgreSQL as its database.
+
+Make sure you have a PostgreSQL server running.
+
+Create a database, for example: vehicle_manager_db.
+
+#### Step 3: Add the configuration
+
+Copy the following properties into your application-dev.properties file and replace the placeholder values (<...>) with your actual settings:
+
+```
 # src/main/resources/application-dev.properties
 
 # JWT Secret Key
 security.jwt.secret=<YOUR_SECRET_KEY>
 
+# CORS Configuration
+cors.config.allowedorigins=*
+
 # PostgreSQL Datasource
 spring.datasource.url=jdbc:postgresql://localhost:5432/vehicle_manager_db
 spring.datasource.username=<DATABASE_USERNAME>
 spring.datasource.password=<DATABASE_PASSWORD>
+
 ```
 
 ### 3. Build the Project
