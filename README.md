@@ -107,6 +107,15 @@ To run the automated tests, use the following Maven command:
 mvn test
 ```
 
+## Easily Configurable File Storage
+
+Inside the `services` folder (`src/main/java/com/matheus/VehicleManager`), you will find the `FileStorageService` interface. This interface defines the contract for managing file storage and deletion.
+
+To use it, you can create your own class that implements this interface and provides the desired storage logic.
+
+For development purposes, a default implementation called `LocalStorageFileService` is included, which handles local file I/O.
+If you plan to deploy the project, you should remove this default implementation and replace it with your own configuration tailored to your environment (e.g., cloud storage, external service, etc.).
+
 ## API Endpoints
 
 The API is structured around REST principles. All endpoints are prefixed with `/api`.
