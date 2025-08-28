@@ -1,0 +1,54 @@
+version: "2.4"
+
+services:
+  backend:
+    build: .
+    container_name: vehicle-manager-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://postgres:5432/vehicle-manager
+      DB_USERNAME: vehicle-manager-user
+      DB_PASSWORD: ${DB_PASSWORD}
+      SECRET_KEY: ${SECRET_KEY}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+    ports:
+      - "8080:8080"
+    networks:
+      - vehicle-manager-network
+    restart: unless-stopped
+    command: java -jar /app/app.jar
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: vehicle-manager-postgres
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: vehicle-manager
+      POSTGRES_USER: vehicle-manager-user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - vehicle-manager-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U vehicle-manager-user -d vehicle-manager" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  vehicle-manager-network:
+    driver: bridge
