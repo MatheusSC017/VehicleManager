@@ -88,6 +88,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>io.gatling.highcharts</groupId>
+			<artifactId>gatling-charts-highcharts</artifactId>
+			<version>3.11.4</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
@@ -95,6 +101,29 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>scala-maven-plugin</artifactId>
+				<version>4.8.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>io.gatling</groupId>
+				<artifactId>gatling-maven-plugin</artifactId>
+				<version>4.20.2</version>
+				<configuration>
+					<jvmArgs>
+						<jvmArg>--add-opens=java.base/java.lang=ALL-UNNAMED</jvmArg>
+						<jvmArg>-Xmx1G</jvmArg>
+					</jvmArgs>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
