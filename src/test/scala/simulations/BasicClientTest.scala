@@ -11,6 +11,8 @@ class BasicClientTest extends Simulation {
     .acceptHeader("application/json")
     .contentTypeHeader("application/json")
 
+  val clientFeeder = csv("data/clients.csv").circular
+
   val authenticate = exec(
     http("Login")
       .post("/api/auth/login")
@@ -22,12 +24,43 @@ class BasicClientTest extends Simulation {
 
   val scn = scenario("Basic Client Test")
     .exec(authenticate)
-    .pause(1.second)
+    .pause(200.millisecond)
     .exec(
       http("Get All Clients")
         .get("/api/clients")
         .header("Authorization", s"Bearer #{jwtToken}")
         .check(status.is(200))
+    )
+    .pause(200.millisecond)
+    .feed(clientFeeder)
+    .exec(
+      http("Create Client")
+        .post("/api/clients")
+        .header("Authorization", s"Bearer #{jwtToken}")
+        .body(StringBody(
+          """{
+            "firstName": "#{firstName}",
+            "lastName": "#{lastName}",
+            "email": "#{email}",
+            "phone": "#{phone}"
+          }"""
+        )).asJson
+        .check(status.is(201))
+        .check(jsonPath("$.id").saveAs("clientId"))
+    )
+    .pause(200.millisecond)
+    .exec(
+      http("Get Client by ID")
+        .get("/api/clients/#{clientId}")
+        .header("Authorization", s"Bearer #{jwtToken}")
+        .check(status.is(200))
+    )
+    .pause(200.millisecond)
+    .exec(
+      http("Delete Client")
+        .delete("/api/clients/#{clientId}")
+        .header("Authorization", s"Bearer #{jwtToken}")
+        .check(status.is(204))
     )
 
   setUp(
