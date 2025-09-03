@@ -7,7 +7,7 @@ import scala.concurrent.duration._
 class BasicClientTest extends Simulation {
 
   val httpProtocol = http
-    .baseUrl("http://localhost:8080")
+    .baseUrl("http://localhost:80")
     .acceptHeader("application/json")
     .contentTypeHeader("application/json")
 
@@ -54,6 +54,23 @@ class BasicClientTest extends Simulation {
         .get("/api/clients/#{clientId}")
         .header("Authorization", s"Bearer #{jwtToken}")
         .check(status.is(200))
+    )
+    .pause(200.millisecond)
+    .exec(
+      http("Update Client")
+        .put("/api/clients/#{clientId}")
+        .header("Authorization", s"Bearer #{jwtToken}")
+        .body(StringBody(
+          """{
+            "id": #{clientId},
+            "firstName": "#{firstName} updated",
+            "lastName": "#{lastName} updated",
+            "email": "#{email}",
+            "phone": "#{phone}"
+          }"""
+        )).asJson
+        .check(status.is(200))
+        .check(jsonPath("$.id").saveAs("clientId"))
     )
     .pause(200.millisecond)
     .exec(

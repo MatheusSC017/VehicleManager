@@ -10,9 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ClientService {
@@ -43,8 +41,7 @@ public class ClientService {
         return clientRepository.save(client);
     }
 
-    public Client update(Long clientId, Client client) {
-        client.setId(clientId);
+    public Client update(Client client) {
         return clientRepository.save(client);
     }
 

@@ -141,7 +141,7 @@ class ClientControllerTest {
     void testUpdateSuccess() throws Exception {
         Client client = buildClient(1L);
 
-        when(clientService.update(eq(1L), any(Client.class))).thenReturn(client);
+        when(clientService.update(any(Client.class))).thenReturn(client);
 
         mockMvc.perform(put("/api/clients/1")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -122,7 +122,7 @@ public class ClientServiceTest {
         Client client = buildClient(1L);
 
         when(clientRepository.save(any(Client.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        Client updatedClient = clientService.update(1L, client);
+        Client updatedClient = clientService.update(client);
 
         assertEquals(client, updatedClient);
         verify(clientRepository, times(1)).save(any(Client.class));

@@ -110,8 +110,8 @@ public class VehicleService {
         return vehicleRepository.save(vehicle);
     }
 
-    public Vehicle update(Long id, VehicleRequestDTO vehicleDto) {
-        Vehicle vehicle = vehicleRepository.getReferenceById(id);
+    public Vehicle update(Long vehicleId, VehicleRequestDTO vehicleDto) {
+        Vehicle vehicle = vehicleRepository.getReferenceById(vehicleId);
         vehicle.setVehicleType(vehicleDto.getVehicleType());
         vehicle.setModel(vehicleDto.getModel());
         vehicle.setBrand(vehicleDto.getBrand());
