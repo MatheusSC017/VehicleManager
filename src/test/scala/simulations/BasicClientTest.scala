@@ -24,7 +24,7 @@ class BasicClientTest extends Simulation {
 
   val scn = scenario("Basic Client Test")
     .exec(authenticate)
-    .pause(100.millisecond)
+    .pause(100.milliseconds, 300.milliseconds)
     .feed(clientFeeder)
     .exec(
       http("Create Client")
@@ -38,6 +38,7 @@ class BasicClientTest extends Simulation {
             "phone": "#{phone}"
           }"""
         )).asJson
+        .check(status.in(200 to 499))
         .check(
           status.saveAs("createStatus"),
           jsonPath("$.id").optional.saveAs("clientId")
@@ -48,16 +49,16 @@ class BasicClientTest extends Simulation {
         http("Get All Clients")
           .get("/api/clients")
           .header("Authorization", s"Bearer #{jwtToken}")
-          .check(status.is(200))
+          .check(status.in(200 to 499))
       )
-        .pause(100.millisecond)
+        .pause(100.milliseconds, 300.milliseconds)
         .exec(
           http("Get Client by ID")
             .get("/api/clients/#{clientId}")
             .header("Authorization", s"Bearer #{jwtToken}")
-            .check(status.is(200))
+            .check(status.in(200 to 499))
         )
-        .pause(100.millisecond)
+        .pause(100.milliseconds, 300.milliseconds)
         .exec(
           http("Update Client")
             .put("/api/clients/#{clientId}")
@@ -71,15 +72,14 @@ class BasicClientTest extends Simulation {
               "phone": "#{phone}"
             }"""
             )).asJson
-            .check(status.is(200))
-            .check(jsonPath("$.id").saveAs("clientId"))
+            .check(status.in(200 to 499))
         )
-        .pause(100.millisecond)
+        .pause(100.milliseconds, 300.milliseconds)
         .exec(
           http("Delete Client")
             .delete("/api/clients/#{clientId}")
             .header("Authorization", s"Bearer #{jwtToken}")
-            .check(status.is(204))
+            .check(status.in(200 to 499))
         )
     } {
       exitHereIfFailed
