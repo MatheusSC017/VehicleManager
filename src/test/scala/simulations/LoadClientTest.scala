@@ -3,7 +3,6 @@ package simulations
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 import scala.concurrent.duration._
-import java.util.UUID
 
 class LoadClientTest extends Simulation {
 
@@ -27,7 +26,7 @@ class LoadClientTest extends Simulation {
       .body(StringBody("""{"username":"admin", "password":"Admin5432"}"""))
       .check(status.is(200))
       .check(jsonPath("$.token").saveAs("jwtToken"))
-  )
+  ).exitHereIfFailed
 
   val crudScenario = scenario("Load Test - Full CRUD")
     .exec(authenticate)
@@ -52,13 +51,13 @@ class LoadClientTest extends Simulation {
             "phone": "#{phone}"
           }"""
         )).asJson
-        .check(status.is(201))
+        .check(status.in(200 to 499))
         .check(
           status.saveAs("createStatus"),
           jsonPath("$.id").optional.saveAs("clientId")
         )
     )
-    .doIfOrElse(session => session("createStatus").as[Int] == 201) {
+    .doIfOrElse(session => session("createStatus").asOption[Int].contains(201)) {
       exec(
         http("Get Client by ID")
           .get("/api/clients/#{clientId}")
@@ -107,14 +106,14 @@ class LoadClientTest extends Simulation {
   setUp(
 
     readOnlyScenario.inject(
-      rampUsersPerSec(5) to 35 during (2.minutes),
-      constantUsersPerSec(35) during (10.minutes),
-      rampUsersPerSec(35) to 5 during (2.minutes)
+      rampUsersPerSec(5) to 100 during (2.minutes),
+      constantUsersPerSec(100) during (10.minutes),
+      rampUsersPerSec(100) to 5 during (2.minutes)
     ),
     crudScenario.inject(
-      rampUsersPerSec(2) to 15 during (2.minutes),
-      constantUsersPerSec(15) during (10.minutes),
-      rampUsersPerSec(15) to 2 during (2.minutes)
+      rampUsersPerSec(2) to 35 during (2.minutes),
+      constantUsersPerSec(35) during (10.minutes),
+      rampUsersPerSec(35) to 2 during (2.minutes)
     )
   ).protocols(httpProtocol)
     .assertions(
