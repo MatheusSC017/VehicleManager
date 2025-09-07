@@ -1,10 +1,11 @@
-package simulations
+package simulations.client
 
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
+
 import scala.concurrent.duration._
 
-class LoadClientTest extends Simulation {
+class LoadTest extends Simulation {
 
   val httpProtocol = http
     .baseUrl("http://localhost:80")
