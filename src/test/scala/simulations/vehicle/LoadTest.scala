@@ -1,11 +1,12 @@
 package simulations.vehicle
 
+
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 
 import scala.concurrent.duration._
 
-class BasicTest extends Simulation {
+class LoadTest extends Simulation {
 
   val httpProtocol = http
     .baseUrl("http://localhost:80")
@@ -20,11 +21,17 @@ class BasicTest extends Simulation {
       .body(StringBody("""{"username":"admin", "password":"Admin5432"}"""))
       .check(status.is(200))
       .check(jsonPath("$.token").saveAs("jwtToken"))
-      .check(bodyString.saveAs("loginResponse"))
-  )
+  ).exitHereIfFailed
 
-  val scn = scenario("Basic Vehicle Test")
+  val crudScenario = scenario("Load Test - Full CRUD")
     .exec(authenticate)
+    .pause(100.milliseconds, 300.milliseconds)
+    .exec(
+      http("Get All Vehicles")
+        .get("/api/vehicles")
+        .header("Authorization", s"Bearer #{jwtToken}")
+        .check(status.is(200))
+    )
     .pause(100.milliseconds, 300.milliseconds)
     .feed(vehicleFeeder)
     .exec(
@@ -55,20 +62,13 @@ class BasicTest extends Simulation {
           jsonPath("$.id").optional.saveAs("vehicleId")
         )
     )
-    .doIfOrElse(session => session("createStatus").as[Int] == 201) {
+    .doIfOrElse(session => session("createStatus").asOption[Int].contains(201)) {
       exec(
-        http("Get All Vehicles")
-          .get("/api/vehicles")
+        http("Get Vehicle by ID")
+          .get("/api/vehicles/#{vehicleId}")
           .header("Authorization", s"Bearer #{jwtToken}")
-          .check(status.in(200 to 499))
+          .check(status.is(200))
       )
-        .pause(100.milliseconds, 300.milliseconds)
-        .exec(
-          http("Get Vehicle by ID")
-            .get("/api/vehicles/#{vehicleId}")
-            .header("Authorization", s"Bearer #{jwtToken}")
-            .check(status.in(200 to 499))
-        )
         .pause(100.milliseconds, 300.milliseconds)
         .exec(
           http("Update Vehicle")
@@ -93,30 +93,49 @@ class BasicTest extends Simulation {
                 "power": "#{power}"
               }"""
             )).asJson
-            .check(status.in(200 to 499))
+            .check(status.is(200))
         )
         .pause(100.milliseconds, 300.milliseconds)
         .exec(
           http("Delete Vehicle")
             .delete("/api/vehicles/#{vehicleId}")
             .header("Authorization", s"Bearer #{jwtToken}")
-            .check(status.in(200 to 499))
+            .check(status.is(204))
         )
     } {
       exitHereIfFailed
     }
 
+  val readOnlyScenario = scenario("Load Test - Read Only")
+    .exec(authenticate)
+    .repeat(5) {
+      pause(100.milliseconds, 300.milliseconds)
+        .exec(
+          http("Get All Vehicles")
+            .get("/api/vehicles")
+            .header("Authorization", s"Bearer #{jwtToken}")
+            .check(status.is(200))
+        )
+    }
+
   setUp(
-    scn.inject(
-      constantUsersPerSec(10) during (30.seconds),
-      rampUsersPerSec(10) to 50 during (1.minute),
-      constantUsersPerSec(50) during (2.minutes),
-      rampUsersPerSec(50) to 10 during (1.minute)
+
+    readOnlyScenario.inject(
+      rampUsersPerSec(5) to 80 during (2.minutes),
+      constantUsersPerSec(80) during (10.minutes),
+      rampUsersPerSec(80) to 5 during (2.minutes)
+    ),
+    crudScenario.inject(
+      rampUsersPerSec(2) to 30 during (2.minutes),
+      constantUsersPerSec(30) during (10.minutes),
+      rampUsersPerSec(30) to 2 during (2.minutes)
     )
   ).protocols(httpProtocol)
     .assertions(
-      global.responseTime.max.lt(5000),
-      global.responseTime.mean.lt(1000),
-      global.successfulRequests.percent.gt(95)
+      global.responseTime.max.lt(3000),
+      global.responseTime.mean.lt(800),
+      global.responseTime.percentile3.lt(1500),
+      global.successfulRequests.percent.gt(98),
+      forAll.failedRequests.count.lt(50)
     )
 }
