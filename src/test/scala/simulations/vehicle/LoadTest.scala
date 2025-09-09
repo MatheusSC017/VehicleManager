@@ -13,7 +13,25 @@ class LoadTest extends Simulation {
     .acceptHeader("application/json")
     .contentTypeHeader("application/json")
 
-  val vehicleFeeder = csv("data/vehicles.csv").circular
+  val dynamicVehicleFeeder = Iterator.continually(
+    Map(
+      "vehicleType"   -> Seq("CAR", "MOTORCYCLE")(scala.util.Random.nextInt(2)),
+      "vehicleStatus" -> Seq("AVAILABLE", "RESERVED", "SOLD", "MAINTENANCE")(scala.util.Random.nextInt(4)),
+      "model"         -> s"Model${scala.util.Random.nextInt(1000)}",
+      "brand"         -> Seq("Toyota", "Ford", "Honda", "Chevrolet", "BMW", "Mercedes")(scala.util.Random.nextInt(6)),
+      "year"          -> (scala.util.Random.between(1990, 2025)).toString,
+      "color"         -> Seq("Black", "White", "Silver", "Red", "Blue", "Gray")(scala.util.Random.nextInt(6)),
+      "plate"         -> f"${('A' + scala.util.Random.nextInt(26)).toChar}${('A' + scala.util.Random.nextInt(26)).toChar}${('A' + scala.util.Random.nextInt(26)).toChar}-${scala.util.Random.nextInt(9999)}%04d",
+      "chassi"        -> s"Chassi${scala.util.Random.nextInt(50000)}",
+      "mileage"       -> BigDecimal(scala.util.Random.between(1000, 300000)).bigDecimal.toPlainString,
+      "price"         -> BigDecimal(scala.util.Random.between(20000, 300000)).bigDecimal.toPlainString,
+      "vehicleFuel"   -> Seq("GASOLINE", "ALCOHOL", "FLEX", "DIESEL", "HYBRID", "ELECTRIC")(scala.util.Random.nextInt(6)),
+      "vehicleChange" -> Seq("MANUAL", "AUTOMATIC", "AUTOMATED", "CVT")(scala.util.Random.nextInt(4)),
+      "doors"         -> scala.util.Random.nextInt(5).toString,
+      "motor"         -> s"${scala.util.Random.between(1, 6)}.${scala.util.Random.between(0, 9)}",
+      "power"         -> s"${scala.util.Random.between(60, 600)} HP"
+    )
+  )
 
   val authenticate = exec(
     http("Login")
@@ -33,7 +51,7 @@ class LoadTest extends Simulation {
         .check(status.is(200))
     )
     .pause(100.milliseconds, 300.milliseconds)
-    .feed(vehicleFeeder)
+    .feed(dynamicVehicleFeeder)
     .exec(
       http("Create Vehicle")
         .post("/api/vehicles")
@@ -56,7 +74,7 @@ class LoadTest extends Simulation {
             "power": "#{power}"
           }"""
         )).asJson
-        .check(status.in(200 to 499))
+        .check(status.in(200, 400))
         .check(
           status.saveAs("createStatus"),
           jsonPath("$.id").optional.saveAs("vehicleId")
