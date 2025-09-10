@@ -21,7 +21,7 @@ class BasicTest extends Simulation {
       .check(status.is(200))
       .check(jsonPath("$.token").saveAs("jwtToken"))
       .check(bodyString.saveAs("loginResponse"))
-  )
+  ).exitHereIfFailed
 
   val scn = scenario("Basic Client Test")
     .exec(authenticate)
