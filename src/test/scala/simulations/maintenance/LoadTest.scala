@@ -4,11 +4,10 @@ import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 
 import java.util.concurrent.ConcurrentLinkedQueue
-
 import scala.concurrent.duration._
 import scala.jdk.CollectionConverters._
 
-class BasicTest extends Simulation {
+class LoadTest extends Simulation {
 
   val httpProtocol = http
     .baseUrl("http://localhost:80")
@@ -56,7 +55,7 @@ class BasicTest extends Simulation {
             "power": "#{power}"
           }"""
         )).asJson
-        .check(status.in(201))
+        .check(status.is(201))
         .check(
           status.saveAs("vehicleCreateStatus"),
           jsonPath("$.id").optional.saveAs("vehicleId")
@@ -69,7 +68,7 @@ class BasicTest extends Simulation {
       }
     }
 
-  val scn = scenario("Maintenance CRUD Test")
+  val crudScenario = scenario("Maintenance CRUD Test")
     .exec(authenticate)
     .pause(100.milliseconds, 300.milliseconds)
     .feed(infoFeeder)
@@ -130,22 +129,56 @@ class BasicTest extends Simulation {
       exitHereIfFailed
     }
 
+  val readOnlyScenario = scenario("Load Test - Read Only")
+    .exec(authenticate)
+    .pause(100.milliseconds, 300.milliseconds)
+    .exec { session =>
+      val ids = SharedData.vehicleIds.asScala.toVector
+      if (ids.nonEmpty) {
+        val randomId = ids(scala.util.Random.nextInt(ids.size))
+        session.set("vehicleId", randomId)
+      } else {
+        session.markAsFailed
+      }
+    }
+    .repeat(5) {
+      pause(100.milliseconds, 300.milliseconds)
+        .exec(
+          http("Get All Maintenances")
+            .get("/api/maintenances")
+            .header("Authorization", "Bearer #{jwtToken}")
+            .check(status.in(200 to 499))
+        )
+        .pause(100.milliseconds, 300.milliseconds)
+        .exec(
+          http("Get Maintenances by Vehicle ID")
+            .get("/api/maintenances/vehicle/#{vehicleId}")
+            .header("Authorization", "Bearer #{jwtToken}")
+            .check(status.in(200 to 499))
+        )
+    }
+
   setUp(
     registerVehicles.inject(atOnceUsers(10)).andThen(
-      scn.inject(
-        constantUsersPerSec(5) during (20.seconds),
-        rampUsersPerSec(5) to 20 during (30.seconds),
-        constantUsersPerSec(20) during (1.minute),
-        rampUsersPerSec(20) to 5 during (30.seconds)
+      crudScenario.inject(
+        rampUsersPerSec(2) to 30 during (2.minutes),
+        constantUsersPerSec(30) during (10.minutes),
+        rampUsersPerSec(30) to 2 during (2.minutes)
+      ),
+      readOnlyScenario.inject(
+        rampUsersPerSec(2) to 30 during (2.minutes),
+        constantUsersPerSec(30) during (10.minutes),
+        rampUsersPerSec(30) to 2 during (2.minutes)
       )
     )
 
   ).protocols(httpProtocol)
     .assertions(
-      global.responseTime.max.lt(4000),
-      global.responseTime.mean.lt(1000),
-      global.successfulRequests.percent.gt(95)
+      global.responseTime.max.lt(3000),
+      global.responseTime.mean.lt(800),
+      global.responseTime.percentile3.lt(1500),
+      global.successfulRequests.percent.gt(98),
+      forAll.failedRequests.count.lt(50)
     )
-
 
 }
