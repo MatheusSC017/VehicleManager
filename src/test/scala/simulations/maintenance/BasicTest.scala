@@ -121,7 +121,7 @@ class BasicTest extends Simulation {
         )
         .pause(100.milliseconds, 300.milliseconds)
         .exec(
-          http("Delete Maintenance (mark as ended)")
+          http("Delete Maintenance")
             .delete("/api/maintenances/#{maintenanceId}")
             .header("Authorization", "Bearer #{jwtToken}")
             .check(status.in(200 to 499))
@@ -146,6 +146,5 @@ class BasicTest extends Simulation {
       global.responseTime.mean.lt(1000),
       global.successfulRequests.percent.gt(95)
     )
-
 
 }

@@ -50,8 +50,8 @@ public class SaleService {
 
     @Transactional
     public Sale create(SaleRequestDTO saleRequestDTO) {
-        Client client = clientRepository.findById(saleRequestDTO.getClient().getId()).orElse(null);
-        Vehicle vehicle = vehicleRepository.findById(saleRequestDTO.getVehicle().id()).orElse(null);
+        Client client = clientRepository.findById(saleRequestDTO.getClient()).orElse(null);
+        Vehicle vehicle = vehicleRepository.findById(saleRequestDTO.getVehicle()).orElse(null);
 
         Map<String, String> errors = new HashMap<>();
 
@@ -72,8 +72,8 @@ public class SaleService {
     public Sale update(Long saleId, SaleRequestDTO saleRequestDTO) {
         Map<String, String> errors = new HashMap<>();
 
-        Client client = clientRepository.findById(saleRequestDTO.getClient().getId()).orElse(null);
-        Vehicle vehicle = vehicleRepository.findById(saleRequestDTO.getVehicle().id()).orElse(null);
+        Client client = clientRepository.findById(saleRequestDTO.getClient()).orElse(null);
+        Vehicle vehicle = vehicleRepository.findById(saleRequestDTO.getVehicle()).orElse(null);
         Sale sale = saleRepository.findById(saleId).orElse(null);
 
         if (client == null) errors.put("client", "Cliente não encontrado");
@@ -95,7 +95,7 @@ public class SaleService {
 
         if (!errors.isEmpty()) throw new InvalidRequestException(errors);
 
-        sale.setClient(saleRequestDTO.getClient());
+        sale.setClient(client);
         sale.setVehicle(vehicle);
         sale.setStatus(saleRequestDTO.getStatus());
 

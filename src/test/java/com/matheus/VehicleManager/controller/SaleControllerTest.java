@@ -155,10 +155,9 @@ public class SaleControllerTest {
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.SOLD);
         Sale sale = buildSale(1L, vehicle, client, SalesStatus.SOLD);
 
-        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(1L, "TestChassi", "TestBrand", "TestModel");
         SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
-        saleRequestDTO.setClient(client);
-        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setClient(1L);
+        saleRequestDTO.setVehicle(1L);
         saleRequestDTO.setStatus(SalesStatus.SOLD);
 
         when(saleService.create(any(SaleRequestDTO.class))).thenReturn(sale);
@@ -194,10 +193,9 @@ public class SaleControllerTest {
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.SOLD);
         Sale sale = buildSale(1L, vehicle, client, SalesStatus.SOLD);
 
-        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(1L, "TestChassi", "TestBrand", "TestModel");
         SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
-        saleRequestDTO.setClient(client);
-        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setClient(1L);
+        saleRequestDTO.setVehicle(1L);
         saleRequestDTO.setStatus(SalesStatus.SOLD);
 
         when(saleService.update(anyLong(), any(SaleRequestDTO.class))).thenReturn(sale);

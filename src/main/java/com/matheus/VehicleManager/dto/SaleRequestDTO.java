@@ -1,32 +1,31 @@
 package com.matheus.VehicleManager.dto;
 
 import com.matheus.VehicleManager.enums.SalesStatus;
-import com.matheus.VehicleManager.model.Client;
 import jakarta.validation.constraints.NotNull;
 
 public class SaleRequestDTO {
     @NotNull(message = "Cliente  é obrigatório")
-    private Client client;
+    private Long client;
 
     @NotNull(message = "Veiculo é obrigatório")
-    private VehicleMinimalDTO vehicle;
+    private Long vehicle;
 
     @NotNull
     private SalesStatus status;
 
-    public @NotNull(message = "Cliente  é obrigatório") Client getClient() {
+    public @NotNull(message = "Cliente  é obrigatório") Long getClient() {
         return client;
     }
 
-    public void setClient(@NotNull(message = "Cliente  é obrigatório") Client client) {
+    public void setClient(@NotNull(message = "Cliente  é obrigatório") Long client) {
         this.client = client;
     }
 
-    public @NotNull(message = "Veiculo é obrigatório") VehicleMinimalDTO getVehicle() {
+    public @NotNull(message = "Veiculo é obrigatório") Long getVehicle() {
         return vehicle;
     }
 
-    public void setVehicle(@NotNull(message = "Veiculo é obrigatório") VehicleMinimalDTO vehicle) {
+    public void setVehicle(@NotNull(message = "Veiculo é obrigatório") Long vehicle) {
         this.vehicle = vehicle;
     }
 

@@ -108,7 +108,7 @@ class StressTest extends Simulation {
         )
         .doIfOrElse(session => session("createStatus").as[Int] == 201) {
           exec(
-            http("Delete Maintenance (mark as ended)")
+            http("Delete Maintenance")
               .delete("/api/maintenances/#{maintenanceId}")
               .header("Authorization", "Bearer #{jwtToken}")
               .check(status.in(200 to 499))

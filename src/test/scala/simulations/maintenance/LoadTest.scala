@@ -120,7 +120,7 @@ class LoadTest extends Simulation {
         )
         .pause(100.milliseconds, 300.milliseconds)
         .exec(
-          http("Delete Maintenance (mark as ended)")
+          http("Delete Maintenance")
             .delete("/api/maintenances/#{maintenanceId}")
             .header("Authorization", "Bearer #{jwtToken}")
             .check(status.in(200 to 499))

@@ -1,7 +1,6 @@
 package com.matheus.VehicleManager.service;
 
 import com.matheus.VehicleManager.dto.SaleRequestDTO;
-import com.matheus.VehicleManager.dto.VehicleMinimalDTO;
 import com.matheus.VehicleManager.enums.SalesStatus;
 import com.matheus.VehicleManager.enums.VehicleStatus;
 import com.matheus.VehicleManager.exception.InvalidRequestException;
@@ -139,16 +138,13 @@ public class SaleServiceTest {
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
         Sale sale = buildSale(1L, vehicle, client, SalesStatus.SOLD);
 
-        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
-                1L, "TestVehicleChassi", "TestBrand", "TestModel"
-        );
         SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
-        saleRequestDTO.setClient(client);
-        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setClient(1L);
+        saleRequestDTO.setVehicle(1L);
         saleRequestDTO.setStatus(SalesStatus.SOLD);
 
-        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
-        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
         when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
 
@@ -161,8 +157,8 @@ public class SaleServiceTest {
         assertEquals(client, createdSale.getClient());
         assertEquals(SalesStatus.SOLD, createdSale.getStatus());
         assertEquals(LocalDate.now(), createdSale.getSalesDate());
-        verify(clientRepository, times(1)).findById(client.getId());
-        verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
+        verify(clientRepository, times(1)).findById(1L);
+        verify(vehicleRepository, times(1)).findById(1L);
         verify(vehicleRepository, times(1)).save(any(Vehicle.class));
         verify(saleRepository, times(1)).save(any(Sale.class));
     }
@@ -170,19 +166,15 @@ public class SaleServiceTest {
     @Test
     @DisplayName("Should throw an error if the client requested to the sale creation doesn't exist")
     void testCreateClientNotFound() {
-        Client client = buildClient(1L);
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
 
-        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
-                1L, "TestVehicleChassi", "TestBrand", "TestModel"
-        );
         SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
-        saleRequestDTO.setClient(client);
-        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setClient(1L);
+        saleRequestDTO.setVehicle(1L);
         saleRequestDTO.setStatus(SalesStatus.SOLD);
 
-        when(clientRepository.findById(client.getId())).thenReturn(Optional.empty());
-        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));;
+        when(clientRepository.findById(1L)).thenReturn(Optional.empty());
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));;
 
         assertThrows(InvalidRequestException.class, () -> saleService.create(saleRequestDTO));
     }
@@ -192,16 +184,13 @@ public class SaleServiceTest {
     void testCreateVehicleNotFound() {
         Client client = buildClient(1L);
 
-        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
-                1L, "TestVehicleChassi", "TestBrand", "TestModel"
-        );
         SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
-        saleRequestDTO.setClient(client);
-        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setClient(1L);
+        saleRequestDTO.setVehicle(1L);
         saleRequestDTO.setStatus(SalesStatus.SOLD);
 
-        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
-        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.empty());;
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.empty());;
 
         assertThrows(InvalidRequestException.class, () -> saleService.create(saleRequestDTO));
     }
@@ -212,16 +201,13 @@ public class SaleServiceTest {
         Client client = buildClient(1L);
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.SOLD);
 
-        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
-                1L, "TestVehicleChassi", "TestBrand", "TestModel"
-        );
         SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
-        saleRequestDTO.setClient(client);
-        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setClient(1L);
+        saleRequestDTO.setVehicle(1L);
         saleRequestDTO.setStatus(SalesStatus.SOLD);
 
-        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
-        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));;
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));;
 
         assertThrows(InvalidRequestException.class, () -> saleService.create(saleRequestDTO));
     }
@@ -233,16 +219,13 @@ public class SaleServiceTest {
         Vehicle newVehicle = buildVehicle(2L, VehicleStatus.AVAILABLE);
         Sale sale = buildSale(1L, oldVehicle, client, SalesStatus.SOLD);
 
-        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
-                2L, "TestVehicleChassi", "TestBrand", "TestModel"
-        );
         SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
-        saleRequestDTO.setClient(client);
-        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setClient(1L);
+        saleRequestDTO.setVehicle(2L);
         saleRequestDTO.setStatus(SalesStatus.SOLD);
 
-        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
-        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(newVehicle));
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(2L)).thenReturn(Optional.of(newVehicle));
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
         when(vehicleRepository.save(any(Vehicle.class))).thenReturn(newVehicle);
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
@@ -255,8 +238,8 @@ public class SaleServiceTest {
         assertEquals(sale, updatedSale);
         assertEquals(VehicleStatus.AVAILABLE, oldVehicle.getVehicleStatus());
         assertEquals(VehicleStatus.SOLD, newVehicle.getVehicleStatus());
-        verify(clientRepository, times(1)).findById(client.getId());
-        verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
+        verify(clientRepository, times(1)).findById(1L);
+        verify(vehicleRepository, times(1)).findById(2L);
         verify(saleRepository, times(1)).findById(1L);
         verify(vehicleRepository, times(2)).save(any(Vehicle.class));
         verify(saleRepository, times(1)).save(any(Sale.class));
@@ -274,16 +257,13 @@ public class SaleServiceTest {
         Vehicle vehicle = buildVehicle(1L, oldStatus.equals(SalesStatus.SOLD) ? VehicleStatus.SOLD : VehicleStatus.RESERVED);
         Sale sale = buildSale(1L, vehicle, client, oldStatus);
 
-        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
-                1L, "TestVehicleChassi", "TestBrand", "TestModel"
-        );
         SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
-        saleRequestDTO.setClient(client);
-        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setClient(1L);
+        saleRequestDTO.setVehicle(1L);
         saleRequestDTO.setStatus(newStatus);
 
-        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
-        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
         when(vehicleRepository.save(any(Vehicle.class))).thenReturn(vehicle);
         when(saleRepository.save(any(Sale.class))).thenReturn(sale);
@@ -297,8 +277,8 @@ public class SaleServiceTest {
         assertEquals(client, updatedSale.getClient());
         assertEquals(newStatus, updatedSale.getStatus());
         assertEquals(sale, updatedSale);
-        verify(clientRepository, times(1)).findById(client.getId());
-        verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
+        verify(clientRepository, times(1)).findById(1L);
+        verify(vehicleRepository, times(1)).findById(1L);
         verify(saleRepository, times(1)).findById(1L);
         verify(vehicleRepository, times(1)).save(any(Vehicle.class));
         verify(saleRepository, times(1)).save(any(Sale.class));
@@ -316,22 +296,19 @@ public class SaleServiceTest {
         Vehicle vehicle = buildVehicle(1L, oldStatus.equals(SalesStatus.SOLD) ? VehicleStatus.SOLD : VehicleStatus.RESERVED);
         Sale sale = buildSale(1L, vehicle, client, oldStatus);
 
-        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
-                1L, "TestVehicleChassi", "TestBrand", "TestModel"
-        );
         SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
-        saleRequestDTO.setClient(client);
-        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setClient(1L);
+        saleRequestDTO.setVehicle(1L);
         saleRequestDTO.setStatus(newStatus);
 
-        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
-        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
 
         assertThrows(InvalidRequestException.class, () -> saleService.update(1L, saleRequestDTO));
 
-        verify(clientRepository, times(1)).findById(client.getId());
-        verify(vehicleRepository, times(1)).findById(vehicleMinimalDTO.id());
+        verify(clientRepository, times(1)).findById(1L);
+        verify(vehicleRepository, times(1)).findById(1L);
         verify(saleRepository, times(1)).findById(1L);
     }
 
@@ -342,16 +319,13 @@ public class SaleServiceTest {
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
         Sale sale = buildSale(1L, vehicle, client, SalesStatus.RESERVED);
 
-        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
-                1L, "TestVehicleChassi", "TestBrand", "TestModel"
-        );
         SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
-        saleRequestDTO.setClient(client);
-        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setClient(1L);
+        saleRequestDTO.setVehicle(1L);
         saleRequestDTO.setStatus(SalesStatus.SOLD);
 
-        when(clientRepository.findById(client.getId())).thenReturn(Optional.empty());
-        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));;
+        when(clientRepository.findById(1L)).thenReturn(Optional.empty());
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));;
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
 
         assertThrows(InvalidRequestException.class, () -> saleService.update(1L, saleRequestDTO));
@@ -364,16 +338,13 @@ public class SaleServiceTest {
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
         Sale sale = buildSale(1L, vehicle, client, SalesStatus.RESERVED);
 
-        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
-                1L, "TestVehicleChassi", "TestBrand", "TestModel"
-        );
         SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
-        saleRequestDTO.setClient(client);
-        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setClient(1L);
+        saleRequestDTO.setVehicle(1L);
         saleRequestDTO.setStatus(SalesStatus.SOLD);
 
-        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
-        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.empty());;
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.empty());;
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
 
         assertThrows(InvalidRequestException.class, () -> saleService.update(1L, saleRequestDTO));
@@ -385,16 +356,13 @@ public class SaleServiceTest {
         Client client = buildClient(1L);
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
 
-        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
-                1L, "TestVehicleChassi", "TestBrand", "TestModel"
-        );
         SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
-        saleRequestDTO.setClient(client);
-        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setClient(1L);
+        saleRequestDTO.setVehicle(1L);
         saleRequestDTO.setStatus(SalesStatus.SOLD);
 
-        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
-        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(vehicle));
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
         when(saleRepository.findById(1L)).thenReturn(Optional.empty());
 
         assertThrows(InvalidRequestException.class, () -> saleService.update(1L, saleRequestDTO));
@@ -408,16 +376,13 @@ public class SaleServiceTest {
         Vehicle newVehicle = buildVehicle(2L, VehicleStatus.SOLD);
         Sale sale = buildSale(1L, oldVehicle, client, SalesStatus.RESERVED);
 
-        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
-                2L, "TestVehicleChassi", "TestBrand", "TestModel"
-        );
         SaleRequestDTO saleRequestDTO = new SaleRequestDTO();
-        saleRequestDTO.setClient(client);
-        saleRequestDTO.setVehicle(vehicleMinimalDTO);
+        saleRequestDTO.setClient(1L);
+        saleRequestDTO.setVehicle(1L);
         saleRequestDTO.setStatus(SalesStatus.SOLD);
 
-        when(clientRepository.findById(client.getId())).thenReturn(Optional.of(client));
-        when(vehicleRepository.findById(vehicleMinimalDTO.id())).thenReturn(Optional.of(newVehicle));;
+        when(clientRepository.findById(1L)).thenReturn(Optional.of(client));
+        when(vehicleRepository.findById(2L)).thenReturn(Optional.of(newVehicle));;
         when(saleRepository.findById(1L)).thenReturn(Optional.of(sale));
 
         assertThrows(InvalidRequestException.class, () -> saleService.update(1L, saleRequestDTO));
