@@ -97,7 +97,7 @@ class LoadTest extends Simulation {
           jsonPath("$.id").optional.saveAs("maintenanceId")
         )
     )
-    .doIfOrElse(session => session("createStatus").as[Int] == 201) {
+    .doIfOrElse(session => session("createStatus").asOption[Int].contains(201)) {
       exec(
         http("Get All Maintenances")
           .get("/api/maintenances")

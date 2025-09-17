@@ -96,9 +96,9 @@ class StressTest extends Simulation {
             .header("Authorization", "Bearer #{jwtToken}")
             .body(StringBody(
               """{
-            "vehicleId": #{vehicleId},
-            "additionalInfo": "#{additionalInfo}"
-          }"""
+                "vehicleId": #{vehicleId},
+                "additionalInfo": "#{additionalInfo}"
+              }"""
             )).asJson
             .check(status.in(200 to 499))
             .check(
@@ -106,7 +106,7 @@ class StressTest extends Simulation {
               jsonPath("$.id").optional.saveAs("maintenanceId")
             )
         )
-        .doIfOrElse(session => session("createStatus").as[Int] == 201) {
+        .doIfOrElse(session => session("createStatus").asOption[Int].contains(201)) {
           exec(
             http("Delete Maintenance")
               .delete("/api/maintenances/#{maintenanceId}")
