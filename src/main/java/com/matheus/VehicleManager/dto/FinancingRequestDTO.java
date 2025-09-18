@@ -10,10 +10,10 @@ import java.time.LocalDate;
 
 public class FinancingRequestDTO {
     @NotNull(message = "Cliente é obrigatório")
-    private Client client;
+    private Long client;
 
     @NotNull(message = "Veículo é obrigatório")
-    private VehicleMinimalDTO vehicle;
+    private Long vehicle;
 
     @NotNull(message = "Valor total é obrigatório")
     @DecimalMin(value = "0.0", inclusive = false)
@@ -41,19 +41,19 @@ public class FinancingRequestDTO {
     @NotNull(message = "Data do primeiro pagamento é obrigatória")
     private LocalDate firstInstallmentDate;
 
-    public @NotNull(message = "Cliente é obrigatório") Client getClient() {
+    public @NotNull(message = "Cliente é obrigatório") Long getClient() {
         return client;
     }
 
-    public void setClient(@NotNull(message = "Cliente é obrigatório") Client client) {
+    public void setClient(@NotNull(message = "Cliente é obrigatório") Long client) {
         this.client = client;
     }
 
-    public @NotNull(message = "Veículo é obrigatório") VehicleMinimalDTO getVehicle() {
+    public @NotNull(message = "Veículo é obrigatório") Long getVehicle() {
         return vehicle;
     }
 
-    public void setVehicle(@NotNull(message = "Veículo é obrigatório") VehicleMinimalDTO vehicle) {
+    public void setVehicle(@NotNull(message = "Veículo é obrigatório") Long vehicle) {
         this.vehicle = vehicle;
     }
 

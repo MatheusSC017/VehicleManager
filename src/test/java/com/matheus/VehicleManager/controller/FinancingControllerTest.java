@@ -154,16 +154,9 @@ public class FinancingControllerTest {
         Vehicle vehicle = buildVehicle(1L, VehicleStatus.AVAILABLE);
         Financing financing = buildFinancing(1L, vehicle, client, FinancingStatus.DRAFT);
 
-        VehicleMinimalDTO vehicleMinimalDTO = new VehicleMinimalDTO(
-                1L,
-                "TestVehicleChassi",
-                "TestVehicleBrand",
-                "TestVehicleModel"
-        );
-
         FinancingRequestDTO financingRequestDTO = new FinancingRequestDTO();
-        financingRequestDTO.setVehicle(vehicleMinimalDTO);
-        financingRequestDTO.setClient(client);
+        financingRequestDTO.setVehicle(1L);
+        financingRequestDTO.setClient(1L);
         financingRequestDTO.setTotalAmount(new BigDecimal(100000));
         financingRequestDTO.setDownPayment(new BigDecimal(40000));
         financingRequestDTO.setInstallmentCount(40);

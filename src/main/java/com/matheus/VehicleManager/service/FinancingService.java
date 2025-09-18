@@ -51,8 +51,8 @@ public class FinancingService {
 
     @Transactional
     public Financing create(FinancingRequestDTO financingRequestDTO) {
-        Client client = clientRepository.findById(financingRequestDTO.getClient().getId()).orElse(null);
-        Vehicle vehicle = vehicleRepository.findById(financingRequestDTO.getVehicle().id()).orElse(null);
+        Client client = clientRepository.findById(financingRequestDTO.getClient()).orElse(null);
+        Vehicle vehicle = vehicleRepository.findById(financingRequestDTO.getVehicle()).orElse(null);
 
         Map<String, String> errors = new HashMap<>();
         if (client == null) errors.put("client", "Cliente não encontrado");
@@ -81,8 +81,8 @@ public class FinancingService {
 
     @Transactional
     public Financing update(Long financingId, FinancingRequestDTO financingRequestDTO) {
-        Client client = clientRepository.findById(financingRequestDTO.getClient().getId()).orElse(null);
-        Vehicle vehicle = vehicleRepository.findById(financingRequestDTO.getVehicle().id()).orElse(null);
+        Client client = clientRepository.findById(financingRequestDTO.getClient()).orElse(null);
+        Vehicle vehicle = vehicleRepository.findById(financingRequestDTO.getVehicle()).orElse(null);
         Financing financing = financingRepository.getReferenceById(financingId);
 
         Map<String, String> errors = new HashMap<>();
