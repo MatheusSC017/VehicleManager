@@ -1,8 +1,5 @@
 package com.matheus.VehicleManager.dto;
 
-import com.matheus.VehicleManager.enums.FinancingStatus;
-
-import com.matheus.VehicleManager.model.Client;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
