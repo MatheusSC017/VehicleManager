@@ -1,0 +1,277 @@
+package simulations.financing
+
+import io.gatling.core.Predef._
+import io.gatling.http.Predef._
+
+import java.util.concurrent.ConcurrentLinkedQueue
+
+import scala.concurrent.duration._
+import scala.jdk.CollectionConverters._
+
+class LoadTest  extends Simulation {
+
+  val httpProtocol = http
+    .baseUrl("http://localhost:80")
+    .acceptHeader("application/json")
+    .contentTypeHeader("application/json")
+
+  val vehicleFeeder = csv("data/vehicles.csv").circular
+  val clientFeeder = csv("data/clients.csv").circular
+  val dynamicFinancingFeeder = Iterator.continually(
+    Map(
+      "totalAmount"          -> BigDecimal(scala.util.Random.between(100000, 500000)).bigDecimal.toPlainString,
+      "downPayment"          -> BigDecimal(scala.util.Random.between(20000, 90000)).bigDecimal.toPlainString,
+      "installmentCount"     -> (scala.util.Random.between(12, 60)).toString,
+      "installmentValue"     -> BigDecimal(scala.util.Random.between(2000, 4000)).bigDecimal.toPlainString,
+      "annualInterestRate"   -> BigDecimal(scala.util.Random.between(1, 4)).bigDecimal.toPlainString,
+      "contractDate"         -> {
+        val year = scala.util.Random.between(1990, 2025)
+        val month = scala.util.Random.between(1, 13)
+        val day = scala.util.Random.between(1, 29)
+        f"$year-$month%02d-$day%02d"
+      },
+      "firstInstallmentDate" -> {
+        val year = scala.util.Random.between(1990, 2025)
+        val month = scala.util.Random.between(1, 13)
+        val day = scala.util.Random.between(1, 29)
+        f"$year-$month%02d-$day%02d"
+      }
+    )
+  )
+
+  object SharedData {
+    val vehicleIds = new ConcurrentLinkedQueue[String]()
+    val clientIds = new ConcurrentLinkedQueue[String]()
+  }
+
+  val authenticate = exec(
+    http("Login")
+      .post("/api/auth/login")
+      .body(StringBody("""{"username":"admin", "password":"Admin5432"}"""))
+      .check(status.is(200))
+      .check(jsonPath("$.token").saveAs("jwtToken"))
+  ).exitHereIfFailed
+
+  val registerVehicles = scenario("Register Vehicles")
+    .exec(authenticate)
+    .pause(100.milliseconds, 300.milliseconds)
+    .feed(vehicleFeeder)
+    .exec(
+      http("Create Vehicle")
+        .post("/api/vehicles")
+        .header("Authorization", "Bearer #{jwtToken}")
+        .body(StringBody(
+          """{
+            "vehicleType": "#{vehicleType}",
+            "model": "#{model}",
+            "brand": "#{brand}",
+            "year": "#{year}",
+            "color": "#{color}",
+            "plate": "#{plate}",
+            "chassi": "#{chassi}",
+            "mileage": "#{mileage}",
+            "price": "#{price}",
+            "vehicleFuel": "#{vehicleFuel}",
+            "vehicleChange": "#{vehicleChange}",
+            "doors": "#{doors}",
+            "motor": "#{motor}",
+            "power": "#{power}"
+          }"""
+        )).asJson
+        .check(status.in(201))
+        .check(
+          status.saveAs("vehicleCreateStatus"),
+          jsonPath("$.id").optional.saveAs("vehicleId")
+        )
+    )
+    .doIf(session => session.contains("vehicleId")) {
+      exec { session =>
+        SharedData.vehicleIds.add(session("vehicleId").as[String])
+        session
+      }
+    }
+
+  val registerClients = scenario("Register Clients")
+    .exec(authenticate)
+    .pause(100.milliseconds, 300.milliseconds)
+    .feed(clientFeeder)
+    .exec(
+      http("Create Client")
+        .post("/api/clients")
+        .header("Authorization", s"Bearer #{jwtToken}")
+        .body(StringBody(
+          """{
+            "firstName": "#{firstName}",
+            "lastName": "#{lastName}",
+            "email": "#{email}",
+            "phone": "#{phone}"
+          }"""
+        )).asJson
+        .check(status.in(201))
+        .check(
+          status.saveAs("clientCreateStatus"),
+          jsonPath("$.id").optional.saveAs("clientId")
+        )
+    )
+    .doIf(session => session.contains("clientId")) {
+      exec { session =>
+        SharedData.clientIds.add(session("clientId").as[String])
+        session
+      }
+    }
+
+  val crudScenario = scenario("Financing CRUD Test")
+    .exec(authenticate)
+    .pause(100.milliseconds, 300.milliseconds)
+    .exec { session =>
+      val ids = SharedData.vehicleIds.asScala.toVector
+      if (ids.nonEmpty) {
+        val randomId = ids(scala.util.Random.nextInt(ids.size))
+        session.set("vehicleId", randomId)
+      } else {
+        session.markAsFailed
+      }
+    }
+    .exec { session =>
+      val ids = SharedData.clientIds.asScala.toVector
+      if (ids.nonEmpty) {
+        val randomId = ids(scala.util.Random.nextInt(ids.size))
+        session.set("clientId", randomId)
+      } else {
+        session.markAsFailed
+      }
+    }
+    .feed(dynamicFinancingFeeder)
+    .exec(
+      http("Create Financing")
+        .post("/api/financings")
+        .header("Authorization", "Bearer #{jwtToken}")
+        .body(StringBody(
+          """{
+            "client": #{clientId},
+            "vehicle": #{vehicleId},
+            "totalAmount": "#{totalAmount}",
+            "downPayment": "#{downPayment}",
+            "installmentCount": "#{installmentCount}",
+            "installmentValue": "#{installmentValue}",
+            "annualInterestRate": "#{annualInterestRate}",
+            "contractDate": "#{contractDate}",
+            "firstInstallmentDate": "#{firstInstallmentDate}"
+          }"""
+        )).asJson
+        .check(status.in(200 to 499))
+        .check(
+          status.saveAs("createStatus"),
+          jsonPath("$.id").optional.saveAs("financingId")
+        )
+    )
+    .doIfOrElse(session => session("createStatus").asOption[Int].contains(201)) {
+      exec(
+        http("Get All Financings")
+          .get("/api/financings")
+          .header("Authorization", "Bearer #{jwtToken}")
+          .check(status.in(200 to 499))
+      )
+        .pause(100.milliseconds, 300.milliseconds)
+        .exec(
+          http("Get Financing by ID")
+            .get("/api/financings/#{financingId}")
+            .header("Authorization", "Bearer #{jwtToken}")
+            .check(status.in(200 to 499))
+        )
+        .pause(100.milliseconds, 300.milliseconds)
+        .exec(
+          http("Get Financings by Vehicle ID")
+            .get("/api/financings/vehicle/#{vehicleId}")
+            .header("Authorization", "Bearer #{jwtToken}")
+            .check(status.in(200 to 499))
+        )
+        .pause(100.milliseconds, 300.milliseconds)
+        .exec(
+          http("Update Financing")
+            .put("/api/financings/#{financingId}")
+            .header("Authorization", "Bearer #{jwtToken}")
+            .body(StringBody(
+              """{
+                "client": #{clientId},
+                "vehicle": #{vehicleId},
+                "totalAmount": "#{totalAmount}",
+                "downPayment": "#{downPayment}",
+                "installmentCount": "#{installmentCount}",
+                "installmentValue": "#{installmentValue}",
+                "annualInterestRate": "#{annualInterestRate}",
+                "contractDate": "#{contractDate}",
+                "firstInstallmentDate": "#{firstInstallmentDate}"
+              }"""
+            )).asJson
+            .check(status.in(200 to 499))
+        )
+        .pause(100.milliseconds, 300.milliseconds)
+        .exec(
+          http("Get Financings by Vehicle ID")
+            .patch("/api/financings/#{financingId}/status")
+            .header("Authorization", "Bearer #{jwtToken}")
+            .body(StringBody(
+              """{
+                "status": "CANCELED"
+              }"""
+            )).asJson
+            .check(status.in(200 to 499))
+        )
+    } {
+      exitHereIfFailed
+    }
+
+  val readOnlyScenario = scenario("Financing Load Test - Read Only")
+    .exec(authenticate)
+    .pause(100.milliseconds, 300.milliseconds)
+    .exec { session =>
+      val ids = SharedData.vehicleIds.asScala.toVector
+      if (ids.nonEmpty) {
+        val randomId = ids(scala.util.Random.nextInt(ids.size))
+        session.set("vehicleId", randomId)
+      } else {
+        session.markAsFailed
+      }
+    }
+    .repeat(5) {
+      pause(100.milliseconds, 300.milliseconds)
+        .exec(
+          http("Get All Financings")
+            .get("/api/financings")
+            .header("Authorization", "Bearer #{jwtToken}")
+            .check(status.in(200 to 499))
+        )
+        .pause(100.milliseconds, 300.milliseconds)
+        .exec(
+          http("Get Financings by Vehicle ID")
+            .get("/api/financings/vehicle/#{vehicleId}")
+            .header("Authorization", "Bearer #{jwtToken}")
+            .check(status.in(200 to 499))
+        )
+    }
+
+  setUp(
+    registerVehicles.inject(atOnceUsers(100)).andThen(
+      registerClients.inject(atOnceUsers(100)).andThen(
+        crudScenario.inject(
+          rampUsersPerSec(2) to 30 during (2.minutes),
+          constantUsersPerSec(30) during (10.minutes),
+          rampUsersPerSec(30) to 2 during (2.minutes)
+        ),
+        readOnlyScenario.inject(
+          rampUsersPerSec(2) to 30 during (2.minutes),
+          constantUsersPerSec(30) during (10.minutes),
+          rampUsersPerSec(30) to 2 during (2.minutes)
+        )
+      )
+    )
+
+  ).protocols(httpProtocol)
+    .assertions(
+      global.responseTime.max.lt(4000),
+      global.responseTime.mean.lt(1000),
+      global.successfulRequests.percent.gt(95)
+    )
+
+}
