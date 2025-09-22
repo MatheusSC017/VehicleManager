@@ -208,7 +208,7 @@ class BasicTest extends Simulation {
         )
         .pause(100.milliseconds, 300.milliseconds)
         .exec(
-          http("Get Financings by Vehicle ID")
+          http("Updating financing status")
             .patch("/api/financings/#{financingId}/status")
             .header("Authorization", "Bearer #{jwtToken}")
             .body(StringBody(

@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import scala.concurrent.duration._
 import scala.jdk.CollectionConverters._
 
-class LoadTest  extends Simulation {
+class StressTest  extends Simulation {
 
   val httpProtocol = http
     .baseUrl("http://localhost:80")
@@ -120,7 +120,7 @@ class LoadTest  extends Simulation {
       }
     }
 
-  val crudScenario = scenario("Financing CRUD Test")
+  val stressScenario = scenario("Financing CRUD Test")
     .exec(authenticate)
     .pause(100.milliseconds, 300.milliseconds)
     .exec { session =>
@@ -142,54 +142,17 @@ class LoadTest  extends Simulation {
       }
     }
     .feed(dynamicFinancingFeeder)
-    .exec(
-      http("Create Financing")
-        .post("/api/financings")
-        .header("Authorization", "Bearer #{jwtToken}")
-        .body(StringBody(
-          """{
-            "client": #{clientId},
-            "vehicle": #{vehicleId},
-            "totalAmount": "#{totalAmount}",
-            "downPayment": "#{downPayment}",
-            "installmentCount": "#{installmentCount}",
-            "installmentValue": "#{installmentValue}",
-            "annualInterestRate": "#{annualInterestRate}",
-            "contractDate": "#{contractDate}",
-            "firstInstallmentDate": "#{firstInstallmentDate}"
-          }"""
-        )).asJson
-        .check(status.in(200 to 499))
-        .check(
-          status.saveAs("createStatus"),
-          jsonPath("$.id").optional.saveAs("financingId")
-        )
-    )
-    .doIfOrElse(session => session("createStatus").asOption[Int].contains(201)) {
-      exec(
-        http("Get All Financings")
-          .get("/api/financings")
-          .header("Authorization", "Bearer #{jwtToken}")
-          .check(status.in(200 to 499))
-      )
-        .pause(100.milliseconds, 300.milliseconds)
-        .exec(
-          http("Get Financing by ID")
-            .get("/api/financings/#{financingId}")
+    .during(3.minutes) {
+      randomSwitch(
+        60.0 -> exec(
+          http("Get All Financings")
+            .get("/api/financings")
             .header("Authorization", "Bearer #{jwtToken}")
             .check(status.in(200 to 499))
-        )
-        .pause(100.milliseconds, 300.milliseconds)
-        .exec(
-          http("Get Financings by Vehicle ID")
-            .get("/api/financings/vehicle/#{vehicleId}")
-            .header("Authorization", "Bearer #{jwtToken}")
-            .check(status.in(200 to 499))
-        )
-        .pause(100.milliseconds, 300.milliseconds)
-        .exec(
-          http("Update Financing")
-            .put("/api/financings/#{financingId}")
+        ),
+        30.0 -> exec(
+          http("Create Financing")
+            .post("/api/financings")
             .header("Authorization", "Bearer #{jwtToken}")
             .body(StringBody(
               """{
@@ -205,73 +168,54 @@ class LoadTest  extends Simulation {
               }"""
             )).asJson
             .check(status.in(200 to 499))
-        )
-        .pause(100.milliseconds, 300.milliseconds)
-        .exec(
-          http("Updating financing status")
-            .patch("/api/financings/#{financingId}/status")
-            .header("Authorization", "Bearer #{jwtToken}")
-            .body(StringBody(
-              """{
-                "status": "CANCELED"
-              }"""
-            )).asJson
-            .check(status.in(200 to 499))
-        )
-    } {
-      exitHereIfFailed
-    }
-
-  val readOnlyScenario = scenario("Financing Load Test - Read Only")
-    .exec(authenticate)
-    .pause(100.milliseconds, 300.milliseconds)
-    .exec { session =>
-      val ids = SharedData.vehicleIds.asScala.toVector
-      if (ids.nonEmpty) {
-        val randomId = ids(scala.util.Random.nextInt(ids.size))
-        session.set("vehicleId", randomId)
-      } else {
-        session.markAsFailed
-      }
-    }
-    .repeat(5) {
-      pause(100.milliseconds, 300.milliseconds)
-        .exec(
-          http("Get All Financings")
-            .get("/api/financings")
-            .header("Authorization", "Bearer #{jwtToken}")
-            .check(status.in(200 to 499))
-        )
-        .pause(100.milliseconds, 300.milliseconds)
-        .exec(
-          http("Get Financings by Vehicle ID")
-            .get("/api/financings/vehicle/#{vehicleId}")
-            .header("Authorization", "Bearer #{jwtToken}")
-            .check(status.in(200 to 499))
-        )
+            .check(
+              status.saveAs("createStatus"),
+              jsonPath("$.id").optional.saveAs("financingId")
+            )
+        ).doIf(session => session("createStatus").asOption[Int].contains(201)) {
+          exec(
+            http("Updating financing status")
+              .patch("/api/financings/#{financingId}/status")
+              .header("Authorization", "Bearer #{jwtToken}")
+              .body(StringBody(
+                """{
+                  "status": "CANCELED"
+                }"""
+              )).asJson
+              .check(status.in(200 to 499))
+          )
+        },
+        10.0 -> doIf(session => session.contains("financingId")) {
+          exec(
+            http("Get Financing by ID")
+              .get("/api/financings/#{financingId}")
+              .header("Authorization", "Bearer #{jwtToken}")
+              .check(status.in(200 to 499))
+          )
+        }
+      )
+        .pause(1.seconds, 3.seconds)
     }
 
   setUp(
     registerVehicles.inject(atOnceUsers(100)).andThen(
       registerClients.inject(atOnceUsers(100)).andThen(
-        crudScenario.inject(
-          rampUsersPerSec(2) to 30 during (2.minutes),
-          constantUsersPerSec(30) during (10.minutes),
-          rampUsersPerSec(30) to 2 during (2.minutes)
-        ),
-        readOnlyScenario.inject(
-          rampUsersPerSec(2) to 30 during (2.minutes),
-          constantUsersPerSec(30) during (10.minutes),
-          rampUsersPerSec(30) to 2 during (2.minutes)
+        stressScenario.inject(
+          rampUsersPerSec(10) to 20 during (1.minute),
+          rampUsersPerSec(20) to 35 during (1.minute),
+          rampUsersPerSec(35) to 60 during (1.minute),
+          constantUsersPerSec(60) during (2.minutes),
+          rampUsersPerSec(60) to 10 during (2.minutes)
         )
       )
     )
 
   ).protocols(httpProtocol)
     .assertions(
-      global.responseTime.max.lt(4000),
-      global.responseTime.mean.lt(1000),
-      global.successfulRequests.percent.gt(95)
+      global.responseTime.max.lt(6000),
+      global.responseTime.mean.lt(500),
+      global.successfulRequests.percent.gt(70),
+      global.responseTime.percentile3.lt(1500)
     )
 
 }
