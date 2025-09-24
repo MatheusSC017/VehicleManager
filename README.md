@@ -30,7 +30,34 @@ Before you begin, ensure you have the following installed on your local machine:
 - Maven 3.x
 - PostgreSQL
 
-## Getting Started
+## Getting Started with Docker Compose
+
+Follow these steps to get a local copy of the project up and running with docker compose.
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/MatheusSC017/VehicleManager.git
+cd VehicleManager
+```
+
+### 2. Create an environment file
+
+The application needs an environment file to connect to the database and handle security settings.
+
+```
+SECRET_KEY=<SECRET_KEY>
+ALLOWED_ORIGINS=<ALLOWED_ORIGINS>
+DB_PASSWORD=<DB_PASSWORD>
+```
+
+### 3. Start the application
+
+```bash
+docker-compose up -d
+```
+
+## Getting Started with Local Running
 
 Follow these steps to get a local copy of the project up and running.
 
@@ -47,7 +74,7 @@ The application needs a configuration file to connect to the database and handle
 
 #### Step 1: Create the configuration file
 
-Create a file named application-dev.properties inside the directory:
+Update the file named application-dev.properties inside the directory:
 
 ```
 src/main/resources
