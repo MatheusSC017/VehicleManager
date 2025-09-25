@@ -1,0 +1,21 @@
+# Ignore common build artifacts
+target/
+build/
+.gradle/
+.idea/
+.vscode/
+.settings/
+
+# Ignore local development files
+.classpath
+.project
+.DS_Store
+*.iml
+*.ipr
+*.iws
+*.log
+tmp/
+
+# Ignore Git-related files
+.git/
+.gitignore
