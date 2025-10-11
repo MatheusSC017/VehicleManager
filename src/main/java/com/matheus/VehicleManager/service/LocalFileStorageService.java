@@ -1,6 +1,7 @@
 package com.matheus.VehicleManager.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
 @Service
+@Profile({"dev", "test"})
 public class LocalFileStorageService implements FileStorageService {
 
     @Value("${file.upload-dir}")
