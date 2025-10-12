@@ -5,7 +5,7 @@ import com.matheus.VehicleManager.model.FileStore;
 import com.matheus.VehicleManager.model.Vehicle;
 import com.matheus.VehicleManager.security.JwtAuthenticationFilter;
 import com.matheus.VehicleManager.security.JwtUtil;
-import com.matheus.VehicleManager.service.FileService;
+import com.matheus.VehicleManager.service.LocalFileService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(FileController.class)
+@WebMvcTest(LocalFileController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class FileControllerTest {
 
@@ -32,7 +32,7 @@ class FileControllerTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private FileService fileService;
+    private LocalFileService fileService;
 
     @MockitoBean
     private JwtUtil jwtUtil;

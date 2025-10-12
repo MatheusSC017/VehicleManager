@@ -11,9 +11,12 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 
 import java.io.IOException;
 import java.net.URLConnection;
+import java.time.Duration;
 import java.util.UUID;
 
 @Service
@@ -33,6 +36,7 @@ public class S3StorageService implements FileStorageService {
     private String bucketName;
 
     private S3Client s3Client;
+    private S3Presigner s3Presigner;
 
     private S3Client getS3Client() {
         if (s3Client == null) {
@@ -45,27 +49,37 @@ public class S3StorageService implements FileStorageService {
         return s3Client;
     }
 
-    @Override
-    public String storeFile(MultipartFile file) throws IOException {
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        String contentType = file.getContentType();
-
-        if (contentType == null) {
-            contentType = URLConnection.guessContentTypeFromName(file.getOriginalFilename());
+    private S3Presigner getS3Presigner() {
+        if (s3Presigner == null) {
+            AwsBasicCredentials credentials = AwsBasicCredentials.create(accessKey, secretKey);
+            s3Presigner = S3Presigner.builder()
+                    .region(Region.of(region))
+                    .credentialsProvider(StaticCredentialsProvider.create(credentials))
+                    .build();
         }
+        return s3Presigner;
+    }
 
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+    public String generatePresignedUrl(String filename, String contentType) {
+        PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key(fileName)
+                .key(filename)
                 .contentType(contentType)
                 .build();
 
-        getS3Client().putObject(putObjectRequest, RequestBody.fromBytes(file.getBytes()));
+        PresignedPutObjectRequest presignedRequest = getS3Presigner()
+                .presignPutObject(builder -> builder
+                        .signatureDuration(Duration.ofMinutes(10))
+                        .putObjectRequest(objectRequest)
+                );
 
-        return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, fileName);
+        return presignedRequest.url().toString();
     }
 
-    @Override
+    public String storeFile(MultipartFile file) throws IOException {
+        throw new UnsupportedOperationException("Direct upload not supported when using presigned URLs.");
+    }
+
     public void deleteFile(String filePath) throws IOException {
         String key = filePath;
         if (filePath.startsWith("https://")) {

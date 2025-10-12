@@ -32,7 +32,7 @@ class FileServiceTest {
     private VehicleRepository vehicleRepository;
 
     @InjectMocks
-    private FileService fileService;
+    private LocalFileService fileService;
 
     @BeforeEach
     void setUp() {

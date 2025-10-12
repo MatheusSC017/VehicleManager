@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class FileService {
+public class LocalFileService {
 
     @Autowired
     private FileStorageService fileStorageService;
@@ -79,4 +79,5 @@ public class FileService {
             }
         }
     }
+
 }

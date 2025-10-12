@@ -2,8 +2,9 @@ package com.matheus.VehicleManager.controller;
 
 import com.matheus.VehicleManager.dto.FileResponseDTO;
 import com.matheus.VehicleManager.model.FileStore;
-import com.matheus.VehicleManager.service.FileService;
+import com.matheus.VehicleManager.service.LocalFileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +16,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/files")
-public class FileController {
+@Profile("dev")
+public class LocalFileController {
 
     @Autowired
-    private FileService fileService;
+    private LocalFileService fileService;
 
     private static FileResponseDTO toDTO(FileStore file) {
         return new FileResponseDTO(
@@ -34,7 +36,7 @@ public class FileController {
     public ResponseEntity<List<FileResponseDTO>> getAll() {
         List<FileStore> fileStores = fileService.getAll();
         List<FileResponseDTO> fileStoresDtos = fileStores.stream()
-                .map(FileController::toDTO)
+                .map(LocalFileController::toDTO)
                 .toList();
         return ResponseEntity.ok(fileStoresDtos);
     }
