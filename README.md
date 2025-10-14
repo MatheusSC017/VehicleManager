@@ -19,6 +19,7 @@ This project can be used separately or in conjunction with the frontend, for thi
 - **Spring Boot 3**: Core framework for building the application.
 - **Spring Data JPA**: For data persistence and repository management.
 - **PostgreSQL**: The primary database for the application.
+- **AWS S3**: Used in the prod profile, responsible for storing images in the cloud.
 - **H2 Database**: Used for running automated tests.
 - **Maven**: Dependency management and build tool.
 - **Spring Security**: For handling authentication and authorization.
@@ -41,7 +42,7 @@ git clone https://github.com/MatheusSC017/VehicleManager.git
 cd VehicleManager
 ```
 
-### 2. Create an environment file
+### 2. Create an environment file (.env)
 
 The application needs an environment file to connect to the database and handle security settings.
 
@@ -49,6 +50,10 @@ The application needs an environment file to connect to the database and handle 
 SECRET_KEY=<SECRET_KEY>
 ALLOWED_ORIGINS=<ALLOWED_ORIGINS>
 DB_PASSWORD=<DB_PASSWORD>
+AWS_ACCESS_KEY=<AWS_ACCESS_KEY>
+AWS_SECRET_KEY=<AWS_SECRET_KEY>
+AWS_REGION=<AWS_REGION>
+ASW_S3_BUCKET_NAME=<ASW_S3_BUCKET_NAME>
 ```
 
 ### 3. Start the application
@@ -70,7 +75,7 @@ cd VehicleManager
 
 ### 2. Profile Configuration
 
-The application needs a configuration file to connect to the database and handle security settings.
+Configure the environment variables according to the configuration file you intend to use, dev or prod.
 
 #### Step 1: Create the configuration file
 
@@ -136,12 +141,11 @@ mvn test
 
 ## Easily Configurable File Storage
 
-Inside the `services` folder (`src/main/java/com/matheus/VehicleManager`), you will find the `FileStorageService` interface. This interface defines the contract for managing file storage and deletion.
+In the **Control** and **Services** modules, dedicated **%File%** components were implemented to handle file management operations.
 
-To use it, you can create your own class that implements this interface and provides the desired storage logic.
+During **development**, the system is configured to use **local storage** for file handling.
 
-For development purposes, a default implementation called `LocalStorageFileService` is included, which handles local file I/O.
-If you plan to deploy the project, you should remove this default implementation and replace it with your own configuration tailored to your environment (e.g., cloud storage, external service, etc.).
+In **production**, it integrates with **AWS S3**, utilizing **pre-signed URLs** to securely upload and access files.
 
 ## API Endpoints
 
@@ -163,6 +167,12 @@ The API is structured around REST principles. All endpoints are prefixed with `/
 -   `POST /api/vehicles`: Create a new vehicle.
 -   `PUT /api/vehicles/{id}`: Update an existing vehicle.
 -   `DELETE /api/vehicles/{id}`: Delete a vehicle.
+
+### Files
+
+-   `GET /api/files/{id}`: Get a specific file by its ID.
+-   `POST /api/files`: Create the files to a specific vehicle and return the pre-signed URLs.
+-   `PUT /api/files/{id}`: Create and Delete files to a specific vehicle and return the pre-signed URLs.
 
 ### Clients
 

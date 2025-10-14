@@ -38,15 +38,6 @@ public class PresignedFileController {
 
     }
 
-    @GetMapping
-    public ResponseEntity<List<FileResponseDTO>> getAll() {
-        List<FileStore> fileStores = fileService.getAll();
-        List<FileResponseDTO> fileStoresDtos = fileStores.stream()
-                .map(PresignedFileController::toDTO)
-                .toList();
-        return ResponseEntity.ok(fileStoresDtos);
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable("id") Long fileId) {
         FileStore fileStore = fileService.getById(fileId);
