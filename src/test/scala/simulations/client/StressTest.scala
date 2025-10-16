@@ -1,5 +1,6 @@
 package simulations.client
 
+import com.typesafe.config.ConfigFactory
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 
@@ -7,8 +8,13 @@ import scala.concurrent.duration._
 
 class StressTest extends Simulation {
 
+  val config = ConfigFactory.load()
+  val baseUrl = config.getString("vehicle-manager.baseUrl")
+  val username = config.getString("vehicle-manager.username")
+  val password = config.getString("vehicle-manager.password")
+
   val httpProtocol = http
-    .baseUrl("http://localhost:80")
+    .baseUrl(baseUrl)
     .acceptHeader("application/json")
     .contentTypeHeader("application/json")
     .shareConnections
@@ -25,7 +31,7 @@ class StressTest extends Simulation {
   val authenticate = exec(
     http("Login")
       .post("/api/auth/login")
-      .body(StringBody("""{"username":"admin", "password":"Admin5432"}"""))
+      .body(StringBody(s"""{"username":"$username", "password":"$password"}"""))
       .check(status.is(200))
       .check(jsonPath("$.token").saveAs("jwtToken"))
   ).exitHereIfFailed
