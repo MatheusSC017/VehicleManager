@@ -58,7 +58,7 @@ class LoadTest extends Simulation {
             "phone": "#{phone}"
           }"""
         )).asJson
-        .check(status.in(200, 400))
+        .check(status.in(200 to 400))
         .check(
           status.saveAs("createStatus"),
           jsonPath("$.id").optional.saveAs("clientId")

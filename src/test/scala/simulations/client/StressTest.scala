@@ -45,7 +45,7 @@ class StressTest extends Simulation {
             http("Get All Clients")
               .get("/api/clients")
               .header("Authorization", s"Bearer #{jwtToken}")
-              .check(status.in(200, 400))
+              .check(status.in(200 to 400))
           ),
           30.0 -> exec(
             http("Create Client")
@@ -59,7 +59,7 @@ class StressTest extends Simulation {
                 "phone": "#{phone}"
               }"""
               )).asJson
-              .check(status.in(200, 400))
+              .check(status.in(200 to 400))
               .check(jsonPath("$.id").optional.saveAs("clientId"))
           ),
           10.0 -> doIf(session => session.contains("clientId")) {
@@ -67,7 +67,7 @@ class StressTest extends Simulation {
               http("Get Client by ID")
                 .get("/api/clients/#{clientId}")
                 .header("Authorization", s"Bearer #{jwtToken}")
-                .check(status.in(200, 400))
+                .check(status.in(200 to 400))
             )
           }
         )
