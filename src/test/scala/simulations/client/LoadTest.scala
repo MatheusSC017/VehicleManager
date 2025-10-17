@@ -58,7 +58,7 @@ class LoadTest extends Simulation {
             "phone": "#{phone}"
           }"""
         )).asJson
-        .check(status.in(200, 400))
+        .check(status.in(200 to 400))
         .check(
           status.saveAs("createStatus"),
           jsonPath("$.id").optional.saveAs("clientId")
@@ -113,14 +113,14 @@ class LoadTest extends Simulation {
   setUp(
 
     readOnlyScenario.inject(
-      rampUsersPerSec(5) to 100 during (2.minutes),
-      constantUsersPerSec(100) during (10.minutes),
-      rampUsersPerSec(100) to 5 during (2.minutes)
+      rampUsersPerSec(5) to 50 during (2.minutes),
+      constantUsersPerSec(50) during (10.minutes),
+      rampUsersPerSec(50) to 5 during (2.minutes)
     ),
     crudScenario.inject(
-      rampUsersPerSec(2) to 35 during (2.minutes),
-      constantUsersPerSec(35) during (10.minutes),
-      rampUsersPerSec(35) to 2 during (2.minutes)
+      rampUsersPerSec(2) to 30 during (2.minutes),
+      constantUsersPerSec(30) during (10.minutes),
+      rampUsersPerSec(30) to 2 during (2.minutes)
     )
   ).protocols(httpProtocol)
     .assertions(

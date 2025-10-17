@@ -41,7 +41,7 @@ services:
       AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
       AWS_SECRET_KEY: ${AWS_SECRET_KEY}
       AWS_REGION: ${AWS_REGION}
-      ASW_S3_BUCKET_NAME: ${ASW_S3_BUCKET_NAME}
+      AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
     deploy:
       resources:
         limits:
@@ -70,7 +70,7 @@ services:
       AWS_ACCESS_KEY: ${AWS_ACCESS_KEY}
       AWS_SECRET_KEY: ${AWS_SECRET_KEY}
       AWS_REGION: ${AWS_REGION}
-      ASW_S3_BUCKET_NAME: ${ASW_S3_BUCKET_NAME}
+      AWS_S3_BUCKET_NAME: ${AWS_S3_BUCKET_NAME}
     deploy:
       resources:
         limits:

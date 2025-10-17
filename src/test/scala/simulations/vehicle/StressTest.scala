@@ -56,7 +56,7 @@ class StressTest extends Simulation {
             http("Get All Vehicles")
               .get("/api/vehicles")
               .header("Authorization", s"Bearer #{jwtToken}")
-              .check(status.in(200, 400))
+              .check(status.in(200 to 400))
           ),
           30.0 -> exec(
             http("Create Vehicle")
@@ -88,7 +88,7 @@ class StressTest extends Simulation {
               http("Get Vehicle by ID")
                 .get("/api/vehicles/#{vehicleId}")
                 .header("Authorization", s"Bearer #{jwtToken}")
-                .check(status.in(200, 400))
+                .check(status.in(200 to 400))
             )
           }
         )

@@ -139,6 +139,41 @@ To run the automated tests, use the following Maven command:
 mvn test
 ```
 
+## Running Gatling Tests
+
+To run all the gatlin tests use the command below
+
+```bash
+for sim in $(find src/test/scala -name "*.scala" | sed 's|src/test/scala/||; s|/|.|g; s|.scala$||'); do
+  echo "Running $sim"
+  mvn gatling:test -Dgatling.simulationClass=$sim
+done
+```
+
+To run individual gatling tests use the command below
+
+```bash
+mvn gatling:test
+```
+
+or change the values between curly braces in the command below, as explained in **group** and **test**
+
+```bash
+mvn gatling:test -Dgatling.simulationClass=simulations.<group>.<test>
+```
+
+### group 
+- client
+- financing
+- maintenance
+- sale
+- vehicle
+
+### test
+- BasicTest
+- LoadTest
+- StressTest
+
 ## Easily Configurable File Storage
 
 In the **Control** and **Services** modules, dedicated **%File%** components were implemented to handle file management operations.
