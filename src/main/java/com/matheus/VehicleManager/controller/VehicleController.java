@@ -51,7 +51,6 @@ public class VehicleController {
                                                                           @RequestParam(value="priceMax", defaultValue="0") int priceMax,
                                                                           @RequestParam(value = "page", defaultValue="0") int page,
                                                                           @RequestParam(value = "size", defaultValue="10") int size) {
-        Pageable paging = PageRequest.of(page, size);
         Page<VehicleImageResponseDTO> vehiclesPage;
         vehiclesPage = vehicleService.getFilteredVehiclesWithOneImage(
                 search,
@@ -60,7 +59,8 @@ public class VehicleController {
                 fuel,
                 priceMin,
                 priceMax,
-                paging
+                page,
+                size
         );
         return ResponseEntity.ok(vehiclesPage);
     }
@@ -74,7 +74,6 @@ public class VehicleController {
                                                            @RequestParam(value="priceMax", defaultValue="0") int priceMax,
                                                            @RequestParam(value = "page", defaultValue="0") int page,
                                                            @RequestParam(value = "size", defaultValue="10") int size) {
-        Pageable paging = PageRequest.of(page, size);
         Page<Vehicle> vehicles = vehicleService.getFilteredVehicles(
                 search,
                 status,
@@ -82,7 +81,8 @@ public class VehicleController {
                 fuel,
                 priceMin,
                 priceMax,
-                paging
+                page,
+                size
         );
         Page<VehicleResponseDTO> vehiclesPage = vehicles.map(VehicleController::toDTO);
         return ResponseEntity.ok(vehiclesPage);

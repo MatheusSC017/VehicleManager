@@ -128,6 +128,6 @@ class LoadTest extends Simulation {
       global.responseTime.mean.lt(800),
       global.responseTime.percentile3.lt(1500),
       global.successfulRequests.percent.gt(98),
-      forAll.failedRequests.count.lt(50)
+      forAll.failedRequests.percent.lt(5)
     )
 }

@@ -114,7 +114,7 @@ class VehicleServiceTest {
             any(Pageable.class)
         )).thenReturn(vehiclePage);
 
-        Page<Vehicle> foundVehicles = vehicleService.getFilteredVehicles("", null, null, null, 0, 0, paging);
+        Page<Vehicle> foundVehicles = vehicleService.getFilteredVehicles("", null, null, null, 0, 0, 0, 10);
 
         assertEquals(2, foundVehicles.getContent().size());
         assertEquals(vehicle1, foundVehicles.getContent().get(0));
@@ -150,7 +150,7 @@ class VehicleServiceTest {
                 any(Pageable.class)
         )).thenReturn(vehiclePage);
 
-        Page<Vehicle> foundVehicles = vehicleService.getFilteredVehicles("", "AVAILABLE", null, null, 0, 0, paging);
+        Page<Vehicle> foundVehicles = vehicleService.getFilteredVehicles("", "AVAILABLE", null, null, 0, 0, 0, 10);
 
         assertEquals(2, foundVehicles.getContent().size());
         assertEquals(VehicleStatus.AVAILABLE, foundVehicles.getContent().get(0).getVehicleStatus());
@@ -186,7 +186,7 @@ class VehicleServiceTest {
         )).thenReturn(vehiclePage);
 
 
-        Page<VehicleImageResponseDTO> foundVehicles = vehicleService.getFilteredVehiclesWithOneImage("", null, null, null, 0, 0, paging);
+        Page<VehicleImageResponseDTO> foundVehicles = vehicleService.getFilteredVehiclesWithOneImage("", null, null, null, 0, 0, 0, 10);
 
         assertEquals(2, foundVehicles.getContent().size());
         assertEquals(1L, foundVehicles.getContent().get(0).id());

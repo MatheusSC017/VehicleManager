@@ -13,6 +13,8 @@ import com.matheus.VehicleManager.repository.VehicleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,21 +36,27 @@ public class FinancingService {
     @Autowired
     private ClientRepository clientRepository;
 
+    @Cacheable(value = "financings_all", key = "#page + '-' + #size")
     public Page<Financing> getAll(int page, int size) {
         Pageable paging = PageRequest.of(page, size);
         return financingRepository.findAll(paging);
     }
 
+    @Cacheable(value = "financing_by_id", key = "#financingId")
     public Financing getById(Long financingId) {
         return financingRepository.findById(financingId)
                 .orElseThrow(() -> new EntityNotFoundException("Financing with id " + financingId + " not found"));
     }
 
+    @Cacheable(value = "financing_by_vehicle_id", key = "#vehicleId")
     public Financing getByVehicleIdNotCanceled(Long vehicleId) {
         return financingRepository.findActiveByVehicleId(vehicleId)
                 .orElseThrow(() -> new EntityNotFoundException("Financing with vehicle id " + vehicleId + " not found"));
     }
 
+    @CacheEvict(value = {
+            "financings_all", "financing_by_id", "financing_by_vehicle_id"
+    }, allEntries = true)
     @Transactional
     public Financing create(FinancingRequestDTO financingRequestDTO) {
         Client client = clientRepository.findById(financingRequestDTO.getClient()).orElse(null);
@@ -79,6 +87,9 @@ public class FinancingService {
         return financingRepository.save(financing);
     }
 
+    @CacheEvict(value = {
+            "financings_all", "financing_by_id", "financing_by_vehicle_id"
+    }, allEntries = true)
     @Transactional
     public Financing update(Long financingId, FinancingRequestDTO financingRequestDTO) {
         Client client = clientRepository.findById(financingRequestDTO.getClient()).orElse(null);

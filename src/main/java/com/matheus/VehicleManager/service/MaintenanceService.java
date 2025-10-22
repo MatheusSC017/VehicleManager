@@ -9,6 +9,8 @@ import com.matheus.VehicleManager.repository.VehicleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,20 +30,26 @@ public class MaintenanceService {
     @Autowired
     private VehicleRepository vehicleRepository;
 
+    @Cacheable(value = "maintenances_all", key = "#page + '-' + #size")
     public Page<Maintenance> findAll(int page, int size) {
         Pageable paging = PageRequest.of(page, size);
         return maintenanceRepository.findAll(paging);
     }
 
+    @Cacheable(value = "maintenances_by_vehicle_id", key = "#vehicleId")
     public List<Maintenance> findAllByVehicleId(Long vehicleId) {
         return maintenanceRepository.findByVehicleIdOrderByIdDesc(vehicleId);
     }
 
+    @Cacheable(value = "maintenances_by_id", key = "#maintenanceId")
     public Maintenance findById(Long maintenanceId) {
         return maintenanceRepository.findById(maintenanceId)
                 .orElseThrow(() -> new EntityNotFoundException("Maintenance with id " + maintenanceId + " not found"));
     }
 
+    @CacheEvict(value = {
+            "maintenances_all", "maintenances_by_vehicle_id", "maintenances_by_id"
+    }, allEntries = true)
     @Transactional
     public Maintenance create(Long vehicleId, String additionalInfo) {
         Vehicle vehicle = vehicleRepository.findById(vehicleId).orElse(null);
@@ -61,6 +69,9 @@ public class MaintenanceService {
         return maintenanceRepository.save(maintenance);
     }
 
+    @CacheEvict(value = {
+            "maintenances_all", "maintenances_by_vehicle_id", "maintenances_by_id"
+    }, allEntries = true)
     @Transactional
     public void delete(Long maintenanceId) {
         Maintenance maintenance = maintenanceRepository.findById(maintenanceId)

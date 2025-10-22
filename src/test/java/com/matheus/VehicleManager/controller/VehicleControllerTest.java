@@ -127,7 +127,8 @@ public class VehicleControllerTest {
                 any(),
                 anyInt(),
                 anyInt(),
-                any(Pageable.class)
+                anyInt(),
+                anyInt()
         )).thenReturn(vehiclePage);
 
         mockMvc.perform(get("/api/vehicles")
@@ -147,7 +148,8 @@ public class VehicleControllerTest {
                 any(),
                 anyInt(),
                 anyInt(),
-                any(Pageable.class)
+                anyInt(),
+                anyInt()
         );
     }
 
@@ -177,7 +179,8 @@ public class VehicleControllerTest {
                 any(),
                 anyInt(),
                 anyInt(),
-                any(Pageable.class)
+                anyInt(),
+                anyInt()
         )).thenReturn(vehiclePage);
 
         mockMvc.perform(get("/api/vehicles/images")
@@ -199,7 +202,8 @@ public class VehicleControllerTest {
                 any(),
                 anyInt(),
                 anyInt(),
-                any(Pageable.class)
+               anyInt(),
+               anyInt()
         );
     }
 

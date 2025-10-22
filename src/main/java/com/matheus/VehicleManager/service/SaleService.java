@@ -13,6 +13,8 @@ import com.matheus.VehicleManager.repository.VehicleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,20 +36,26 @@ public class SaleService {
     @Autowired
     private ClientRepository clientRepository;
 
+    @Cacheable(value = "sales_all", key = "#page + '-' + #size")
     public Page<Sale> findAll(int page, int size) {
         Pageable paging = PageRequest.of(page, size);
         return saleRepository.findAll(paging);
     }
 
+    @Cacheable(value = "sale_by_vehicle_id", key = "#vehicleId")
     public List<Sale> findAllByVehicleId(Long vehicleId) {
         return saleRepository.findByVehicleIdOrderByIdDesc(vehicleId);
     }
 
+    @Cacheable(value = "sale_by_id", key = "#saleId")
     public Sale findById(Long saleId) {
         return saleRepository.findById(saleId)
                 .orElseThrow(() -> new EntityNotFoundException("Sale with id " + saleId + " not found"));
     }
 
+    @CacheEvict(value = {
+        "sales_all", "sale_by_vehicle_id", "sale_by_id"
+    }, allEntries = true)
     @Transactional
     public Sale create(SaleRequestDTO saleRequestDTO) {
         Client client = clientRepository.findById(saleRequestDTO.getClient()).orElse(null);
@@ -68,6 +76,9 @@ public class SaleService {
         return saveSale(sale);
     }
 
+    @CacheEvict(value = {
+        "sales_all", "sale_by_vehicle_id", "sale_by_id"
+    }, allEntries = true)
     @Transactional
     public Sale update(Long saleId, SaleRequestDTO saleRequestDTO) {
         Map<String, String> errors = new HashMap<>();
