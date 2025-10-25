@@ -36,27 +36,25 @@ public class FinancingService {
     @Autowired
     private ClientRepository clientRepository;
 
-    @Cacheable(value = "financings_all", key = "#page + '-' + #size")
+    @Cacheable(value = "financings", key = "'page-' + #page + '-size-' + #size")
     public Page<Financing> getAll(int page, int size) {
         Pageable paging = PageRequest.of(page, size);
         return financingRepository.findAll(paging);
     }
 
-    @Cacheable(value = "financing_by_id", key = "#financingId")
+    @Cacheable(value = "financings", key = "'id-' + #financingId")
     public Financing getById(Long financingId) {
         return financingRepository.findById(financingId)
                 .orElseThrow(() -> new EntityNotFoundException("Financing with id " + financingId + " not found"));
     }
 
-    @Cacheable(value = "financing_by_vehicle_id", key = "#vehicleId")
+    @Cacheable(value = "financings", key = "'vehicle-' + #vehicleId")
     public Financing getByVehicleIdNotCanceled(Long vehicleId) {
         return financingRepository.findActiveByVehicleId(vehicleId)
                 .orElseThrow(() -> new EntityNotFoundException("Financing with vehicle id " + vehicleId + " not found"));
     }
 
-    @CacheEvict(value = {
-            "financings_all", "financing_by_id", "financing_by_vehicle_id"
-    }, allEntries = true)
+    @CacheEvict(value = "financings", allEntries = true)
     @Transactional
     public Financing create(FinancingRequestDTO financingRequestDTO) {
         Client client = clientRepository.findById(financingRequestDTO.getClient()).orElse(null);
@@ -87,9 +85,7 @@ public class FinancingService {
         return financingRepository.save(financing);
     }
 
-    @CacheEvict(value = {
-            "financings_all", "financing_by_id", "financing_by_vehicle_id"
-    }, allEntries = true)
+    @CacheEvict(value = "financings", allEntries = true)
     @Transactional
     public Financing update(Long financingId, FinancingRequestDTO financingRequestDTO) {
         Client client = clientRepository.findById(financingRequestDTO.getClient()).orElse(null);

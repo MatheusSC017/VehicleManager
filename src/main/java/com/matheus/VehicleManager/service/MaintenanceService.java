@@ -30,26 +30,24 @@ public class MaintenanceService {
     @Autowired
     private VehicleRepository vehicleRepository;
 
-    @Cacheable(value = "maintenances_all", key = "#page + '-' + #size")
+    @Cacheable(value = "maintenances", key = "'page-' + #page + '-size-' + #size")
     public Page<Maintenance> findAll(int page, int size) {
         Pageable paging = PageRequest.of(page, size);
         return maintenanceRepository.findAll(paging);
     }
 
-    @Cacheable(value = "maintenances_by_vehicle_id", key = "#vehicleId")
+    @Cacheable(value = "maintenances", key = "'vehicle-' + #vehicleId")
     public List<Maintenance> findAllByVehicleId(Long vehicleId) {
         return maintenanceRepository.findByVehicleIdOrderByIdDesc(vehicleId);
     }
 
-    @Cacheable(value = "maintenances_by_id", key = "#maintenanceId")
+    @Cacheable(value = "maintenances", key = "'id-' + #maintenanceId")
     public Maintenance findById(Long maintenanceId) {
         return maintenanceRepository.findById(maintenanceId)
                 .orElseThrow(() -> new EntityNotFoundException("Maintenance with id " + maintenanceId + " not found"));
     }
 
-    @CacheEvict(value = {
-            "maintenances_all", "maintenances_by_vehicle_id", "maintenances_by_id"
-    }, allEntries = true)
+    @CacheEvict(value = "maintenances", allEntries = true)
     @Transactional
     public Maintenance create(Long vehicleId, String additionalInfo) {
         Vehicle vehicle = vehicleRepository.findById(vehicleId).orElse(null);
@@ -69,9 +67,7 @@ public class MaintenanceService {
         return maintenanceRepository.save(maintenance);
     }
 
-    @CacheEvict(value = {
-            "maintenances_all", "maintenances_by_vehicle_id", "maintenances_by_id"
-    }, allEntries = true)
+    @CacheEvict(value = "maintenances", allEntries = true)
     @Transactional
     public void delete(Long maintenanceId) {
         Maintenance maintenance = maintenanceRepository.findById(maintenanceId)

@@ -19,46 +19,41 @@ public class ClientService {
     @Autowired
     private ClientRepository clientRepository;
 
-    @Cacheable(value = "clients_all", key = "#page + '-' + #size")
+    @Cacheable(value = "clients", key = "'page-' + #page + '-size-' + #size")
     public Page<Client> findAll(int page, int size) {
         Pageable paging = PageRequest.of(page, size);
         return clientRepository.findAll(paging);
     }
 
-    @Cacheable(value = "clients_search", key = "#query")
+    @Cacheable(value = "clients", key = "'query-' + #query")
     public List<Client> search(String query) {
         return clientRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCaseOrPhoneContaining(query, query, query);
     }
 
-    @Cacheable(value = "clients_by_email", key = "#email")
+    @Cacheable(value = "clients", key = "'email-' + #email")
     public Client findByEmail(String email) {
         return clientRepository.findByEmail(email)
                 .orElseThrow(() -> new EntityNotFoundException("Client with email " + email + " not found"));
     }
 
-    @Cacheable(value = "clients_by_id", key = "#clientId")
+    @Cacheable(value = "clients", key = "'id-' + #clientId")
     public Client getById(Long clientId) {
         return clientRepository.findById(clientId)
                 .orElseThrow(() -> new EntityNotFoundException("Client with id " + clientId + " not found"));
     }
 
-    @CacheEvict(value = {
-            "clients_all", "clients_search", "clients_by_email", "clients_by_id"
-    }, allEntries = true)
+    @CacheEvict(value = "clients", allEntries = true)
     public Client create(Client client) {
         return clientRepository.save(client);
     }
 
-    @CacheEvict(value = {
-            "clients_all", "clients_search", "clients_by_email", "clients_by_id"
-    }, allEntries = true)
+    @CacheEvict(value = "clients", allEntries = true)
+
     public Client update(Client client) {
         return clientRepository.save(client);
     }
 
-    @CacheEvict(value = {
-            "clients_all", "clients_search", "clients_by_email", "clients_by_id"
-    }, allEntries = true)
+    @CacheEvict(value = "clients", allEntries = true)
     public void delete(Long clientId) {
         Client client = clientRepository.findById(clientId)
                 .orElseThrow(() -> new EntityNotFoundException("Client with id " + clientId + " not found"));
